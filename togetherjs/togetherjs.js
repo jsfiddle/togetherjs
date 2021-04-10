@@ -669,8 +669,7 @@ function togetherjsMain() {
             tjsInstance.removeShortcut();
         }
     });
-    // It's nice to replace this early, before the load event fires, so we conflict
-    // as little as possible with the app we are embedded in:
+    // It's nice to replace this early, before the load event fires, so we conflict as little as possible with the app we are embedded in:
     const hash = location.hash.replace(/^#/, "");
     const m = /&?togetherjs=([^&]*)/.exec(hash);
     if (m) {
@@ -684,23 +683,6 @@ function togetherjsMain() {
         // FIXME: probably should remove, it's a wonky feature.
         tjsInstance.startup._joinShareId = window._TogetherJSShareId;
         delete window._TogetherJSShareId;
-    }
-    function conditionalActivate() {
-        if (window.TogetherJSConfig_noAutoStart) {
-            return;
-        }
-        // A page can define this function to defer TogetherJS from starting
-        let callToStart = window.TogetherJSConfig_callToStart;
-        if (window.TogetherJSConfig && window.TogetherJSConfig.callToStart) {
-            callToStart = window.TogetherJSConfig.callToStart;
-        }
-        if (callToStart) {
-            // FIXME: need to document this:
-            callToStart(onload);
-        }
-        else {
-            onload();
-        }
     }
     // FIXME: can we push this up before the load event?
     // Do we need to wait at all?
@@ -729,6 +711,23 @@ function togetherjsMain() {
                 tjsInstance.startup.reason = "joined";
                 TogetherJS.start();
             }
+        }
+    }
+    function conditionalActivate() {
+        if (window.TogetherJSConfig_noAutoStart) {
+            return;
+        }
+        // A page can define this function to defer TogetherJS from starting
+        let callToStart = window.TogetherJSConfig_callToStart;
+        if (window.TogetherJSConfig && window.TogetherJSConfig.callToStart) {
+            callToStart = window.TogetherJSConfig.callToStart;
+        }
+        if (callToStart) {
+            // FIXME: need to document this:
+            callToStart(onload);
+        }
+        else {
+            onload();
         }
     }
     conditionalActivate();
