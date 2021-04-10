@@ -3,24 +3,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-function clone<T>(o: T): T {
-    return extend(o as any) as unknown as T; // TODO all those casts!!!!!
-}
-
-/** Can also be used to clone an object */
-function extend(base: { [key: string]: unknown }, extensions?: any) {
-    if(!extensions) {
-        extensions = base;
-        base = {};
-    }
-    for(const a in extensions) {
-        if(Object.prototype.hasOwnProperty.call(extensions, a)) {
-            base[a] = extensions[a];
-        }
-    }
-    return base;
-}
-
 class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<void>}> {
     _knownEvents?: string[];
     _listeners: { [name: string]: TogetherJSNS.CallbackForOn<void>[] } = {};
@@ -332,7 +314,7 @@ function togetherjsMain() {
         private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
         private _startupInit: TogetherJSNS.Startup = defaultStartupInit;
-        public startup: TogetherJSNS.Startup = clone(this._startupInit);
+        public startup: TogetherJSNS.Startup = Object.assign({}, this._startupInit);
         public _configuration: Partial<TogetherJSNS.Config> = {};
         public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration;
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
@@ -465,7 +447,7 @@ function togetherjsMain() {
             if(minSetting !== undefined) {
                 min = !!minSetting;
             }
-            const requireConfig: RequireConfig = clone(this.requireConfig);
+            const requireConfig: RequireConfig = Object.assign({}, this.requireConfig);
             const deps = ["session", "jquery"];
             let lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
@@ -548,7 +530,7 @@ function togetherjsMain() {
                 delete requireObject.s.contexts.togetherjs;
             }
             this._loaded = false;
-            this.startup = clone(this._startupInit);
+            this.startup = Object.assign({}, this._startupInit);
             this.running = false;
         }
 

@@ -3,22 +3,6 @@
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-function clone(o) {
-    return extend(o); // TODO all those casts!!!!!
-}
-/** Can also be used to clone an object */
-function extend(base, extensions) {
-    if (!extensions) {
-        extensions = base;
-        base = {};
-    }
-    for (const a in extensions) {
-        if (Object.prototype.hasOwnProperty.call(extensions, a)) {
-            base[a] = extensions[a];
-        }
-    }
-    return base;
-}
 class OnClass {
     constructor() {
         this._listeners = {};
@@ -118,7 +102,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+let min = "no" == "__" + "min__" ? false : "no" == "yes";
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
@@ -189,8 +173,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
+    let cacheBust = "";
+    if ((!cacheBust) || cacheBust == "") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -308,7 +292,7 @@ function togetherjsMain() {
             this.hub = new OnClass();
             this.pageLoaded = Date.now();
             this._startupInit = defaultStartupInit;
-            this.startup = clone(this._startupInit);
+            this.startup = Object.assign({}, this._startupInit);
             this._configuration = {};
             this._defaultConfiguration = defaultConfiguration;
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
@@ -429,7 +413,7 @@ function togetherjsMain() {
             if (minSetting !== undefined) {
                 min = !!minSetting;
             }
-            const requireConfig = clone(this.requireConfig);
+            const requireConfig = Object.assign({}, this.requireConfig);
             const deps = ["session", "jquery"];
             let lang = this.getConfig("lang");
             // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
@@ -508,7 +492,7 @@ function togetherjsMain() {
                 delete requireObject.s.contexts.togetherjs;
             }
             this._loaded = false;
-            this.startup = clone(this._startupInit);
+            this.startup = Object.assign({}, this._startupInit);
             this.running = false;
         }
         toString() {
@@ -624,7 +608,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "__baseUrl__";
+        let baseUrl = "";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -751,7 +735,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "__hubUrl__";
+    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
