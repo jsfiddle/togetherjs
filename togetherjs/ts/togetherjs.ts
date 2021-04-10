@@ -163,6 +163,15 @@ class ConfigClass {
     }
 }
 
+    // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
+    function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
+        const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
+        config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
+        config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => void) => confObj.track(name, callback);
+        config.has = (name: string) => name in confObj;
+        return config;
+    }
+
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
@@ -236,15 +245,6 @@ function togetherjsMain() {
     }
     else {
         version = cacheBust;
-    }
-
-    // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
-    function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
-        const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
-        config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
-        config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => void) => confObj.track(name, callback);
-        config.has = (name: string) => name in confObj;
-        return config;
     }
 
     class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {

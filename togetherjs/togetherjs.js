@@ -151,6 +151,14 @@ class ConfigClass {
         return callback;
     }
 }
+// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
+function createConfigFunObj(confObj) {
+    const config = ((name, maybeValue) => confObj.call(name, maybeValue));
+    config.get = (name) => confObj.get(name);
+    config.track = (name, callback) => confObj.track(name, callback);
+    config.has = (name) => name in confObj;
+    return config;
+}
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
@@ -218,14 +226,6 @@ function togetherjsMain() {
     }
     else {
         version = cacheBust;
-    }
-    // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
-    function createConfigFunObj(confObj) {
-        const config = ((name, maybeValue) => confObj.call(name, maybeValue));
-        config.get = (name) => confObj.get(name);
-        config.track = (name, callback) => confObj.track(name, callback);
-        config.has = (name) => name in confObj;
-        return config;
     }
     class TogetherJSClass extends OnClass {
         constructor(requireConfig, version, baseUrl, configuration, startup) {
