@@ -171,6 +171,8 @@ function togetherjsMain() {
         fallbackLang: "en-US"
     };
 
+    const actualConfiguration = Object.assign({}, defaultConfiguration);
+
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
     let cacheBust = "__gitCommit__";
@@ -431,10 +433,10 @@ function togetherjsMain() {
                 }
             }
             if(min) {
-                addScriptInner("/togetherjsPackage.js");
+                addScript("/togetherjsPackage.js");
             }
             else {
-                addScriptInner("/libs/require.js");
+                addScript("/libs/require.js");
             }
         }
 
@@ -596,13 +598,13 @@ function togetherjsMain() {
         }
     }
 
-    function addScriptInner(url: string) {
+    function addScript(url: string) {
         const script = document.createElement("script");
         script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
 
-    defaultConfiguration.baseUrl = baseUrl;
+    actualConfiguration.baseUrl = baseUrl;
 
     const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride: TogetherJSNS.BaseUrlOverride | null;
@@ -625,7 +627,12 @@ function togetherjsMain() {
         }
     }
 
-    function copyConfigInWindow(configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null) {
+    // Need this for a typesafe copy of two field with the same key between two object of the same type
+    function copyWithSameKey<T, K extends keyof T>(key: K, readFrom: T, writeIn: T) {
+        writeIn[key] = readFrom[key];
+    }
+
+    function copyConfig(configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null, targetConfig: TogetherJSNS.Config) {
         const shownAny = false;
         for(const _attr in configOverride) {
             const attr = _attr as keyof typeof configOverride;
@@ -639,8 +646,7 @@ function togetherjsMain() {
                 console.warn("Using TogetherJS configOverride");
                 console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
             }
-            const k = `TogetherJSConfig_${attr}` as const;
-            (window as unknown as TogetherJSNS.TogetherJsConfigForWindow)[k] = configOverride[attr] as any; // TODO any
+            copyWithSameKey(attr, configOverride, targetConfig);
             console.log("Config override:", attr, "=", configOverride[attr]);
         }
     }
@@ -658,7 +664,7 @@ function togetherjsMain() {
             localStorage.removeItem("togetherjs.configOverride");
         }
         else {
-            copyConfigInWindow(configOverride);
+            copyConfig(configOverride, actualConfiguration);
         }
     }
 
@@ -705,9 +711,9 @@ function togetherjsMain() {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     }
-    defaultConfiguration.hubBase = defaultHubBase;
+    actualConfiguration.hubBase = defaultHubBase;
 
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, actualConfiguration, defaultStartupInit);
 
     window["TogetherJS"] = tjsInstance;
 

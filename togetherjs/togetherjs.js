@@ -157,6 +157,7 @@ function togetherjsMain() {
         lang: undefined,
         fallbackLang: "en-US"
     };
+    const actualConfiguration = Object.assign({}, defaultConfiguration);
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
     let cacheBust = "__gitCommit__";
@@ -395,10 +396,10 @@ function togetherjsMain() {
                 }
             }
             if (min) {
-                addScriptInner("/togetherjsPackage.js");
+                addScript("/togetherjsPackage.js");
             }
             else {
-                addScriptInner("/libs/require.js");
+                addScript("/libs/require.js");
             }
         }
         _teardown() {
@@ -542,12 +543,12 @@ function togetherjsMain() {
             document.head.appendChild(link);
         }
     }
-    function addScriptInner(url) {
+    function addScript(url) {
         const script = document.createElement("script");
         script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
         document.head.appendChild(script);
     }
-    defaultConfiguration.baseUrl = baseUrl;
+    actualConfiguration.baseUrl = baseUrl;
     const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride;
     if (baseUrlOverrideString) {
@@ -568,7 +569,11 @@ function togetherjsMain() {
             logger.call(console, "To undo run: localStorage.removeItem('togetherjs.baseUrlOverride')");
         }
     }
-    function copyConfigInWindow(configOverride) {
+    // Need this for a typesafe copy of two field with the same key between two object of the same type
+    function copyWithSameKey(key, readFrom, writeIn) {
+        writeIn[key] = readFrom[key];
+    }
+    function copyConfig(configOverride, targetConfig) {
         const shownAny = false;
         for (const _attr in configOverride) {
             const attr = _attr;
@@ -582,8 +587,7 @@ function togetherjsMain() {
                 console.warn("Using TogetherJS configOverride");
                 console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
             }
-            const k = `TogetherJSConfig_${attr}`;
-            window[k] = configOverride[attr]; // TODO any
+            copyWithSameKey(attr, configOverride, targetConfig);
             console.log("Config override:", attr, "=", configOverride[attr]);
         }
     }
@@ -600,7 +604,7 @@ function togetherjsMain() {
             localStorage.removeItem("togetherjs.configOverride");
         }
         else {
-            copyConfigInWindow(configOverride);
+            copyConfig(configOverride, actualConfiguration);
         }
     }
     if (!baseUrl) {
@@ -644,8 +648,8 @@ function togetherjsMain() {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     }
-    defaultConfiguration.hubBase = defaultHubBase;
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
+    actualConfiguration.hubBase = defaultHubBase;
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, actualConfiguration, defaultStartupInit);
     window["TogetherJS"] = tjsInstance;
     /* TogetherJS.config(configurationObject)
        or: TogetherJS.config(configName, value)
