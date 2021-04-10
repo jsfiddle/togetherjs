@@ -6,7 +6,6 @@ import type { linkify } from "linkify";
 import type { Analytics as AnalyticsType } from "../analytics";
 import type { WebSocketChannel as WebSocketChannelType } from "../channels";
 import type { Chat as ChatType } from "../chat";
-import type { Console as ConsoleType } from "../console";
 import type { ElementFinder as ElementFinderType } from "../elementFinder";
 import type { EventMaker as EventMakerType } from "../eventMaker";
 import type { TrackerClass as TrackerClassType } from "../forms";
@@ -589,7 +588,6 @@ declare global {
         type Chat = ChatType;
         type Ui = UiType;
         type Who = WhoType;
-        type Console = ConsoleType;
         type TogetherJSClass = ReturnType<typeof togetherjsMain>;
         type TogetherJS = ReturnType<typeof togetherjsMain>;
         type On<T extends { [messageName: string]: CallbackForOn<any>; }> = OnClass<T>;
