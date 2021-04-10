@@ -314,15 +314,6 @@ function togetherjsMain() {
             catch (e) {
                 console.warn("Error determining starting button:", e);
             }
-            if (window.TowTruckConfig) {
-                console.warn("TowTruckConfig is deprecated; please use TogetherJSConfig");
-                if (window.TogetherJSConfig) {
-                    console.warn("Ignoring TowTruckConfig in favor of TogetherJSConfig");
-                }
-                else {
-                    window.TogetherJSConfig = window.TowTruckConfig;
-                }
-            }
             if (window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
                 this.config(window.TogetherJSConfig);
                 window.TogetherJSConfig.loaded = true;
@@ -340,16 +331,6 @@ function togetherjsMain() {
                 }
                 else if (attr.indexOf("TogetherJSConfig_") === 0) {
                     attrName = attr.substr(("TogetherJSConfig_").length);
-                    this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
-                }
-                else if (attr.indexOf("TowTruckConfig_on_") === 0) {
-                    attrName = attr.substr(("TowTruckConfig_on_").length);
-                    console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_on_" + attrName);
-                    globalOns[attrName] = window[attr];
-                }
-                else if (attr.indexOf("TowTruckConfig_") === 0) {
-                    attrName = attr.substr(("TowTruckConfig_").length);
-                    console.warn("TowTruckConfig_* is deprecated, please rename", attr, "to TogetherJSConfig_" + attrName);
                     this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
                 }
             }
@@ -771,10 +752,6 @@ function togetherjsMain() {
         }
         // A page can define this function to defer TogetherJS from starting
         let callToStart = window.TogetherJSConfig_callToStart;
-        if (!callToStart && window.TowTruckConfig_callToStart) {
-            callToStart = window.TowTruckConfig_callToStart;
-            console.warn("Please rename TowTruckConfig_callToStart to TogetherJSConfig_callToStart");
-        }
         if (window.TogetherJSConfig && window.TogetherJSConfig.callToStart) {
             callToStart = window.TogetherJSConfig.callToStart;
         }
@@ -821,6 +798,5 @@ function togetherjsMain() {
         tjsInstance.listenForShortcut();
     }
     // For compatibility:
-    window.TowTruck = TogetherJS;
     return tjsInstance;
 }
