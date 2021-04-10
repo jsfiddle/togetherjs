@@ -3,6 +3,56 @@
 License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
+// True if this file should use minimized sub-resources:
+//@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
+// eslint-disable-next-line no-constant-condition
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+function addStyle(styleSheetUrl, baseUrl, cacheBust) {
+    const existing = document.getElementById("togetherjs-stylesheet");
+    if (!existing) {
+        const link = document.createElement("link");
+        link.id = "togetherjs-stylesheet";
+        link.setAttribute("rel", "stylesheet");
+        link.href = baseUrl + styleSheetUrl + (cacheBust ? ("?bust=" + cacheBust) : '');
+        document.head.appendChild(link);
+    }
+}
+function addScript(url, baseUrl, cacheBust) {
+    const script = document.createElement("script");
+    script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
+    document.head.appendChild(script);
+}
+function computeBaseUrl() {
+    let baseUrl = "__baseUrl__";
+    if (baseUrl == "__" + "baseUrl__") {
+        // Reset the variable if it doesn't get substituted
+        baseUrl = "";
+    }
+    // Allow override of baseUrl (this is done separately because it needs
+    // to be done very early)
+    if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
+        baseUrl = window.TogetherJSConfig.baseUrl;
+    }
+    if (window.TogetherJSConfig_baseUrl) {
+        baseUrl = window.TogetherJSConfig_baseUrl;
+    }
+    return baseUrl;
+}
+function computeCacheBust() {
+    let cacheBust = "__gitCommit__";
+    if (!cacheBust || cacheBust == "__" + "gitCommit__") {
+        cacheBust = Date.now().toString();
+    }
+    return cacheBust;
+}
+// FIXME: we could/should use a version from the checkout, at least for production
+function computeVersion() {
+    let version = "__gitCommit__";
+    if (!version || version == "__" + "gitCommit__") {
+        version = "unknown";
+    }
+    return version;
+}
 class OnClass {
     constructor() {
         this._listeners = {};
@@ -159,15 +209,301 @@ function createConfigFunObj(confObj) {
     config.has = (name) => name in confObj;
     return config;
 }
-// True if this file should use minimized sub-resources:
-//@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
-// eslint-disable-next-line no-constant-condition
-let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+class TogetherJSClass extends OnClass {
+    constructor(requireConfig, version, baseUrl, configuration, startup) {
+        super();
+        this.requireConfig = requireConfig;
+        this.version = version;
+        this.baseUrl = baseUrl;
+        this.startup = startup;
+        this.startupReason = null;
+        this.running = false;
+        this.require = null;
+        this.hub = new OnClass();
+        /** Time at which the page was loaded */
+        this.pageLoaded = Date.now();
+        this.editTrackers = {};
+        this.requireObject = null;
+        this.listener = null;
+        this.startupInit = Object.assign({}, startup);
+        this._knownEvents = ["ready", "close"];
+        this.configObject = new ConfigClass(configuration);
+        this.config = createConfigFunObj(this.configObject);
+        this.startup.button = null;
+    }
+    start(event) {
+        let cacheBust = computeCacheBust();
+        let session;
+        if (this.running && this.require != null) {
+            session = this.require("session").session;
+            session.close();
+            return;
+        }
+        try {
+            if (event && typeof event == "object") {
+                if ("target" in event && event.target && typeof event) {
+                    this.startup.button = event.target;
+                }
+                else if ("nodeType" in event && event.nodeType == 1) {
+                    this.startup.button = event;
+                }
+                else if (Array.isArray(event) && event[0] && event[0].nodeType == 1) {
+                    // TODO What?
+                    // Probably a jQuery element
+                    this.startup.button = event[0];
+                }
+            }
+        }
+        catch (e) {
+            console.warn("Error determining starting button:", e);
+        }
+        if (window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
+            this.config(window.TogetherJSConfig);
+            window.TogetherJSConfig.loaded = true;
+        }
+        // This handles loading configuration from global variables.  This includes TogetherJSConfig_on_*, which are attributes folded into the "on" configuration value.
+        let attr;
+        let attrName;
+        const globalOns = {};
+        for (attr in window) {
+            if (attr.indexOf("TogetherJSConfig_on_") === 0) {
+                attrName = attr.substr(("TogetherJSConfig_on_").length);
+                globalOns[attrName] = window[attr];
+            }
+            else if (attr.indexOf("TogetherJSConfig_") === 0) {
+                attrName = attr.substr(("TogetherJSConfig_").length);
+                this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
+            }
+        }
+        // FIXME: copy existing config?
+        // FIXME: do this directly in this.config() ?
+        // FIXME: close these configs?
+        const ons = this.config.get("on") || {};
+        for (attr in globalOns) {
+            if (Object.prototype.hasOwnProperty.call(globalOns, attr)) {
+                // FIXME: should we avoid overwriting?  Maybe use arrays?
+                ons[attr] = globalOns[attr];
+            }
+        }
+        this.config("on", ons);
+        for (attr in ons) {
+            this.on(attr, ons[attr]); // TODO check cast
+        }
+        const hubOns = this.config.get("hub_on");
+        if (hubOns) {
+            for (attr in hubOns) {
+                if (Object.prototype.hasOwnProperty.call(hubOns, attr)) {
+                    this.hub.on(attr, hubOns[attr]); // TODO check cast
+                }
+            }
+        }
+        if (!this.startup.reason) {
+            // Then a call to TogetherJS() from a button must be started TogetherJS
+            this.startup.reason = "started";
+        }
+        if (this.require) {
+            session = this.require("session").session;
+            addStyle("/togetherjs.css", this.baseUrl, cacheBust);
+            session.start();
+            return;
+        }
+        // A sort of signal to session.js to tell it to actually
+        // start itself (i.e., put up a UI and try to activate)
+        this.startup._launch = true;
+        addStyle("/togetherjs.css", this.baseUrl, cacheBust);
+        const minSetting = this.config.get("useMinimizedCode");
+        if (minSetting !== undefined) {
+            min = !!minSetting;
+        }
+        const requireConfig = Object.assign({}, this.requireConfig);
+        const deps = ["session", "jquery"];
+        let lang = this.getConfig("lang");
+        // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
+        const availableTranslations = {
+            "en-US": true,
+            "en": "en-US",
+            "es": "es-BO",
+            "es-BO": true,
+            "ru": true,
+            "ru-RU": "ru",
+            "pl": "pl-PL",
+            "pl-PL": true,
+            "de-DE": true,
+            "de": "de-DE"
+        };
+        if (!lang) {
+            // BCP 47 mandates hyphens, not underscores, to separate lang parts
+            lang = navigator.language.replace(/_/g, "-");
+        }
+        // TODO check if the updates of those conditions is right
+        // if(/-/.test(lang) && !availableTranslations[lang]) {
+        if (/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
+            lang = lang.replace(/-.*$/, '');
+        }
+        // if(!availableTranslations[lang]) {
+        if (!("lang" in availableTranslations) || !availableTranslations[lang]) {
+            lang = this.config.get("fallbackLang");
+        }
+        // else if(availableTranslations[lang] !== true) {
+        else if (availableTranslations[lang] !== true) {
+            lang = availableTranslations[lang];
+        }
+        this.config("lang", lang);
+        const localeTemplates = "templates-" + lang;
+        deps.splice(0, 0, localeTemplates);
+        const callback = ( /*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
+            if (!min) {
+                this.require = require.config({ context: "togetherjs" });
+                this.requireObject = require;
+            }
+        };
+        if (!min) {
+            if (typeof require == "function") {
+                if (!require.config) {
+                    console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
+                    throw new Error("Conflict with window.require");
+                }
+                this.require = require.config(requireConfig);
+            }
+        }
+        if (typeof this.require == "function") {
+            // This is an already-configured version of require
+            this.require(deps, callback);
+        }
+        else {
+            requireConfig.deps = deps;
+            requireConfig.callback = callback;
+            if (!min) {
+                // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/libs/require.js"); (see below) will be executed
+                //@ts-expect-error weird stuff
+                window.require = requireConfig;
+            }
+        }
+        if (min) {
+            addScript("/togetherjsPackage.js", this.baseUrl, cacheBust);
+        }
+        else {
+            addScript("/libs/require.js", this.baseUrl, cacheBust);
+        }
+    }
+    _teardown() {
+        const requireObject = this.requireObject || window.require;
+        // FIXME: this doesn't clear the context for min-case
+        if (requireObject.s && requireObject.s.contexts) {
+            delete requireObject.s.contexts.togetherjs;
+        }
+        this.startup = Object.assign({}, this.startupInit);
+        this.running = false;
+    }
+    toString() {
+        return "TogetherJS";
+    }
+    reinitialize() {
+        if (this.running && typeof this.require == "function") {
+            this.require(["session"], function ({ session }) {
+                session.emit("reinitialize");
+            });
+        }
+        // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
+    }
+    getConfig(name) {
+        return this.configObject.get(name);
+    }
+    refreshUserData() {
+        if (this.running && typeof this.require == "function") {
+            this.require(["session"], function ({ session }) {
+                session.emit("refresh-user-data");
+            });
+        }
+    }
+    _onmessage(msg) {
+        const type = msg.type;
+        let type2 = type;
+        if (type.search(/^app\./) === 0) {
+            type2 = type2.substr("app.".length);
+        }
+        else {
+            type2 = "togetherjs." + type2;
+        }
+        msg.type = type2; // TODO cast!!!
+        this.hub.emit(msg.type, msg); // TODO emit error
+    }
+    /** Use this method if you want you app to send custom messages */
+    send(msg) {
+        if (!this.require) {
+            throw "You cannot use TogetherJS.send() when TogetherJS is not running";
+        }
+        const session = this.require("session").session;
+        session.appSend(msg);
+    }
+    shareUrl() {
+        if (!this.require) {
+            return null;
+        }
+        const session = this.require("session").session;
+        return session.shareUrl();
+    }
+    listenForShortcut() {
+        const self = this;
+        console.warn("Listening for alt-T alt-T to start TogetherJS");
+        this.removeShortcut();
+        this.listener = function (event) {
+            if (event.which == 84 && event.altKey) {
+                if (this.pressed) {
+                    // Second hit
+                    self.start();
+                }
+                else {
+                    this.pressed = true;
+                }
+            }
+            else {
+                this.pressed = false;
+            }
+        };
+        this.once("ready", this.removeShortcut);
+        document.addEventListener("keyup", this.listener, false);
+    }
+    removeShortcut() {
+        if (this.listener) {
+            document.addEventListener("keyup", this.listener, false);
+            this.listener = null;
+        }
+    }
+    // TODO can peerCount (in the callback) really be undefined?
+    checkForUsersOnChannel(address, callback) {
+        if (address.search(/^https?:/i) === 0) {
+            address = address.replace(/^http/i, 'ws');
+        }
+        const socket = new WebSocket(address);
+        let gotAnswer = false;
+        socket.onmessage = function (event) {
+            const msg = JSON.parse(event.data);
+            if (msg.type != "init-connection") {
+                console.warn("Got unexpected first message (should be init-connection):", msg);
+                return;
+            }
+            if (gotAnswer) {
+                console.warn("Somehow received two responses from channel; ignoring second");
+                socket.close();
+                return;
+            }
+            gotAnswer = true;
+            socket.close();
+            callback(msg.peerCount);
+        };
+        socket.onclose = socket.onerror = function () {
+            if (!gotAnswer) {
+                console.warn("Socket was closed without receiving answer");
+                gotAnswer = true;
+                callback(undefined);
+            }
+        };
+    }
+}
 // eslint-disable-next-line no-var
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
-    const styleSheet = "/togetherjs.css";
-    let listener = null;
     const defaultStartupInit = {
         // What element, if any, was used to start the session:
         button: null,
@@ -218,336 +554,9 @@ function togetherjsMain() {
         fallbackLang: "en-US"
     };
     const actualConfiguration = Object.assign({}, defaultConfiguration);
-    let version = "unknown";
-    // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
-        cacheBust = Date.now() + "";
-    }
-    else {
-        version = cacheBust;
-    }
-    class TogetherJSClass extends OnClass {
-        constructor(requireConfig, version, baseUrl, configuration, startup) {
-            super();
-            this.requireConfig = requireConfig;
-            this.version = version;
-            this.baseUrl = baseUrl;
-            this.startup = startup;
-            this.startupReason = null;
-            this.running = false;
-            this.require = null;
-            this.hub = new OnClass();
-            /** Time at which the page was loaded */
-            this.pageLoaded = Date.now();
-            this.editTrackers = {};
-            this.requireObject = null;
-            this.startupInit = Object.assign({}, startup);
-            this._knownEvents = ["ready", "close"];
-            this.configObject = new ConfigClass(configuration);
-            this.config = createConfigFunObj(this.configObject);
-            this.startup.button = null;
-        }
-        start(event) {
-            let session;
-            if (this.running && this.require != null) {
-                session = this.require("session").session;
-                session.close();
-                return;
-            }
-            try {
-                if (event && typeof event == "object") {
-                    if ("target" in event && event.target && typeof event) {
-                        this.startup.button = event.target;
-                    }
-                    else if ("nodeType" in event && event.nodeType == 1) {
-                        this.startup.button = event;
-                    }
-                    else if (Array.isArray(event) && event[0] && event[0].nodeType == 1) {
-                        // TODO What?
-                        // Probably a jQuery element
-                        this.startup.button = event[0];
-                    }
-                }
-            }
-            catch (e) {
-                console.warn("Error determining starting button:", e);
-            }
-            if (window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
-                this.config(window.TogetherJSConfig);
-                window.TogetherJSConfig.loaded = true;
-            }
-            // This handles loading configuration from global variables.  This includes TogetherJSConfig_on_*, which are attributes folded into the "on" configuration value.
-            let attr;
-            let attrName;
-            const globalOns = {};
-            for (attr in window) {
-                if (attr.indexOf("TogetherJSConfig_on_") === 0) {
-                    attrName = attr.substr(("TogetherJSConfig_on_").length);
-                    globalOns[attrName] = window[attr];
-                }
-                else if (attr.indexOf("TogetherJSConfig_") === 0) {
-                    attrName = attr.substr(("TogetherJSConfig_").length);
-                    this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
-                }
-            }
-            // FIXME: copy existing config?
-            // FIXME: do this directly in this.config() ?
-            // FIXME: close these configs?
-            const ons = this.config.get("on") || {};
-            for (attr in globalOns) {
-                if (Object.prototype.hasOwnProperty.call(globalOns, attr)) {
-                    // FIXME: should we avoid overwriting?  Maybe use arrays?
-                    ons[attr] = globalOns[attr];
-                }
-            }
-            this.config("on", ons);
-            for (attr in ons) {
-                this.on(attr, ons[attr]); // TODO check cast
-            }
-            const hubOns = this.config.get("hub_on");
-            if (hubOns) {
-                for (attr in hubOns) {
-                    if (Object.prototype.hasOwnProperty.call(hubOns, attr)) {
-                        this.hub.on(attr, hubOns[attr]); // TODO check cast
-                    }
-                }
-            }
-            if (!this.startup.reason) {
-                // Then a call to TogetherJS() from a button must be started TogetherJS
-                this.startup.reason = "started";
-            }
-            if (this.require) {
-                session = this.require("session").session;
-                addStyle();
-                session.start();
-                return;
-            }
-            // A sort of signal to session.js to tell it to actually
-            // start itself (i.e., put up a UI and try to activate)
-            this.startup._launch = true;
-            addStyle();
-            const minSetting = this.config.get("useMinimizedCode");
-            if (minSetting !== undefined) {
-                min = !!minSetting;
-            }
-            const requireConfig = Object.assign({}, this.requireConfig);
-            const deps = ["session", "jquery"];
-            let lang = this.getConfig("lang");
-            // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-            const availableTranslations = {
-                "en-US": true,
-                "en": "en-US",
-                "es": "es-BO",
-                "es-BO": true,
-                "ru": true,
-                "ru-RU": "ru",
-                "pl": "pl-PL",
-                "pl-PL": true,
-                "de-DE": true,
-                "de": "de-DE"
-            };
-            if (!lang) {
-                // BCP 47 mandates hyphens, not underscores, to separate lang parts
-                lang = navigator.language.replace(/_/g, "-");
-            }
-            // TODO check if the updates of those conditions is right
-            // if(/-/.test(lang) && !availableTranslations[lang]) {
-            if (/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
-                lang = lang.replace(/-.*$/, '');
-            }
-            // if(!availableTranslations[lang]) {
-            if (!("lang" in availableTranslations) || !availableTranslations[lang]) {
-                lang = this.config.get("fallbackLang");
-            }
-            // else if(availableTranslations[lang] !== true) {
-            else if (availableTranslations[lang] !== true) {
-                lang = availableTranslations[lang];
-            }
-            this.config("lang", lang);
-            const localeTemplates = "templates-" + lang;
-            deps.splice(0, 0, localeTemplates);
-            const callback = ( /*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
-                if (!min) {
-                    this.require = require.config({ context: "togetherjs" });
-                    this.requireObject = require;
-                }
-            };
-            if (!min) {
-                if (typeof require == "function") {
-                    if (!require.config) {
-                        console.warn("The global require (", require, ") is not requirejs; please use togetherjs-min.js");
-                        throw new Error("Conflict with window.require");
-                    }
-                    this.require = require.config(requireConfig);
-                }
-            }
-            if (typeof this.require == "function") {
-                // This is an already-configured version of require
-                this.require(deps, callback);
-            }
-            else {
-                requireConfig.deps = deps;
-                requireConfig.callback = callback;
-                if (!min) {
-                    // TODO I really don't know what happens here... note that this is only executed if !min which means that at some point addScriptInner("/libs/require.js"); (see below) will be executed
-                    //@ts-expect-error weird stuff
-                    window.require = requireConfig;
-                }
-            }
-            if (min) {
-                addScript("/togetherjsPackage.js");
-            }
-            else {
-                addScript("/libs/require.js");
-            }
-        }
-        _teardown() {
-            const requireObject = this.requireObject || window.require;
-            // FIXME: this doesn't clear the context for min-case
-            if (requireObject.s && requireObject.s.contexts) {
-                delete requireObject.s.contexts.togetherjs;
-            }
-            this.startup = Object.assign({}, this.startupInit);
-            this.running = false;
-        }
-        toString() {
-            return "TogetherJS";
-        }
-        reinitialize() {
-            if (this.running && typeof this.require == "function") {
-                this.require(["session"], function ({ session }) {
-                    session.emit("reinitialize");
-                });
-            }
-            // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
-        }
-        getConfig(name) {
-            return this.configObject.get(name);
-        }
-        refreshUserData() {
-            if (this.running && typeof this.require == "function") {
-                this.require(["session"], function ({ session }) {
-                    session.emit("refresh-user-data");
-                });
-            }
-        }
-        _onmessage(msg) {
-            const type = msg.type;
-            let type2 = type;
-            if (type.search(/^app\./) === 0) {
-                type2 = type2.substr("app.".length);
-            }
-            else {
-                type2 = "togetherjs." + type2;
-            }
-            msg.type = type2; // TODO cast!!!
-            this.hub.emit(msg.type, msg); // TODO emit error
-        }
-        /** Use this method if you want you app to send custom messages */
-        send(msg) {
-            if (!this.require) {
-                throw "You cannot use TogetherJS.send() when TogetherJS is not running";
-            }
-            const session = this.require("session").session;
-            session.appSend(msg);
-        }
-        shareUrl() {
-            if (!this.require) {
-                return null;
-            }
-            const session = this.require("session").session;
-            return session.shareUrl();
-        }
-        listenForShortcut() {
-            console.warn("Listening for alt-T alt-T to start TogetherJS");
-            this.removeShortcut();
-            listener = function (event) {
-                if (event.which == 84 && event.altKey) {
-                    if (this.pressed) {
-                        // Second hit
-                        TogetherJS.start();
-                    }
-                    else {
-                        this.pressed = true;
-                    }
-                }
-                else {
-                    this.pressed = false;
-                }
-            };
-            this.once("ready", this.removeShortcut);
-            document.addEventListener("keyup", listener, false);
-        }
-        removeShortcut() {
-            if (listener) {
-                document.addEventListener("keyup", listener, false);
-                listener = null;
-            }
-        }
-        // TODO can peerCount (in the callback) really be undefined?
-        checkForUsersOnChannel(address, callback) {
-            if (address.search(/^https?:/i) === 0) {
-                address = address.replace(/^http/i, 'ws');
-            }
-            const socket = new WebSocket(address);
-            let gotAnswer = false;
-            socket.onmessage = function (event) {
-                const msg = JSON.parse(event.data);
-                if (msg.type != "init-connection") {
-                    console.warn("Got unexpected first message (should be init-connection):", msg);
-                    return;
-                }
-                if (gotAnswer) {
-                    console.warn("Somehow received two responses from channel; ignoring second");
-                    socket.close();
-                    return;
-                }
-                gotAnswer = true;
-                socket.close();
-                callback(msg.peerCount);
-            };
-            socket.onclose = socket.onerror = function () {
-                if (!gotAnswer) {
-                    console.warn("Socket was closed without receiving answer");
-                    gotAnswer = true;
-                    callback(undefined);
-                }
-            };
-        }
-    }
-    function baseUrl1Inner() {
-        let baseUrl = "__baseUrl__";
-        if (baseUrl == "__" + "baseUrl__") {
-            // Reset the variable if it doesn't get substituted
-            baseUrl = "";
-        }
-        // Allow override of baseUrl (this is done separately because it needs
-        // to be done very early)
-        if (window.TogetherJSConfig && window.TogetherJSConfig.baseUrl) {
-            baseUrl = window.TogetherJSConfig.baseUrl;
-        }
-        if (window.TogetherJSConfig_baseUrl) {
-            baseUrl = window.TogetherJSConfig_baseUrl;
-        }
-        return baseUrl;
-    }
-    let baseUrl = baseUrl1Inner();
-    function addStyle() {
-        const existing = document.getElementById("togetherjs-stylesheet");
-        if (!existing) {
-            const link = document.createElement("link");
-            link.id = "togetherjs-stylesheet";
-            link.setAttribute("rel", "stylesheet");
-            link.href = baseUrl + styleSheet + (cacheBust ? ("?bust=" + cacheBust) : '');
-            document.head.appendChild(link);
-        }
-    }
-    function addScript(url) {
-        const script = document.createElement("script");
-        script.src = baseUrl + url + (cacheBust ? ("?bust=" + cacheBust) : '');
-        document.head.appendChild(script);
-    }
+    const cacheBust = computeCacheBust();
+    const version = computeVersion();
+    let baseUrl = computeBaseUrl();
     actualConfiguration.baseUrl = baseUrl;
     const baseUrlOverrideString = localStorage.getItem("togetherjs.baseUrlOverride");
     let baseUrlOverride;
