@@ -1079,7 +1079,6 @@ declare global {
         (moduleName: "analytics"): typeof import("analytics");
         (moduleName: "channels"): typeof import("channels");
         (moduleName: "chat"): typeof import("chat");
-        (moduleName: "console"): typeof import("console");
         (moduleName: "cursor"): typeof import("cursor");
         (moduleName: "elementFinder"): typeof import("elementFinder");
         (moduleName: "eventMaker"): typeof import("eventMaker");
@@ -1114,7 +1113,6 @@ declare global {
         (moduleName: ["analytics"], ready: (module: typeof import("analytics")) => void): void;
         (moduleName: ["channels"], ready: (module: typeof import("channels")) => void): void;
         (moduleName: ["chat"], ready: (module: typeof import("chat")) => void): void;
-        (moduleName: ["console"], ready: (module: typeof import("console")) => void): void;
         (moduleName: ["cursor"], ready: (module: typeof import("cursor")) => void): void;
         (moduleName: ["elementFinder"], ready: (module: typeof import("elementFinder")) => void): void;
         (moduleName: ["eventMaker"], ready: (module: typeof import("eventMaker")) => void): void;
