@@ -35,20 +35,19 @@ export class Console {
     public debug: LogFunction = logFunction("debug", Console.levels["debug"]);
     public log: LogFunction = logFunction("log", Console.levels["log"]);
     public info: LogFunction = logFunction("info", Console.levels["info"]);
-    public notify: LogFunction = logFunction("notify", Console.levels["notify"]);
+    public notify: LogFunction = logFunction("notify", Console.levels["info"]); // fake
     public warn: LogFunction = logFunction("warn", Console.levels["warn"]);
     public error: LogFunction = logFunction("error", Console.levels["error"]);
-    public fatal: LogFunction = logFunction("fatal", Console.levels["fatal"]);
+    public fatal: LogFunction = logFunction("error", Console.levels["error"]); // fake
 
     private consoleLevels: LogFunction[] = [
-        [],
-        "debug" in console ? console.debug : [],
-        "log" in console ? console.log : [],
-        "info" in console ? console.info : [],
-        "notify" in console ? (console as any).notify : [], // TODO remove
-        "warn" in console ? console.warn : [],
-        "error" in console ? console.error : [],
-        "fatal" in console ? (console as any).fatal : [] // TODO remove
+        console.debug,
+        console.log,
+        console.info,
+        console.info, //notify,
+        console.warn,
+        console.error,
+        console.error //fatal,
     ];
 
     constructor() {

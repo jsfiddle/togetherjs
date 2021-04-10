@@ -17,19 +17,18 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.debug = logFunction("debug", Console.levels["debug"]);
             this.log = logFunction("log", Console.levels["log"]);
             this.info = logFunction("info", Console.levels["info"]);
-            this.notify = logFunction("notify", Console.levels["notify"]);
+            this.notify = logFunction("notify", Console.levels["info"]); // fake
             this.warn = logFunction("warn", Console.levels["warn"]);
             this.error = logFunction("error", Console.levels["error"]);
-            this.fatal = logFunction("fatal", Console.levels["fatal"]);
+            this.fatal = logFunction("error", Console.levels["error"]); // fake
             this.consoleLevels = [
-                [],
-                "debug" in console ? console.debug : [],
-                "log" in console ? console.log : [],
-                "info" in console ? console.info : [],
-                "notify" in console ? console.notify : [],
-                "warn" in console ? console.warn : [],
-                "error" in console ? console.error : [],
-                "fatal" in console ? console.fatal : [] // TODO remove
+                console.debug,
+                console.log,
+                console.info,
+                console.info,
+                console.warn,
+                console.error,
+                console.error //fatal,
             ];
             util_1.util.forEachAttr(Console.levels, (value) => {
                 this.maxLevel = Math.max(this.maxLevel, value);
