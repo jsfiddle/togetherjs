@@ -1184,23 +1184,6 @@ export class Ui {
         }).change(function() {
             updateShareLink();
         });
-        // TODO qw this do not work, remove?
-        container.find("a.togetherjs-share-link").click(function(this: HTMLElement) {
-            // FIXME: this is currently opening up Bluetooth, not sharing a link
-            if(false && window.MozActivity) {
-                //@ts-expect-error unused
-                const activity = new MozActivity({
-                    name: "share",
-                    data: {
-                        type: "url",
-                        url: $(this).attr("href")
-                    }
-                });
-            }
-            // FIXME: should show some help if you actually try to follow the link
-            // like this, instead of simply suppressing it
-            return false;
-        });
         updateShareLink();
     }
 
