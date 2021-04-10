@@ -118,7 +118,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
@@ -133,7 +133,7 @@ function togetherjsMain() {
             console.log = function () { };
         }
         ["debug", "info", "warn", "error"].forEach(function (method) {
-            if (!console[method]) {
+            if (!("method" in console)) {
                 console[method] = console.log;
             }
         });
@@ -189,8 +189,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -624,7 +624,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -691,7 +691,8 @@ function togetherjsMain() {
                 console.warn("Using TogetherJS configOverride");
                 console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
             }
-            window["TogetherJSConfig_" + attr] = configOverride[attr];
+            const k = `TogetherJSConfig_${attr}`;
+            window[k] = configOverride[attr]; // TODO any
             console.log("Config override:", attr, "=", configOverride[attr]);
         }
     }
@@ -750,7 +751,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";

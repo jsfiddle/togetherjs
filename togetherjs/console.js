@@ -29,7 +29,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
                 "notify" in console ? console.notify : [],
                 "warn" in console ? console.warn : [],
                 "error" in console ? console.error : [],
-                "fatal" in console ? console.fatal : []
+                "fatal" in console ? console.fatal : [] // TODO remove
             ];
             util_1.util.forEachAttr(Console.levels, (value) => {
                 this.maxLevel = Math.max(this.maxLevel, value);

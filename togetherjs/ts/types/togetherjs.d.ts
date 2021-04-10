@@ -1001,11 +1001,15 @@ declare global {
         }
 
 
-    interface MediaConstraintsMandatory {
-        OfferToReceiveAudio: boolean,
-        OfferToReceiveVideo: boolean,
-        MozDontOfferDataChannel?: boolean,
-    }
+        interface MediaConstraintsMandatory {
+            OfferToReceiveAudio: boolean,
+            OfferToReceiveVideo: boolean,
+            MozDontOfferDataChannel?: boolean,
+        }
+
+        type TogetherJsConfigForWindow = {
+            [P in keyof TogetherJSNS.Config as `TogetherJSConfig_${P}`]: TogetherJSNS.Config[P] | undefined
+        }
     }
 
     interface EventHtmlElement extends Event {

@@ -45,10 +45,10 @@ export class Console {
         "debug" in console ? console.debug : [],
         "log" in console ? console.log : [],
         "info" in console ? console.info : [],
-        "notify" in console ? (console as any).notify : [],
+        "notify" in console ? (console as any).notify : [], // TODO remove
         "warn" in console ? console.warn : [],
         "error" in console ? console.error : [],
-        "fatal" in console ? (console as any).fatal : []
+        "fatal" in console ? (console as any).fatal : [] // TODO remove
     ];
 
     constructor() {

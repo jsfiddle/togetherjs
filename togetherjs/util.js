@@ -136,7 +136,8 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                     deferred.reject(e);
                     throw e;
                 }
-                if (result && result.then) {
+                // in operator only works on objects
+                if (result && typeof (result) == "object" && "then" in result) {
                     result.then(function () {
                         deferred.resolveWith(this, args);
                     }, function () {

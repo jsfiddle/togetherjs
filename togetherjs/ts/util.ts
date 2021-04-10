@@ -150,7 +150,8 @@ export class Util {
                 deferred.reject(e);
                 throw e;
             }
-            if(result && result.then) {
+            // in operator only works on objects
+            if(result && typeof(result) == "object" && "then" in result) {
                 result.then(function(this: This) {
                     deferred.resolveWith(this, args);
                 }, function(this: This) {

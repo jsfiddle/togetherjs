@@ -121,7 +121,7 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<voi
         }
     }
 
-    forProtocol<Map2 extends {[messageName: string]: any}>() {
+    forProtocol<Map2 extends {[messageName: string]: unknown}>() {
         return this as unknown as OnClass<{[M in keyof Map2]: (msg: Map2[M]) => void}>; // TODO cast
     }
 }
@@ -147,7 +147,7 @@ function togetherjsMain() {
             console.log = function() { /* No real fallback here so we just do nothing */ };
         }
         ["debug", "info", "warn", "error"].forEach(function(method) {
-            if(!(console as any)[method]) {
+            if(!("method" in console)) {
                 (console as any)[method] = console.log;
             }
         });
@@ -751,7 +751,8 @@ function togetherjsMain() {
                 console.warn("Using TogetherJS configOverride");
                 console.warn("To undo run: localStorage.removeItem('togetherjs.configOverride')");
             }
-            (window as any)["TogetherJSConfig_" + attr] = configOverride[attr];
+            const k = `TogetherJSConfig_${attr}` as const;
+            (window as unknown as TogetherJSNS.TogetherJsConfigForWindow)[k] = configOverride[attr] as any; // TODO any
             console.log("Config override:", attr, "=", configOverride[attr]);
         }
     }

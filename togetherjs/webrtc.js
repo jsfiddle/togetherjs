@@ -13,8 +13,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
     const assert = util_1.util.assert.bind(util_1.util);
     session_1.session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
     if (session_1.session.RTCSupported && jquery_1.default.browser.mozilla && parseInt(jquery_1.default.browser.version, 10) <= 19) {
-        // In a few versions of Firefox (18 and 19) these APIs are present but
-        // not actually usable
+        // In a few versions of Firefox (18 and 19) these APIs are present but not actually usable
         // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
         // Because they could be pref'd on we'll do a quick check:
         try {
