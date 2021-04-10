@@ -245,11 +245,11 @@ function togetherjsMain() {
     class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         public startupReason: TogetherJSNS.Reason | null = null;
         public running = false;
-        public require: Require | null = null; // TODO !
+        public require: Require | null = null;
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
-        private _requireObject!: Require; // TODO !
+        private requireObject: Require | null = null;
         public pageLoaded: number = Date.now();
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
@@ -404,7 +404,7 @@ function togetherjsMain() {
             const callback = (/*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
                 if(!min) {
                     this.require = require.config({ context: "togetherjs" });
-                    this._requireObject = require;
+                    this.requireObject = require;
                 }
             }
             if(!min) {
@@ -438,7 +438,7 @@ function togetherjsMain() {
         }
 
         _teardown() {
-            const requireObject = this._requireObject || window.require;
+            const requireObject = this.requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
             if(requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;

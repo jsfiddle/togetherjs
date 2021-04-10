@@ -234,9 +234,10 @@ function togetherjsMain() {
             this.startup = startup;
             this.startupReason = null;
             this.running = false;
-            this.require = null; // TODO !
+            this.require = null;
             this.configObject = new ConfigClass(this);
             this.hub = new OnClass();
+            this.requireObject = null;
             this.pageLoaded = Date.now();
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             this._configTrackers = {};
@@ -368,10 +369,9 @@ function togetherjsMain() {
             const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
             const callback = ( /*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
-                this._loaded = true;
                 if (!min) {
                     this.require = require.config({ context: "togetherjs" });
-                    this._requireObject = require;
+                    this.requireObject = require;
                 }
             };
             if (!min) {
@@ -404,12 +404,11 @@ function togetherjsMain() {
             }
         }
         _teardown() {
-            const requireObject = this._requireObject || window.require;
+            const requireObject = this.requireObject || window.require;
             // FIXME: this doesn't clear the context for min-case
             if (requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
             }
-            this._loaded = false;
             this.startup = Object.assign({}, this._startupInit);
             this.running = false;
         }
