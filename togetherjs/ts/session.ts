@@ -29,7 +29,6 @@ let channel: TogetherJSNS.WebSocketChannel | null = null;
  * URLs
  */
 const includeHashInUrl = TogetherJS.config.get("includeHashInUrl");
-TogetherJS.config.close("includeHashInUrl");
 let currentUrl = (location.href + "").replace(/#.*$/, "");
 if(includeHashInUrl) {
     currentUrl = location.href;
@@ -73,7 +72,6 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     hubUrl(id: string | null = null) {
         id = id || this.shareId;
         assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
-        TogetherJS.config.close("hubBase");
         const hubBase = TogetherJS.config.get("hubBase");
         assert(hubBase != null);
         return hubBase.replace(/\/*$/, "") + "/hub/" + id;
@@ -201,7 +199,6 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
                                 startup.start();
                             });
                             ui.activateUI();
-                            TogetherJS.config.close("enableAnalytics");
                             if(TogetherJS.config.get("enableAnalytics")) {
                                 require(["analytics"], function({ analytics }) {
                                     analytics.activate();
@@ -414,7 +411,6 @@ function initShareId() {
         }
         return storage.tab.get("status").then(function(saved) {
             const findRoom = TogetherJS.config.get("findRoom");
-            TogetherJS.config.close("findRoom");
             if(findRoom && saved && findRoom != saved.shareId) {
                 console.info("Ignoring findRoom in lieu of continued session");
             }

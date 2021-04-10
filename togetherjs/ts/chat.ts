@@ -312,7 +312,7 @@ class Commands {
             });
             return;
         }
-        if(!Object.prototype.hasOwnProperty.call(TogetherJS._defaultConfiguration, variable)) {
+        if(!Object.prototype.hasOwnProperty.call(TogetherJS.configuration, variable)) {
             ui.chat.system({
                 text: "Warning: variable " + variable + " is unknown"
             });

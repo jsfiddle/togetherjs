@@ -842,7 +842,6 @@ declare global {
             <K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
             (configOrAttributeName: Config | string, attributeValue?: keyof Config): void;
             get<K extends keyof Config>(name: K): Config[K];
-            close<K extends keyof Config>(thing: K): Partial<Config>[K];
             track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => void): (value: Config[K], previous?: Config[K]) => void;
         }
 

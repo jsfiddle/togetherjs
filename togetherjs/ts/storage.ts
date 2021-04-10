@@ -157,7 +157,6 @@ export class TJSStorageWithTab extends TJSStorage {
 }
 
 const namePrefix = TogetherJS.config.get("storagePrefix");
-TogetherJS.config.close("storagePrefix");
 
 const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
 export const storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);

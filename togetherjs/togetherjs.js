@@ -102,7 +102,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+let min = "no" == "__" + "min__" ? false : "no" == "yes";
 // eslint-disable-next-line no-var
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
@@ -159,8 +159,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "__gitCommit__";
-    if ((!cacheBust) || cacheBust == "__gitCommit__") {
+    let cacheBust = "";
+    if ((!cacheBust) || cacheBust == "") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -169,82 +169,44 @@ function togetherjsMain() {
     class ConfigClass {
         constructor(tjsInstance) {
             this.tjsInstance = tjsInstance;
-            this._configClosed = {};
         }
         call(name, maybeValue) {
             var _a;
-            let settings;
-            if (maybeValue === undefined) {
-                if (typeof name != "object") {
-                    throw new Error('TogetherJS.config(value) must have an object value (not: ' + name + ')');
-                }
-                settings = name;
+            if (name == "loaded" || name == "callToStart") {
+                console.error("Cannot change loaded or callToStart values");
+                return;
             }
-            else {
-                settings = {};
-                settings[name] = maybeValue;
-            }
-            let tracker;
-            let attr;
-            for (attr in settings) {
-                if (Object.prototype.hasOwnProperty.call(settings, attr)) {
-                    if (this._configClosed[attr] && this.tjsInstance.running) {
-                        throw new Error("The configuration " + attr + " is finalized and cannot be changed");
-                    }
+            const previous = this.tjsInstance.configuration[name];
+            const value = maybeValue;
+            this.tjsInstance.configuration[name] = value; // TODO any, how to remove this any
+            const trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
+            let failed = false;
+            for (let i = 0; i < trackers.length; i++) {
+                try {
+                    trackers[i](value, previous);
+                }
+                catch (e) {
+                    console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
+                    failed = true;
+                    break;
                 }
             }
-            for (attr in settings) {
-                if (!Object.prototype.hasOwnProperty.call(settings, attr)) {
-                    continue;
-                }
-                if (attr == "loaded" || attr == "callToStart") {
-                    continue;
-                }
-                if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, attr)) {
-                    console.warn("Unknown configuration value passed to TogetherJS.config():", attr);
-                }
-                const previous = this.tjsInstance._configuration[attr];
-                const value = settings[attr];
-                this.tjsInstance._configuration[attr] = value; // TODO any, how to remove this any
-                const trackers = (_a = this.tjsInstance._configTrackers[name]) !== null && _a !== void 0 ? _a : [];
-                let failed = false;
+            if (failed) {
+                this.tjsInstance.configuration[name] = previous; // TODO any, how to remove this any?
                 for (let i = 0; i < trackers.length; i++) {
                     try {
-                        tracker = trackers[i];
-                        tracker(value, previous);
+                        trackers[i](value);
                     }
                     catch (e) {
-                        console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
-                        failed = true;
-                        break;
-                    }
-                }
-                if (failed) {
-                    this.tjsInstance._configuration[attr] = previous; // TODO any, how to remove this any?
-                    for (let i = 0; i < trackers.length; i++) {
-                        try {
-                            tracker = trackers[i];
-                            tracker(value);
-                        }
-                        catch (e) {
-                            console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
-                        }
+                        console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
                     }
                 }
             }
-        }
-        // We need this for this weird reason: https://github.com/microsoft/TypeScript/issues/31675
-        getValueOrDefault(obj, key, defaultValue) {
-            var _a;
-            return (_a = obj[key]) !== null && _a !== void 0 ? _a : defaultValue;
         }
         get(name) {
-            return this.getValueOrDefault(this.tjsInstance._configuration, name, this.tjsInstance._defaultConfiguration[name]);
+            return this.tjsInstance.configuration[name];
         }
         track(name, callback) {
-            if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
-                throw new Error("Configuration is unknown: " + name);
-            }
             const v = this.tjsInstance.config.get(name);
             callback(v);
             if (!this.tjsInstance._configTrackers[name]) {
@@ -254,28 +216,21 @@ function togetherjsMain() {
             this.tjsInstance._configTrackers[name].push(callback); // TODO ! and any cast
             return callback;
         }
-        close(name) {
-            if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
-                throw new Error("Configuration is unknown: " + name);
-            }
-            this._configClosed[name] = true;
-            return this.get(name);
-        }
     }
     // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
     function createConfigFunObj(confObj) {
         const config = ((name, maybeValue) => confObj.call(name, maybeValue));
         config.get = (name) => confObj.get(name);
-        config.close = (name) => confObj.close(name);
         config.track = (name, callback) => confObj.track(name, callback);
         return config;
     }
     class TogetherJSClass extends OnClass {
-        constructor(requireConfig, version, baseUrl) {
+        constructor(requireConfig, version, baseUrl, configuration) {
             super();
             this.requireConfig = requireConfig;
             this.version = version;
             this.baseUrl = baseUrl;
+            this.configuration = configuration;
             this.startupReason = null;
             this.running = false;
             this.configObject = new ConfigClass(this);
@@ -283,8 +238,6 @@ function togetherjsMain() {
             this.pageLoaded = Date.now();
             this._startupInit = defaultStartupInit;
             this.startup = Object.assign({}, this._startupInit);
-            this._configuration = {};
-            this._defaultConfiguration = defaultConfiguration;
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             this._configTrackers = {};
             this.editTrackers = {};
@@ -359,10 +312,6 @@ function togetherjsMain() {
                     }
                 }
             }
-            if (!this.config.close('cacheBust')) {
-                cacheBust = '';
-                delete this.requireConfig.urlArgs;
-            }
             if (!this.startup.reason) {
                 // Then a call to TogetherJS() from a button must be started TogetherJS
                 this.startup.reason = "started";
@@ -379,7 +328,6 @@ function togetherjsMain() {
             this.startup._launch = true;
             addStyle();
             const minSetting = this.config.get("useMinimizedCode");
-            this.config.close("useMinimizedCode");
             if (minSetting !== undefined) {
                 min = !!minSetting;
             }
@@ -477,14 +425,7 @@ function togetherjsMain() {
             // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
         }
         getConfig(name) {
-            let value = this._configuration[name];
-            if (value === undefined) {
-                if (!Object.prototype.hasOwnProperty.call(this._defaultConfiguration, name)) {
-                    console.error("Tried to load unknown configuration value:", name);
-                }
-                value = this._defaultConfiguration[name];
-            }
-            return value;
+            return this.configuration[name];
         }
         refreshUserData() {
             if (this.running && typeof this.require == "function") {
@@ -578,7 +519,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "__baseUrl__";
+        let baseUrl = "";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -702,16 +643,14 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl);
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration);
     window["TogetherJS"] = tjsInstance;
-    let defaultHubBase = "__hubUrl__";
+    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     }
     defaultConfiguration.hubBase = defaultHubBase;
-    // FIXME: there's a point at which configuration can't be updated (e.g., hubBase after the TogetherJS has loaded).  We should keep track of these and signal an error if someone attempts to reconfigure too late
-    tjsInstance._defaultConfiguration = defaultConfiguration;
     /* TogetherJS.config(configurationObject)
        or: TogetherJS.config(configName, value)
   
@@ -720,7 +659,6 @@ function togetherjsMain() {
   
        Unknown configuration values will lead to console error messages.
        */
-    //Config !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // This should contain the output of "git describe --always --dirty"
     // FIXME: substitute this on the server (and update make-static-client)
     tjsInstance.config.track("enableShortcut", function (enable, previous) {

@@ -140,7 +140,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     }
     exports.TJSStorageWithTab = TJSStorageWithTab;
     const namePrefix = TogetherJS.config.get("storagePrefix");
-    TogetherJS.config.close("storagePrefix");
     const tab = new TJSStorage('sessionStorage', sessionStorage, namePrefix + "-session.");
     exports.storage = new TJSStorageWithTab('localStorage', localStorage, namePrefix + ".", tab);
 });

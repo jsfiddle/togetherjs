@@ -60,7 +60,6 @@ class Handlers {
             next();
             return;
         }
-        TogetherJS.config.close("suppressJoinConfirmation");
         if(TogetherJS.config.get("suppressJoinConfirmation")) {
             next();
             return;
@@ -96,7 +95,6 @@ class Handlers {
     }
 
     share(next: StepHandler) {
-        TogetherJS.config.close("suppressInvite");
         if(session.isClient || (!session.firstRun) ||
             TogetherJS.config.get("suppressInvite")) {
             next();

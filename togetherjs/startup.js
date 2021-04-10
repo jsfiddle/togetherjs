@@ -55,7 +55,6 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                 next();
                 return;
             }
-            TogetherJS.config.close("suppressJoinConfirmation");
             if (TogetherJS.config.get("suppressJoinConfirmation")) {
                 next();
                 return;
@@ -89,7 +88,6 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
             });
         }
         share(next) {
-            TogetherJS.config.close("suppressInvite");
             if (session.isClient || (!session.firstRun) ||
                 TogetherJS.config.get("suppressInvite")) {
                 next();

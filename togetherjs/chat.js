@@ -291,7 +291,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 });
                 return;
             }
-            if (!Object.prototype.hasOwnProperty.call(TogetherJS._defaultConfiguration, variable)) {
+            if (!Object.prototype.hasOwnProperty.call(TogetherJS.configuration, variable)) {
                 ui_1.ui.chat.system({
                     text: "Warning: variable " + variable + " is unknown"
                 });
