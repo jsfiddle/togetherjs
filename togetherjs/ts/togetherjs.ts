@@ -245,11 +245,10 @@ function togetherjsMain() {
     class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         public startupReason: TogetherJSNS.Reason | null = null;
         public running = false;
-        public require!: Require; // TODO !
+        public require: Require | null = null; // TODO !
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
-        private _loaded?: boolean;
         private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
@@ -275,7 +274,7 @@ function togetherjsMain() {
 
         start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
             let session;
-            if(this.running) {
+            if(this.running && this.require != null) {
                 session = this.require("session").session;
                 session.close();
                 return;
@@ -348,8 +347,7 @@ function togetherjsMain() {
                 this.startup.reason = "started";
             }
 
-            // FIXME: maybe I should just test for this.require:
-            if(this._loaded) {
+            if(this.require) {
                 session = this.require("session").session;
                 addStyle();
                 session.start();
@@ -404,7 +402,6 @@ function togetherjsMain() {
             const localeTemplates = "templates-" + lang;
             deps.splice(0, 0, localeTemplates);
             const callback = (/*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
-                this._loaded = true;
                 if(!min) {
                     this.require = require.config({ context: "togetherjs" });
                     this._requireObject = require;
@@ -446,7 +443,6 @@ function togetherjsMain() {
             if(requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
             }
-            this._loaded = false;
             this.startup = Object.assign({}, this._startupInit);
             this.running = false;
         }

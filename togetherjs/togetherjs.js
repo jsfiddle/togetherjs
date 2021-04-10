@@ -102,7 +102,7 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 // eslint-disable-next-line no-var
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
@@ -159,8 +159,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -234,6 +234,7 @@ function togetherjsMain() {
             this.startup = startup;
             this.startupReason = null;
             this.running = false;
+            this.require = null; // TODO !
             this.configObject = new ConfigClass(this);
             this.hub = new OnClass();
             this.pageLoaded = Date.now();
@@ -247,7 +248,7 @@ function togetherjsMain() {
         }
         start(event) {
             let session;
-            if (this.running) {
+            if (this.running && this.require != null) {
                 session = this.require("session").session;
                 session.close();
                 return;
@@ -316,8 +317,7 @@ function togetherjsMain() {
                 // Then a call to TogetherJS() from a button must be started TogetherJS
                 this.startup.reason = "started";
             }
-            // FIXME: maybe I should just test for this.require:
-            if (this._loaded) {
+            if (this.require) {
                 session = this.require("session").session;
                 addStyle();
                 session.start();
@@ -519,7 +519,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -643,7 +643,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
