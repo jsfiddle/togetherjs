@@ -41,6 +41,7 @@
 
 # Improvements (only after full typing)
 - Browse PR on original repo to implement them
+- Scrollable list of particpants when it's too big
 
 # Maybe towards full typing
 - [ ] maybe I should convert the libs? Like walkabout?
