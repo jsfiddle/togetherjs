@@ -12,20 +12,6 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
     //function webrtcMain(_require: Require, $: JQueryStatic, util: TogetherJSNS.Util, session: TogetherJSNS.Session, ui: TogetherJSNS.Ui, peers: TogetherJSNS.Peers, storage: TogetherJSNS.Storage, windowing: TogetherJSNS.Windowing) {
     const assert = util_1.util.assert.bind(util_1.util);
     session_1.session.RTCSupported = !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection);
-    if (session_1.session.RTCSupported && jquery_1.default.browser.mozilla && parseInt(jquery_1.default.browser.version, 10) <= 19) {
-        // In a few versions of Firefox (18 and 19) these APIs are present but not actually usable
-        // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
-        // Because they could be pref'd on we'll do a quick check:
-        try {
-            (function () {
-                //@ts-ignore this var is unused but we don't remove code
-                const conn = new window.mozRTCPeerConnection();
-            })();
-        }
-        catch (e) {
-            session_1.session.RTCSupported = false;
-        }
-    }
     const mediaConstraints = {
         mandatory: {
             OfferToReceiveAudio: true,
