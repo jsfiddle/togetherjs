@@ -486,28 +486,6 @@ export class PeerView extends PeerSelfView {
     // if users hit X then show the participant button with the consol
     dock() {
         deferForContainer(() => {
-            const numberOfUsers = peers.getAllPeers().length;
-
-            // collapse the Dock if too many users
-            function CollapsedDock() {
-                // decrease/reset dock height
-                $("#togetherjs-dock").css("height", 260);
-                //replace participant button
-                $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url(" + TogetherJS.baseUrl + "/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
-                // new full participant window created on toggle
-                $("#togetherjs-participantlist-button").click(function() {
-                    windowing.toggle("#togetherjs-participantlist");
-                });
-            }
-
-            // FIXME: turned off for now
-            if(numberOfUsers >= 5) {
-                CollapsedDock();
-            }
-            else {
-                // reset
-            }
-
             if(this.dockElement) {
                 return;
             }
