@@ -253,7 +253,6 @@ function togetherjsMain() {
         /** Time at which the page was loaded */
         public pageLoaded: number = Date.now();
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
-        public startTarget?: HTMLElement;
 
         private requireObject: Require | null = null;
         private configObject = new ConfigClass(this);

@@ -30,8 +30,6 @@ const TEXTAREA_MAX_LINES = 5;
 // This is set when an animation will keep the UI from being ready
 // (until this time):
 let finishedAt: number | null = null;
-// Time in milliseconds for the dock to animate out:
-const DOCK_ANIMATION_TIME = 300;
 // If two chat messages come from the same person in this time (milliseconds) then they are collapsed into one message:
 const COLLAPSE_MESSAGE_LIMIT = 5000;
 
@@ -632,58 +630,6 @@ export class Ui {
         assert(container.length);
         $("body").append(container);
         fixupAvatars(container);
-        if(session.firstRun && TogetherJS.startTarget) {
-            // Time at which the UI will be fully ready: (We have to do this because the offset won't be quite right until the animation finishes - attempts to calculate the offset without taking into account CSS transforms have so far failed.)
-            const timeoutSeconds = DOCK_ANIMATION_TIME / 1000;
-            finishedAt = Date.now() + DOCK_ANIMATION_TIME + 50;
-            setTimeout(function() {
-                finishedAt = Date.now() + DOCK_ANIMATION_TIME + 40;
-                const iface = container.find("#togetherjs-dock");
-                const start = iface.offset()!; // TODO !
-                const pos = $(TogetherJS.startTarget!).offset()!; // TODO !
-                pos.top = Math.floor(pos.top - start.top);
-                pos.left = Math.floor(pos.left - start.left);
-                const translate = "translate(" + pos.left + "px, " + pos.top + "px)";
-                iface.css({
-                    MozTransform: translate,
-                    WebkitTransform: translate,
-                    transform: translate,
-                    opacity: "0.0"
-                });
-                setTimeout(function() {
-                    // We keep recalculating because the setTimeout times aren't always so accurate:
-                    finishedAt = Date.now() + DOCK_ANIMATION_TIME + 20;
-                    let transition = "transform " + timeoutSeconds + "s ease-out, ";
-                    transition += "opacity " + timeoutSeconds + "s ease-out";
-                    iface.css({
-                        opacity: "1.0",
-                        MozTransition: "-moz-" + transition,
-                        MozTransform: "translate(0, 0)",
-                        WebkitTransition: "-webkit-" + transition,
-                        WebkitTransform: "translate(0, 0)",
-                        transition: transition,
-                        transform: "translate(0, 0)"
-                    });
-                    setTimeout(function() {
-                        finishedAt = null;
-                        iface.attr("style", "");
-                    }, 510);
-                }, 5);
-            }, 5);
-        }
-        if(TogetherJS.startTarget) {
-            const el = $(TogetherJS.startTarget);
-            let text = el.text().toLowerCase().replace(/\s+/g, " ");
-            text = text.replace(/^\s*/, "").replace(/\s*$/, "");
-            if(text == "start togetherjs") {
-                el.attr("data-end-togetherjs-html", "End TogetherJS");
-            }
-            if(el.attr("data-end-togetherjs-html")) {
-                el.attr("data-start-togetherjs-html", el.html());
-                el.html(el.attr("data-end-togetherjs-html"));
-            }
-            el.addClass("togetherjs-started");
-        }
         this.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function(this: HTMLElement) {
             $(this).append($('<button class="togetherjs-close"></button>'));
         });
@@ -1408,13 +1354,6 @@ session.on("close", function() {
     if(starterButton.attr("data-start-text")) {
         starterButton.text(starterButton.attr("data-start-text"));
         starterButton.attr("data-start-text", "");
-    }
-    if(TogetherJS.startTarget) {
-        const el = $(TogetherJS.startTarget);
-        if(el.attr("data-start-togetherjs-html")) {
-            el.html(el.attr("data-start-togetherjs-html"));
-        }
-        el.removeClass("togetherjs-started");
     }
 });
 
