@@ -62,7 +62,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     public firstRun = false;
     /** Setting, essentially global: */
     public readonly AVATAR_SIZE = 90;
-    timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
+    public timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
     public identityId?: string;
     public RTCSupported: boolean | undefined;
 
