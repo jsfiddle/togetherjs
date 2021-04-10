@@ -464,7 +464,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
                     });
                 }
                 // FIXME: turned off for now
-                if (numberOfUsers >= 5 && false) {
+                if (numberOfUsers >= 5) {
                     CollapsedDock();
                 }
                 else {

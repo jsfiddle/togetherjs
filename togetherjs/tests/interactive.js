@@ -15,9 +15,9 @@ Test.require("ui", "chat", "util", "session", "jquery", "storage", "peers", "cur
 
 printChained(
   Test.resetSettings(),
-  storage.settings.set("seenIntroDialog", true),
-  storage.settings.set("seenWalkthrough", true),
-  storage.settings.set("dontShowRtcInfo", true),
+  storage.storage.settings.set("seenIntroDialog", true),
+  storage.storage.settings.set("seenWalkthrough", true),
+  storage.storage.settings.set("dontShowRtcInfo", true),
   Test.startTogetherJS());
 
 // => ...

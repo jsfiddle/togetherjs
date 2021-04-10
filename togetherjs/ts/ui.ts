@@ -501,7 +501,7 @@ export class PeerView extends PeerSelfView {
             }
 
             // FIXME: turned off for now
-            if(numberOfUsers >= 5 && false) {
+            if(numberOfUsers >= 5) {
                 CollapsedDock();
             }
             else {
