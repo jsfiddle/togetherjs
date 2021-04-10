@@ -282,7 +282,7 @@ function togetherjsMain() {
         const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
         config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
         config.close = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.close(name);
-        config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => any) => confObj.track(name, callback);
+        config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => void) => confObj.track(name, callback);
         return config;
     }
 
