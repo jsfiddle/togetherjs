@@ -108,6 +108,61 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<voi
     }
 }
 
+class ConfigClass {
+    private readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
+
+    constructor(private configuration: TogetherJSNS.Config) { }
+
+    call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) {
+        if(name == "loaded" || name == "callToStart") {
+            console.error("Cannot change loaded or callToStart values");
+            return;
+        }
+
+        const previous = this.configuration[name];
+        const value = maybeValue;
+        this.configuration[name] = value as any; // TODO any, how to remove this any
+        const trackers = this._configTrackers[name] ?? [];
+        let failed = false;
+        for(let i = 0; i < trackers.length; i++) {
+            try {
+                trackers[i](value, previous);
+            }
+            catch(e) {
+                console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
+                failed = true;
+                break;
+            }
+        }
+        if(failed) {
+            this.configuration[name] = previous as any; // TODO any, how to remove this any?
+            for(let i = 0; i < trackers.length; i++) {
+                try {
+                    trackers[i](value);
+                }
+                catch(e) {
+                    console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
+                }
+            }
+        }
+    }
+
+    get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
+        return this.configuration[name];
+    }
+
+    track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => void) {
+        const v = this.get(name);
+        callback(v);
+        if(!this._configTrackers[name]) {
+            this._configTrackers[name] = [];
+        }
+        // TODO any how to make callback typecheck?
+        this._configTrackers[name]!.push(callback as any); // TODO ! and any cast
+        return callback;
+    }
+}
+
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
@@ -181,61 +236,6 @@ function togetherjsMain() {
     }
     else {
         version = cacheBust;
-    }
-
-    class ConfigClass {
-        private readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
-
-        constructor(private configuration: TogetherJSNS.Config) { }
-
-        call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) {
-            if(name == "loaded" || name == "callToStart") {
-                console.error("Cannot change loaded or callToStart values");
-                return;
-            }
-
-            const previous = this.configuration[name];
-            const value = maybeValue;
-            this.configuration[name] = value as any; // TODO any, how to remove this any
-            const trackers = this._configTrackers[name] ?? [];
-            let failed = false;
-            for(let i = 0; i < trackers.length; i++) {
-                try {
-                    trackers[i](value, previous);
-                }
-                catch(e) {
-                    console.warn("Error setting configuration", name, "to", value, ":", e, "; reverting to", previous);
-                    failed = true;
-                    break;
-                }
-            }
-            if(failed) {
-                this.configuration[name] = previous as any; // TODO any, how to remove this any?
-                for(let i = 0; i < trackers.length; i++) {
-                    try {
-                        trackers[i](value);
-                    }
-                    catch(e) {
-                        console.warn("Error REsetting configuration", name, "to", previous, ":", e, "(ignoring)");
-                    }
-                }
-            }
-        }
-
-        get<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] {
-            return this.configuration[name];
-        }
-
-        track<K extends keyof TogetherJSNS.Config>(name: K, callback: (value: TogetherJSNS.Config[K], previous?: TogetherJSNS.Config[K]) => void) {
-            const v = this.get(name);
-            callback(v);
-            if(!this._configTrackers[name]) {
-                this._configTrackers[name] = [];
-            }
-            // TODO any how to make callback typecheck?
-            this._configTrackers[name]!.push(callback as any); // TODO ! and any cast
-            return callback;
-        }
     }
 
     // TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
