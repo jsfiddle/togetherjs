@@ -367,6 +367,7 @@ function getRoomName(prefix: string, maxSize: number) {
 }
 
 function initIdentityId() {
+
     return util.Deferred(function(def) {
         if(session.identityId) {
             def.resolve();
