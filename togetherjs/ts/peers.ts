@@ -464,8 +464,6 @@ session.on("start", function() {
     if(peers.Self) {
         return;
     }
-    /* Same interface as Peer, represents oneself (local user): */
-
     // peer.Self init
     peers.Self = new PeersSelf(peers);
 

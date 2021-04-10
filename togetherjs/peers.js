@@ -422,7 +422,6 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         if (exports.peers.Self) {
             return;
         }
-        /* Same interface as Peer, represents oneself (local user): */
         // peer.Self init
         exports.peers.Self = new PeersSelf(exports.peers);
         exports.peers.Self.view = ui.PeerSelfView(exports.peers.Self);
