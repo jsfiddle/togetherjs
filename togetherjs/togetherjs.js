@@ -102,26 +102,11 @@ class OnClass {
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 var TogetherJS = togetherjsMain();
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
     let listener = null;
-    function polyfillConsole() {
-        // Make sure we have all of the console.* methods:
-        if (typeof console == "undefined") {
-            // eslint-disable-next-line no-global-assign
-            console = {};
-        }
-        if (!console.log) {
-            console.log = function () { };
-        }
-        ["debug", "info", "warn", "error"].forEach(function (method) {
-            if (!("method" in console)) {
-                console[method] = console.log;
-            }
-        });
-    }
     const defaultStartupInit = {
         // What element, if any, was used to start the session:
         button: null,
@@ -173,8 +158,8 @@ function togetherjsMain() {
     };
     let version = "unknown";
     // FIXME: we could/should use a version from the checkout, at least for production
-    let cacheBust = "";
-    if ((!cacheBust) || cacheBust == "") {
+    let cacheBust = "__gitCommit__";
+    if ((!cacheBust) || cacheBust == "__gitCommit__") {
         cacheBust = Date.now() + "";
     }
     else {
@@ -608,7 +593,7 @@ function togetherjsMain() {
         }
     }
     function baseUrl1Inner() {
-        let baseUrl = "";
+        let baseUrl = "__baseUrl__";
         if (baseUrl == "__" + "baseUrl__") {
             // Reset the variable if it doesn't get substituted
             baseUrl = "";
@@ -696,7 +681,6 @@ function togetherjsMain() {
             copyConfigInWindow(configOverride);
         }
     }
-    polyfillConsole();
     if (!baseUrl) {
         const scripts = document.getElementsByTagName("script");
         for (let i = 0; i < scripts.length; i++) {
@@ -735,7 +719,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";

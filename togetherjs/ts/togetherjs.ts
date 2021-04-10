@@ -119,22 +119,6 @@ function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
     let listener: TogetherJSNS.KeyboardListener | null = null;
 
-    function polyfillConsole() {
-        // Make sure we have all of the console.* methods:
-        if(typeof console == "undefined") {
-            // eslint-disable-next-line no-global-assign
-            (console as unknown) = {};
-        }
-        if(!console.log) {
-            console.log = function() { /* No real fallback here so we just do nothing */ };
-        }
-        ["debug", "info", "warn", "error"].forEach(function(method) {
-            if(!("method" in console)) {
-                (console as any)[method] = console.log;
-            }
-        });
-    }
-
     const defaultStartupInit: TogetherJSNS.Startup = {
         // What element, if any, was used to start the session:
         button: null,
@@ -755,8 +739,6 @@ function togetherjsMain() {
             copyConfigInWindow(configOverride);
         }
     }
-
-    polyfillConsole();
 
     if(!baseUrl) {
         const scripts = document.getElementsByTagName("script");
