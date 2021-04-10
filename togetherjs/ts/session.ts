@@ -57,7 +57,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     public shareId: string | null = null;
     /** This is the ID that identifies this client: */
     public clientId!: string; // TODO !
-    public readonly router = new Router();
+    public router: Router = new Router();
     /** Indicates if TogetherJS has just started (not continuing from a saved session): */
     public firstRun = false;
     /** Setting, essentially global: */

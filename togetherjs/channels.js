@@ -224,7 +224,8 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
     class Router extends OnClass {
         constructor(channel) {
             super();
-            this._routes = Object.create(null);
+            this._routes = {};
+            this.channel = null;
             this.boundChannelMessage = this._channelMessage.bind(this);
             this.boundChannelClosed = this._channelClosed.bind(this);
             if (channel) {

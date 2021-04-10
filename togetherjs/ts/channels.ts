@@ -240,7 +240,7 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
     }
 
     send(msg: TogetherJSNS.AnyMessage.AnyForReceiving) {
-        this.router.channel.send({
+        this.router.channel!.send({
             type: "route",
             routeId: this.id,
             message: msg,
@@ -258,8 +258,8 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
 }
 
 export class Router extends OnClass<TogetherJSNS.On.Map> {
-    _routes: {[key: string]: Route} = Object.create(null);
-    channel!: AbstractChannel; // TODO !
+    _routes: {[key: string]: Route} = {};
+    channel: AbstractChannel | null = null;
 
     private boundChannelMessage = this._channelMessage.bind(this);
     private boundChannelClosed = this._channelClosed.bind(this);
