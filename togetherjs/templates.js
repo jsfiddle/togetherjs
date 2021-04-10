@@ -18,7 +18,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         t = t.replace(/TOOL_SITE_LINK/g, '<a href="https://togetherjs.com/" target="_blank"><span class="togetherjs-tool-name">TogetherJS</span></a>');
         return t;
     }
-    const lang = TogetherJS.getConfig("lang") || "en-US";
+    const lang = TogetherJS.config.get("lang") || "en-US";
     const moduleName = "templates-" + lang;
     let templatesLang;
     require([moduleName], function (mod) {

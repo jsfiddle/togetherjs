@@ -232,7 +232,7 @@ class TogetherJSClass extends OnClass {
         this.startup.button = null;
     }
     start(event) {
-        let cacheBust = computeCacheBust();
+        const cacheBust = computeCacheBust();
         let session;
         if (this.running && this.require != null) {
             session = this.require("session").session;
@@ -317,7 +317,7 @@ class TogetherJSClass extends OnClass {
         }
         const requireConfig = Object.assign({}, this.requireConfig);
         const deps = ["session", "jquery"];
-        let lang = this.getConfig("lang");
+        let lang = this.config.get("lang");
         // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
         const availableTranslations = {
             "en-US": true,

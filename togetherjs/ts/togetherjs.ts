@@ -260,7 +260,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
     }
 
     start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
-        let cacheBust = computeCacheBust();
+        const cacheBust = computeCacheBust();
         let session;
         if(this.running && this.require != null) {
             session = this.require("session").session;
@@ -350,7 +350,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         }
         const requireConfig: RequireConfig = Object.assign({}, this.requireConfig);
         const deps = ["session", "jquery"];
-        let lang = this.getConfig("lang");
+        let lang = this.config.get("lang");
         // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
         const availableTranslations = {
             "en-US": true,
@@ -444,10 +444,6 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
             });
         }
         // If it's not set, TogetherJS has not been loaded, and reinitialization is not needed
-    }
-
-    getConfig<K extends keyof TogetherJSNS.Config>(name: K): Partial<TogetherJSNS.Config>[K] { // rename into TogetherJS.config.get()?
-        return this.configObject.get(name);
     }
 
     refreshUserData() {

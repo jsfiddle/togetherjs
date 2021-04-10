@@ -19,7 +19,7 @@ function clean(t: string) {
     return t;
 }
 
-const lang = TogetherJS.getConfig("lang") || "en-US";
+const lang = TogetherJS.config.get("lang") || "en-US";
 const moduleName = "templates-" + lang;
 let templatesLang: TogetherJSNS.Template;
 require([moduleName], function(mod: TogetherJSNS.Template) {
