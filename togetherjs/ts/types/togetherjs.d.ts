@@ -1021,16 +1021,13 @@ declare global {
         TogetherJSConfig: TogetherJSNS.Config;
         TogetherJSConfig_baseUrl?: string;
         TogetherJS: TogetherJSNS.TogetherJS;
-        TowTruckConfig?: TogetherJSNS.Config;
         TogetherJSConfig_noAutoStart?: boolean;
         TogetherJSConfig_callToStart?: TogetherJSNS.CallToStart;
-        TowTruckConfig_callToStart?: TogetherJSNS.CallToStart;
         _TogetherJSBookmarklet: unknown;
         //require?: RequireConfig;
         _TogetherJSShareId?: string;
         TogetherJSConfig_autoStart?: boolean;
         TogetherJSConfig_enableShortcut?: boolean;
-        TowTruck: TogetherJSNS.TogetherJS;
         TogetherJSTestSpy?: { [k: string]: unknown };
         _gaq?: [string, string?][];
         CKEDITOR: typeof CKEDITOR;

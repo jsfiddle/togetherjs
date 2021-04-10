@@ -3,9 +3,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-// eslint-disable-next-line no-var
-var TogetherJS: TogetherJSNS.TogetherJSClass = togetherjsMain();
-
 class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<void>}> {
     _knownEvents?: string[];
     _listeners: { [name: string]: TogetherJSNS.CallbackForOn<void>[] } = {};
@@ -115,6 +112,9 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<voi
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
 let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+
+// eslint-disable-next-line no-var
+var TogetherJS: TogetherJSNS.TogetherJSClass = togetherjsMain();
 
 function togetherjsMain() {
     const styleSheet = "/togetherjs.css";
