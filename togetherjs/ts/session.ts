@@ -69,6 +69,10 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     public readonly hub = new OnClass<TogetherJSNS.On.Map>();
     public isClient?: boolean;
 
+    public constructor() {
+        super();
+    }
+
     hubUrl(id: string | null = null) {
         id = id || this.shareId;
         assert(id, "URL cannot be resolved before TogetherJS.shareId has been initialized");
@@ -223,7 +227,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
         this.send(msg);
         this.emit("close");
         const name = window.name;
-        storage.tab.get("status").then((saved) => {
+        storage.tab.get("status").then(saved => {
             if(!saved) {
                 console.warn("No session information saved in", "status." + name);
             }

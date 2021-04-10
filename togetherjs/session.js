@@ -45,7 +45,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     const features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     class Session extends OnClass {
         constructor() {
-            super(...arguments);
+            super();
             /** This is the hub we connect to: */
             this.shareId = null;
             this.router = new channels_1.Router();
@@ -199,7 +199,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             this.send(msg);
             this.emit("close");
             const name = window.name;
-            storage_1.storage.tab.get("status").then((saved) => {
+            storage_1.storage.tab.get("status").then(saved => {
                 if (!saved) {
                     console.warn("No session information saved in", "status." + name);
                 }
