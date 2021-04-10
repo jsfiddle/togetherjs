@@ -39,7 +39,6 @@ declare global {
                 "peerCache": { peers: SerializedPeer[] },
                 "playback.logs": LogItem[],
                 "playback.pos": number,
-                "startTarget": string,
             }
 
             type MapForSettings = {

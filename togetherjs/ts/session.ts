@@ -179,7 +179,6 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     }
 
     start() {
-        initStartTarget();
         initIdentityId().then(() => {
             initShareId().then(() => {
                 readyForMessages = false;
@@ -481,25 +480,6 @@ function initShareId() {
             session.emit("shareId");
             def.resolve(session.shareId);
         });
-    });
-}
-
-function initStartTarget() {
-    let id;
-    if(TogetherJS.startup.button) {
-        id = TogetherJS.startup.button.id;
-        if(id) {
-            storage.set("startTarget", id);
-        }
-        return;
-    }
-    storage.get("startTarget").then(function(id) {
-        if(id) {
-            const el = document.getElementById(id);
-            if(el) {
-                TogetherJS.startup.button = el;
-            }
-        }
     });
 }
 

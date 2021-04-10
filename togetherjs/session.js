@@ -156,7 +156,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             }
         }
         start() {
-            initStartTarget();
             initIdentityId().then(() => {
                 initShareId().then(() => {
                     readyForMessages = false;
@@ -444,24 +443,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                 exports.session.emit("shareId");
                 def.resolve(exports.session.shareId);
             });
-        });
-    }
-    function initStartTarget() {
-        let id;
-        if (TogetherJS.startup.button) {
-            id = TogetherJS.startup.button.id;
-            if (id) {
-                storage_1.storage.set("startTarget", id);
-            }
-            return;
-        }
-        storage_1.storage.get("startTarget").then(function (id) {
-            if (id) {
-                const el = document.getElementById(id);
-                if (el) {
-                    TogetherJS.startup.button = el;
-                }
-            }
         });
     }
     exports.session.on("start", function () {
