@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 // RTC Patches
 
 export {}
@@ -65,6 +66,7 @@ declare global {
         new(configuration?: RTCConfiguration, options?: { "optional": [] }): mozRTCPeerConnection;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface RTCIceServer {
         /** @deprecated should be replaced by urls https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer Since we can't mark the urls field as optional adding this would not remove the type error so we update the "url" field to "urls" in the code */
         //url: string | string[];
