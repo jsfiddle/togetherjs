@@ -34,7 +34,7 @@ function addPeer(id) {
     color: color,
     clientId: id
   });
-  var len = peers.getAllPeers().length;
+  var len = peers.peers.getAllPeers().length;
   var pageHeight = $(document).height();
   var left = (len * 40) % $(window).width();
   var top = len % 2 ? (len * 10) : (pageHeight - 100 - len * 10);
@@ -58,7 +58,7 @@ function addPeer(id) {
 
 function pick(seq) {
   if (! seq) {
-    seq = peers.getAllPeers(true);
+    seq = peers.peers.getAllPeers(true);
   }
   return seq[Math.floor(Math.random() * seq.length)];
 }
@@ -124,7 +124,7 @@ Test.addControl($('<button>Nudge Me</button>').click(function () {
     type: "url-change-nudge",
     clientId: peer.id,
     url: peer.url,
-    to: peers.Self.id
+    to: peers.peers.Self.id
   });
 }));
 
@@ -147,7 +147,7 @@ Test.addControl($('<button>Focus something</button>').click(function () {
   focused[peer.id] = el;
   Test.incoming({
     type: "form-focus",
-    element: elementFinder.elementLocation(el),
+    element: elementFinder.elementFinder.elementLocation(el),
     clientId: peer.id,
     url: peer.url
   });
