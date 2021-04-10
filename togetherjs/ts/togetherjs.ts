@@ -652,7 +652,7 @@ function togetherjsMain() {
     }
 
     const configOverrideString = localStorage.getItem("togetherjs.configOverride");
-    let configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null;
+    let configOverride: TogetherJSNS.WithExpiration<TogetherJSNS.Config> | null = null;
     if(configOverrideString) {
         try {
             configOverride = JSON.parse(configOverrideString);
@@ -660,7 +660,7 @@ function togetherjsMain() {
         catch(e) {
             configOverride = null;
         }
-        if((!configOverride) || configOverride.expiresAt < Date.now()) {
+        if(configOverride == null || configOverride.expiresAt < Date.now()) {
             localStorage.removeItem("togetherjs.configOverride");
         }
         else {
