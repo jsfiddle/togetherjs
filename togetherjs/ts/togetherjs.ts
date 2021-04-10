@@ -257,7 +257,7 @@ function togetherjsMain() {
         private requireObject: Require | null = null;
         private configObject = new ConfigClass(this);
         /** a copy of startup to be used on _teardown */
-        private _startupInit: TogetherJSNS.Startup;
+        private startupInit: TogetherJSNS.Startup;
 
         constructor(
             private requireConfig: RequireConfig,
@@ -267,7 +267,7 @@ function togetherjsMain() {
             public startup: TogetherJSNS.Startup,
         ) {
             super();
-            this._startupInit = Object.assign({}, startup);
+            this.startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
@@ -442,7 +442,7 @@ function togetherjsMain() {
             if(requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
             }
-            this.startup = Object.assign({}, this._startupInit);
+            this.startup = Object.assign({}, this.startupInit);
             this.running = false;
         }
 

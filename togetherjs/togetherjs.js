@@ -242,7 +242,7 @@ function togetherjsMain() {
             this.editTrackers = {};
             this.requireObject = null;
             this.configObject = new ConfigClass(this);
-            this._startupInit = Object.assign({}, startup);
+            this.startupInit = Object.assign({}, startup);
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
             this.startup.button = null;
@@ -407,7 +407,7 @@ function togetherjsMain() {
             if (requireObject.s && requireObject.s.contexts) {
                 delete requireObject.s.contexts.togetherjs;
             }
-            this.startup = Object.assign({}, this._startupInit);
+            this.startup = Object.assign({}, this.startupInit);
             this.running = false;
         }
         toString() {
