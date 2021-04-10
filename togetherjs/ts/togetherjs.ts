@@ -704,16 +704,16 @@ function togetherjsMain() {
         }
     };
 
-    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
-
-    window["TogetherJS"] = tjsInstance;
-
     let defaultHubBase = "__hubUrl__";
     if(defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     }
     defaultConfiguration.hubBase = defaultHubBase;
+
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl, defaultConfiguration, defaultStartupInit);
+
+    window["TogetherJS"] = tjsInstance;
 
     /* TogetherJS.config(configurationObject)
        or: TogetherJS.config(configName, value)
