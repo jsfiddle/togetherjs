@@ -591,8 +591,7 @@ function togetherjsMain() {
             const link = document.createElement("link");
             link.id = "togetherjs-stylesheet";
             link.setAttribute("rel", "stylesheet");
-            link.href = baseUrl + styleSheet +
-                (cacheBust ? ("?bust=" + cacheBust) : '');
+            link.href = baseUrl + styleSheet + (cacheBust ? ("?bust=" + cacheBust) : '');
             document.head.appendChild(link);
         }
     }
