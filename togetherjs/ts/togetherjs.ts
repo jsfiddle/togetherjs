@@ -182,6 +182,8 @@ function togetherjsMain() {
     }
 
     class ConfigClass {
+        public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
+
         constructor(public tjsInstance: TogetherJSClass) { }
 
         call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) { // TODO any
@@ -200,7 +202,7 @@ function togetherjsMain() {
             let attr: keyof typeof settings;
             for(attr in settings) {
                 if(Object.prototype.hasOwnProperty.call(settings, attr)) {
-                    if(this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
+                    if(this._configClosed[attr] && this.tjsInstance.running) {
                         throw new Error("The configuration " + attr + " is finalized and cannot be changed");
                     }
                 }
@@ -273,7 +275,7 @@ function togetherjsMain() {
             if(!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
-            this.tjsInstance._configClosed[name] = true;
+            this._configClosed[name] = true;
             return this.get(name);
         }
     }
@@ -304,7 +306,6 @@ function togetherjsMain() {
         public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration;
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
-        public _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
         public version!: string; // TODO !
         public baseUrl!: string; // TODO !
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};

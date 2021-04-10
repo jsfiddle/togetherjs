@@ -169,6 +169,7 @@ function togetherjsMain() {
     class ConfigClass {
         constructor(tjsInstance) {
             this.tjsInstance = tjsInstance;
+            this._configClosed = {};
         }
         call(name, maybeValue) {
             var _a;
@@ -187,7 +188,7 @@ function togetherjsMain() {
             let attr;
             for (attr in settings) {
                 if (Object.prototype.hasOwnProperty.call(settings, attr)) {
-                    if (this.tjsInstance._configClosed[attr] && this.tjsInstance.running) {
+                    if (this._configClosed[attr] && this.tjsInstance.running) {
                         throw new Error("The configuration " + attr + " is finalized and cannot be changed");
                     }
                 }
@@ -257,7 +258,7 @@ function togetherjsMain() {
             if (!Object.prototype.hasOwnProperty.call(this.tjsInstance._defaultConfiguration, name)) {
                 throw new Error("Configuration is unknown: " + name);
             }
-            this.tjsInstance._configClosed[name] = true;
+            this._configClosed[name] = true;
             return this.get(name);
         }
     }
@@ -283,7 +284,6 @@ function togetherjsMain() {
             this._defaultConfiguration = defaultConfiguration;
             //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
             this._configTrackers = {};
-            this._configClosed = {};
             this.editTrackers = {};
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
