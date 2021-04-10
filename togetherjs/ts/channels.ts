@@ -239,14 +239,6 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
         this.id = id;
     }
 
-    send(msg: TogetherJSNS.AnyMessage.AnyForReceiving) {
-        this.router.channel!.send({
-            type: "route",
-            routeId: this.id,
-            message: msg,
-        });
-    }
-
     close() {
         if(this.router._routes[this.id] !== this) {
             // This route instance has been overwritten, so ignore
@@ -254,7 +246,6 @@ class Route extends OnClass<TogetherJSNS.On.Map> {
         }
         delete this.router._routes[this.id];
     }
-
 }
 
 export class Router extends OnClass<TogetherJSNS.On.Map> {

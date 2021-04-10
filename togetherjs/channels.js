@@ -206,13 +206,6 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             this.router = router;
             this.id = id;
         }
-        send(msg) {
-            this.router.channel.send({
-                type: "route",
-                routeId: this.id,
-                message: msg,
-            });
-        }
         close() {
             if (this.router._routes[this.id] !== this) {
                 // This route instance has been overwritten, so ignore
