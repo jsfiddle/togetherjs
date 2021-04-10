@@ -296,7 +296,6 @@ function togetherjsMain() {
         private configObject = new ConfigClass(this);
         public readonly config: TogetherJSNS.ConfigFunObj;
         public hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
-        public requireConfig!: RequireConfig; // TODO !
         private _loaded?: boolean;
         private _requireObject!: Require; // TODO !
         public pageLoaded: number = Date.now();
@@ -306,12 +305,14 @@ function togetherjsMain() {
         public _defaultConfiguration: TogetherJSNS.Config = defaultConfiguration;
         //public readonly _configTrackers2: Partial<{[key in keyof TogetherJSNS.Config]: ((value: TogetherJSNS.Config[key], previous?: TogetherJSNS.Config[key]) => any)[]}> = {};
         public readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => any)[] }> = {};
-        public version!: string; // TODO !
-        public baseUrl!: string; // TODO !
         public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
         public startTarget?: HTMLElement;
 
-        constructor() {
+        constructor(
+            private requireConfig: RequireConfig,
+            public readonly version: string,
+            public readonly baseUrl: string,
+        ) {
             super();
             this._knownEvents = ["ready", "close"];
             this.config = createConfigFunObj(this.configObject);
@@ -743,11 +744,7 @@ function togetherjsMain() {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
 
-    const tjsInstance = new TogetherJSClass();
-
-    window["TogetherJS"] = tjsInstance;
-
-    tjsInstance.requireConfig = {
+    const requireConfig: RequireConfig = {
         context: "togetherjs",
         baseUrl: baseUrl,
         urlArgs: "bust=" + cacheBust,
@@ -765,6 +762,10 @@ function togetherjsMain() {
         }
     };
 
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl);
+
+    window["TogetherJS"] = tjsInstance;
+
     let defaultHubBase = "__hubUrl__";
     if(defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
@@ -773,8 +774,6 @@ function togetherjsMain() {
     defaultConfiguration.hubBase = defaultHubBase;
 
     // FIXME: there's a point at which configuration can't be updated (e.g., hubBase after the TogetherJS has loaded).  We should keep track of these and signal an error if someone attempts to reconfigure too late
-
-
     tjsInstance._defaultConfiguration = defaultConfiguration;
 
     /* TogetherJS.config(configurationObject)
@@ -791,8 +790,6 @@ function togetherjsMain() {
 
     // This should contain the output of "git describe --always --dirty"
     // FIXME: substitute this on the server (and update make-static-client)
-    tjsInstance.version = version;
-    tjsInstance.baseUrl = baseUrl;
 
     tjsInstance.config.track("enableShortcut", function(enable: boolean, previous: unknown) {
         if(enable) {

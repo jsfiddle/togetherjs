@@ -271,8 +271,11 @@ function togetherjsMain() {
         return config;
     }
     class TogetherJSClass extends OnClass {
-        constructor() {
+        constructor(requireConfig, version, baseUrl) {
             super();
+            this.requireConfig = requireConfig;
+            this.version = version;
+            this.baseUrl = baseUrl;
             this.startupReason = null;
             this.running = false;
             this.configObject = new ConfigClass(this);
@@ -682,9 +685,7 @@ function togetherjsMain() {
     if (!baseUrl) {
         console.warn("Could not determine TogetherJS's baseUrl (looked for a <script> with togetherjs.js and togetherjs-min.js)");
     }
-    const tjsInstance = new TogetherJSClass();
-    window["TogetherJS"] = tjsInstance;
-    tjsInstance.requireConfig = {
+    const requireConfig = {
         context: "togetherjs",
         baseUrl: baseUrl,
         urlArgs: "bust=" + cacheBust,
@@ -701,6 +702,8 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
+    const tjsInstance = new TogetherJSClass(requireConfig, version, baseUrl);
+    window["TogetherJS"] = tjsInstance;
     let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
@@ -720,8 +723,6 @@ function togetherjsMain() {
     //Config !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // This should contain the output of "git describe --always --dirty"
     // FIXME: substitute this on the server (and update make-static-client)
-    tjsInstance.version = version;
-    tjsInstance.baseUrl = baseUrl;
     tjsInstance.config.track("enableShortcut", function (enable, previous) {
         if (enable) {
             tjsInstance.listenForShortcut();
