@@ -610,8 +610,7 @@ export class Ui {
                 const d = deferringPrepareUI;
                 deferringPrepareUI = null;
                 this.prepareUI();
-                // This happens when ui.activateUI is called before the document has been
-                // loaded:
+                // This happens when ui.activateUI is called before the document has been loaded:
                 if(d == "activate") {
                     this.activateUI();
                 }
