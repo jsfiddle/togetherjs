@@ -23,21 +23,13 @@ const BUTTON_HEIGHT = 60 + 1; // 60 is button height, 1 is border
 // chat TextArea
 const TEXTAREA_LINE_HEIGHT = 20; // in pixels
 const TEXTAREA_MAX_LINES = 5;
-// This is also in togetherjs.less, under .togetherjs-animated
-//var ANIMATION_DURATION = 1000; // TODO unused
-// Time the new user window sticks around until it fades away:
-//var NEW_USER_FADE_TIMEOUT = 5000; // TODO unused
-// This is set when an animation will keep the UI from being ready
-// (until this time):
+// This is set when an animation will keep the UI from being ready (until this time):
 let finishedAt: number | null = null;
 // If two chat messages come from the same person in this time (milliseconds) then they are collapsed into one message:
 const COLLAPSE_MESSAGE_LIMIT = 5000;
-
 const COLORS = ["#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF", "#FFD700", "#F08080", "#90EE90", "#FF6347"];
-
 // This is used for some signalling when ui.prepareUI and/or ui.activateUI is called before the DOM is fully loaded:
 let deferringPrepareUI: string | null = null;
-
 let setToolName = false;
 
 // This would be a circular import, but we just need the chat module sometime after everything is loaded, and this is sure to complete by that time:

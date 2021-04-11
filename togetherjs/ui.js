@@ -19,12 +19,7 @@ define(["require", "exports", "./elementFinder", "./linkify", "./peers", "./sess
     // chat TextArea
     const TEXTAREA_LINE_HEIGHT = 20; // in pixels
     const TEXTAREA_MAX_LINES = 5;
-    // This is also in togetherjs.less, under .togetherjs-animated
-    //var ANIMATION_DURATION = 1000; // TODO unused
-    // Time the new user window sticks around until it fades away:
-    //var NEW_USER_FADE_TIMEOUT = 5000; // TODO unused
-    // This is set when an animation will keep the UI from being ready
-    // (until this time):
+    // This is set when an animation will keep the UI from being ready (until this time):
     let finishedAt = null;
     // If two chat messages come from the same person in this time (milliseconds) then they are collapsed into one message:
     const COLLAPSE_MESSAGE_LIMIT = 5000;
