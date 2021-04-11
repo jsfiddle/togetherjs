@@ -8,22 +8,14 @@ import { storage } from "./storage";
 import { util } from "./util";
 //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
 
-let DEBUG = false;
-
-// This is the amount of time in which a hello-back must be received after a hello
-// for us to respect a URL change:
-const HELLO_BACK_CUTOFF = 1500;
-
 const assert: typeof util.assert = util.assert.bind(util);
-
+let DEBUG = false;
+// This is the amount of time in which a hello-back must be received after a hello for us to respect a URL change:
+const HELLO_BACK_CUTOFF = 1500;
 // We will load this module later (there's a circular import):
 let peers: TogetherJSNS.Peers;
-
 // This is the channel to the hub:
 let channel: TogetherJSNS.WebSocketChannel | null = null;
-
-// This is the key we use for localStorage:
-//var localStoragePrefix = "togetherjs."; // TODO not used
 
 /****************************************
  * URLs
@@ -47,9 +39,6 @@ if(IGNORE_MESSAGES === true) {
 // These are messages sent by clients who aren't "part" of the TogetherJS session:
 const MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
 
-// We ignore incoming messages from the channel until this is true:
-let readyForMessages = false;
-
 // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
 const features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
 
@@ -69,6 +58,8 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
 
     public readonly hub = new OnClass<TogetherJSNS.On.Map>();
     public isClient?: boolean;
+    /** We ignore incoming messages from the channel until this is true */
+    public readyForMessages = false;
 
     public constructor() {
         super();
@@ -186,7 +177,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     start() {
         initIdentityId().then(() => {
             initShareId().then(() => {
-                readyForMessages = false;
+                this.readyForMessages = false;
                 openChannel();
                 require(["ui"], (uiModule) => {
                     const ui = uiModule.ui;
@@ -198,8 +189,8 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
                             peers = peersModule.peers;
                             const { startup } = require("startup");
                             this.emit("start");
-                            this.once("ui-ready", function() {
-                                readyForMessages = true;
+                            this.once("ui-ready", () => {
+                                this.readyForMessages = true;
                                 startup.start();
                             });
                             ui.activateUI();
@@ -254,14 +245,12 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
 
 export const session = new Session();
 
-//var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
-
 function openChannel() {
     assert(!channel, "Attempt to re-open channel");
     console.info("Connecting to", session.hubUrl(), location.href);
     const c = new WebSocketChannel(session.hubUrl());
     c.onmessage = function(msg) {
-        if(!readyForMessages) {
+        if(!session.readyForMessages) {
             if(DEBUG) {
                 console.info("In (but ignored for being early):", msg);
             }
@@ -505,8 +494,7 @@ session.on("close", function() {
 });
 
 function hashchangeEvent() {
-    // needed because when message arives from peer this variable will be checked to
-    // decide weather to show actions or not
+    // needed because when message arrives from peer this variable will be checked to decide weather to show actions or not
     sendHello(false);
 }
 

@@ -10,17 +10,14 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     exports.session = exports.Session = void 0;
     jquery_1 = __importDefault(jquery_1);
     //function sessionMain(require: Require, util: TogetherJSNS.Util, channels: TogetherJSNS.Channels, $: JQueryStatic, storage: TogetherJSNS.Storage) {
-    let DEBUG = false;
-    // This is the amount of time in which a hello-back must be received after a hello
-    // for us to respect a URL change:
-    const HELLO_BACK_CUTOFF = 1500;
     const assert = util_1.util.assert.bind(util_1.util);
+    let DEBUG = false;
+    // This is the amount of time in which a hello-back must be received after a hello for us to respect a URL change:
+    const HELLO_BACK_CUTOFF = 1500;
     // We will load this module later (there's a circular import):
     let peers;
     // This is the channel to the hub:
     let channel = null;
-    // This is the key we use for localStorage:
-    //var localStoragePrefix = "togetherjs."; // TODO not used
     /****************************************
      * URLs
      */
@@ -40,8 +37,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     }
     // These are messages sent by clients who aren't "part" of the TogetherJS session:
     const MESSAGES_WITHOUT_CLIENTID = ["who", "invite", "init-connection"];
-    // We ignore incoming messages from the channel until this is true:
-    let readyForMessages = false;
     // These are Javascript files that implement features, and so must be injected at runtime because they aren't pulled in naturally via define(). ui must be the first item:
     const features = ["peers", "ui", "chat", "webrtc", "cursor", "startup", "videos", "forms", "visibilityApi", "youtubeVideos"];
     class Session extends OnClass {
@@ -56,6 +51,8 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             this.AVATAR_SIZE = 90;
             this.timeHelloSent = 0; // TODO try an init to 0 and see if it introduce any bug, it was null before
             this.hub = new OnClass();
+            /** We ignore incoming messages from the channel until this is true */
+            this.readyForMessages = false;
         }
         hubUrl(id = null) {
             id = id || this.shareId;
@@ -159,7 +156,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
         start() {
             initIdentityId().then(() => {
                 initShareId().then(() => {
-                    readyForMessages = false;
+                    this.readyForMessages = false;
                     openChannel();
                     require(["ui"], (uiModule) => {
                         const ui = uiModule.ui;
@@ -171,8 +168,8 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                                 peers = peersModule.peers;
                                 const { startup } = require("startup");
                                 this.emit("start");
-                                this.once("ui-ready", function () {
-                                    readyForMessages = true;
+                                this.once("ui-ready", () => {
+                                    this.readyForMessages = true;
                                     startup.start();
                                 });
                                 ui.activateUI();
@@ -224,13 +221,12 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
     }
     exports.Session = Session;
     exports.session = new Session();
-    //var MAX_SESSION_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days // TODO not used
     function openChannel() {
         assert(!channel, "Attempt to re-open channel");
         console.info("Connecting to", exports.session.hubUrl(), location.href);
         const c = new channels_1.WebSocketChannel(exports.session.hubUrl());
         c.onmessage = function (msg) {
-            if (!readyForMessages) {
+            if (!exports.session.readyForMessages) {
                 if (DEBUG) {
                     console.info("In (but ignored for being early):", msg);
                 }
@@ -461,8 +457,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
         }
     });
     function hashchangeEvent() {
-        // needed because when message arives from peer this variable will be checked to
-        // decide weather to show actions or not
+        // needed because when message arrives from peer this variable will be checked to decide weather to show actions or not
         sendHello(false);
     }
     function resizeEvent() {
