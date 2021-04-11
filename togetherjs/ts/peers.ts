@@ -14,12 +14,10 @@ let IDLE_TIME = 3 * 60 * 1000; // Idle time is 3 minutes
 const TAB_IDLE_TIME = 2 * 60 * 1000; // When you tab away, after two minutes you'll say you are idle
 let BYE_TIME = 10 * 60 * 1000; // After 10 minutes of inactivity the person is considered to be "gone"
 
-let ui: TogetherJSNS.Ui;
+let ui: TogetherJSNS.Ui; // TODO unpure
 require(["ui"], function(uiModule) {
     ui = uiModule.ui;
 });
-
-const DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
 export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public readonly isSelf: true = true;
@@ -30,11 +28,12 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public name: string | null = null;
     public avatar: string | null = null;
     public color = "#00FF00"; // TODO I added a default value, but is that ok?
-    public defaultName: string = util.pickRandom(DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
+    public defaultName: string = util.pickRandom(PeersSelf.DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
     // private loaded = false;// TODO unused
     public isCreator = !session.isClient;
     public view!: TogetherJSNS.PeerSelfView; // TODO !
     public url?: string;
+    private static DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
     constructor(private peers: Peers) {
         super();
@@ -110,7 +109,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
             storage.settings.get("color")] as const).then(args => {
                 let [name, avatar, defaultName, color] = args!; // TODO !
                 if(!defaultName) {
-                    defaultName = util.pickRandom(DEFAULT_NICKNAMES);
+                    defaultName = util.pickRandom(PeersSelf.DEFAULT_NICKNAMES);
                     storage.settings.set("defaultName", defaultName);
                 }
                 if(!color) {
@@ -204,7 +203,7 @@ export class Peers extends OnClass<TogetherJSNS.On.Map> {
             return this.Self;
         }
         if(message && !peer) {
-            peer = new PeerClass(id, { fromHelloMessage: message });
+            peer = new PeerClass(this, id, { fromHelloMessage: message });
             return peer;
         }
         if(!peer) {
@@ -228,8 +227,6 @@ export class Peers extends OnClass<TogetherJSNS.On.Map> {
         return result;
     }
 }
-
-export const peers = new Peers();
 
 export class PeerClass {
     public readonly isSelf: false = false;
@@ -255,7 +252,7 @@ export class PeerClass {
     public static peers: { [id: string]: PeerClass } = {};
     public scrollPosition?: TogetherJSNS.ElementFinder.Position;
 
-    constructor(id: string, attrs: Partial<TogetherJSNS.PeerClassAttributes> = {}) {
+    constructor(private peers: Peers, id: string, attrs: Partial<TogetherJSNS.PeerClassAttributes> = {}) {
         assert(id);
         assert(!PeerClass.peers[id]);
         this.id = id;
@@ -360,20 +357,20 @@ export class PeerClass {
         }
         if(this.status != "live") {
             this.status = "live";
-            peers.emit("status-updated", this);
+            this.peers.emit("status-updated", this);
         }
         if(this.idle != "active") {
             this.idle = "active";
-            peers.emit("idle-updated", this);
+            this.peers.emit("idle-updated", this);
         }
         if("rtcSupported" in msg && msg.rtcSupported) {
-            peers.emit("rtc-supported", this);
+            this.peers.emit("rtc-supported", this);
         }
         if(urlUpdated) {
-            peers.emit("url-updated", this);
+            this.peers.emit("url-updated", this);
         }
         if(identityUpdated) {
-            peers.emit("identity-updated", this);
+            this.peers.emit("identity-updated", this);
         }
         // FIXME: I can't decide if this is the only time we need to emit this message (and not .update() or other methods)
         if(this.following) {
@@ -399,7 +396,7 @@ export class PeerClass {
     bye(): void {
         if(this.status != "bye") {
             this.status = "bye";
-            peers.emit("status-updated", this);
+            this.peers.emit("status-updated", this);
         }
         this.view.update();
     }
@@ -407,7 +404,7 @@ export class PeerClass {
     unbye(): void {
         if(this.status == "bye") {
             this.status = "live";
-            peers.emit("status-updated", this);
+            this.peers.emit("status-updated", this);
         }
         this.view.update();
     }
@@ -424,7 +421,7 @@ export class PeerClass {
         if(this.following) {
             return;
         }
-        peers.getAllPeers().forEach(function(p) {
+        this.peers.getAllPeers().forEach(function(p) {
             if(p.following) {
                 p.unfollow();
             }
@@ -442,12 +439,47 @@ export class PeerClass {
         this.view.update();
     }
 
-    static deserialize(obj: TogetherJSNS.SerializedPeer): PeerClass {
+    static deserialize(peers: Peers, obj: TogetherJSNS.SerializedPeer): PeerClass {
         // This function is leverage the side-effect of new Peer which is adding the peer to the static list of peers
         obj.fromStorage = true;
-        return new PeerClass(obj.id, obj);
+        return new PeerClass(peers, obj.id, obj);
     }
 }
+
+function serialize() {
+    const peers: TogetherJSNS.SerializedPeer[] = [];
+    util.forEachAttr(PeerClass.peers, function(peer) {
+        peers.push(peer.serialize());
+    });
+    return { peers: peers };
+}
+
+function deserialize(peers: Peers, obj?: { peers: TogetherJSNS.SerializedPeer[] }) {
+    if(!obj) {
+        return;
+    }
+    obj.peers.forEach(function(peer) {
+        PeerClass.deserialize(peers, peer);
+    });
+}
+
+function checkActivity(peers: Peers) {
+    const ps = peers.getAllPeers();
+    const now = Date.now();
+    ps.forEach(function(p) {
+        if(p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
+            p.update({ idle: "inactive" });
+        }
+        if(p.status != "bye" && now - p.lastMessageDate > BYE_TIME) {
+            p.bye();
+        }
+    });
+}
+
+export const peers = new Peers();
+
+let checkActivityTask: number | null = null;
+let tabIdleTimeout: number | null = null;
 
 // FIXME: I can't decide where this should actually go, seems weird that it is emitted and handled in the same module
 session.on("follow-peer", function(peer) {
@@ -468,7 +500,7 @@ session.on("start", function() {
     peers.Self = new PeersSelf(peers);
 
     peers.Self.view = ui.PeerSelfView(peers.Self);
-    storage.tab.get("peerCache").then(deserialize);
+    storage.tab.get("peerCache").then(obj => deserialize(peers, obj));
     peers.Self._loadFromSettings().then(function() {
         peers.Self._loadFromApp();
         peers.Self.view.update();
@@ -497,49 +529,17 @@ TogetherJS.config.track(
     )
 );
 
-function serialize() {
-    const peers: TogetherJSNS.SerializedPeer[] = [];
-    util.forEachAttr(PeerClass.peers, function(peer) {
-        peers.push(peer.serialize());
-    });
-    return { peers: peers };
-}
-
-function deserialize(obj?: { peers: TogetherJSNS.SerializedPeer[] }) {
-    if(!obj) {
-        return;
-    }
-    obj.peers.forEach(function(peer) {
-        PeerClass.deserialize(peer);
-    });
-}
-
-function checkActivity() {
-    const ps = peers.getAllPeers();
-    const now = Date.now();
-    ps.forEach(function(p) {
-        if(p.idle == "active" && now - p.lastMessageDate > IDLE_TIME) {
-            p.update({ idle: "inactive" });
-        }
-        if(p.status != "bye" && now - p.lastMessageDate > BYE_TIME) {
-            p.bye();
-        }
-    });
-}
-
 session.hub.on("bye", function(msg) {
     const peer = peers.getPeer(msg.clientId);
     (peer as PeerClass).bye(); // TODO we probably can't receive a bye message from ourself so it's always of type PeerClass
 });
-
-let checkActivityTask: number | null = null;
 
 session.on("start", function() {
     if(checkActivityTask) {
         console.warn("Old peers checkActivityTask left over?");
         clearTimeout(checkActivityTask);
     }
-    checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+    checkActivityTask = setInterval(() => checkActivity(peers), CHECK_ACTIVITY_INTERVAL);
 });
 
 session.on("close", function() {
@@ -552,8 +552,6 @@ session.on("close", function() {
     }
     checkActivityTask = null;
 });
-
-let tabIdleTimeout: number | null = null;
 
 session.on("visibility-change", function(hidden) {
     if(hidden) {
@@ -600,7 +598,7 @@ util.testExpose({
             if(checkActivityTask !== null) {
                 clearTimeout(checkActivityTask);
             }
-            checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+            checkActivityTask = setInterval(() => checkActivity(peers), CHECK_ACTIVITY_INTERVAL);
         }
     }
 });
@@ -613,7 +611,7 @@ util.testExpose({
             if(checkActivityTask !== null) {
                 clearTimeout(checkActivityTask);
             }
-            checkActivityTask = setInterval(checkActivity, CHECK_ACTIVITY_INTERVAL);
+            checkActivityTask = setInterval(() => checkActivity(peers), CHECK_ACTIVITY_INTERVAL);
         }
     }
 });
