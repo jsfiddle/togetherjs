@@ -14,24 +14,9 @@ import $ from "jquery";
 
 //function cursorMain($: JQueryStatic, _ui: TogetherJSNS.Ui, util: TogetherJSNS.Util, session: TogetherJSNS.Session, elementFinder: TogetherJSNS.ElementFinder, eventMaker: TogetherJSNS.EventMaker, peers: TogetherJSNS.Peers, templating: TogetherJSNS.Templating) {
 const assert: typeof util.assert = util.assert.bind(util);
-
 const CURSOR_HEIGHT = 50;
 const CURSOR_ANGLE = (35 / 180) * Math.PI;
 const CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
-// Number of milliseconds after page load in which a scroll-update
-// related hello-back message will be processed:
-const SCROLL_UPDATE_CUTOFF = 2000;
-
-session.hub.on("cursor-update", function(msg) {
-    if(msg.sameUrl) {
-        Cursor.getClient(msg.clientId).updatePosition(msg);
-    }
-    else {
-        // FIXME: This should be caught even before the cursor-update message,
-        // when the peer goes to another URL
-        Cursor.getClient(msg.clientId).hideOtherUrl();
-    }
-});
 
 // FIXME: should check for a peer leaving and remove the cursor object
 class Cursor {
@@ -239,6 +224,17 @@ class Cursor {
     }
 }
 
+session.hub.on("cursor-update", function(msg) {
+    if(msg.sameUrl) {
+        Cursor.getClient(msg.clientId).updatePosition(msg);
+    }
+    else {
+        // FIXME: This should be caught even before the cursor-update message,
+        // when the peer goes to another URL
+        Cursor.getClient(msg.clientId).hideOtherUrl();
+    }
+});
+
 export function getClient(clientId: string): Cursor {
     return Cursor.getClient(clientId);
 }
@@ -253,13 +249,13 @@ peers.on("identity-updated", cbCursor);
 peers.on("status-updated", cbCursor);
 
 let lastTime = 0;
-const MIN_TIME = 100;
+const MIN_TIME_BETWEEN_MOUSE_MOVE = 100;
 let lastPosX = -1;
 let lastPosY = -1;
 let lastMessage: TogetherJSNS.On.CursorUpdate | null = null;
 function mousemove(event: JQueryMouseEventObject) {
     const now = Date.now();
-    if(now - lastTime < MIN_TIME) {
+    if(now - lastTime < MIN_TIME_BETWEEN_MOUSE_MOVE) {
         return;
     }
     lastTime = now;
@@ -334,7 +330,6 @@ let scrollTimeout: number | null = null;
 let scrollTimeoutSet = 0;
 const SCROLL_DELAY_TIMEOUT = 75;
 const SCROLL_DELAY_LIMIT = 300;
-
 function scroll() {
     const now = Date.now();
     if(scrollTimeout) {
@@ -380,10 +375,10 @@ session.hub.on("scroll-update", function(msg) {
     }
 });
 
-// In case there are multiple peers, we track that we've accepted one of their
-// hello-based scroll updates, just so we don't bounce around (we don't intelligently
-// choose which one to use, just the first that comes in)
+// In case there are multiple peers, we track that we've accepted one of their hello-based scroll updates, just so we don't bounce around (we don't intelligently choose which one to use, just the first that comes in)
 let acceptedScrollUpdate = false;
+// Number of milliseconds after page load in which a scroll-update related hello-back message will be processed:
+const SCROLL_UPDATE_CUTOFF = 2000;
 function cbHelloHelloback(msg: TogetherJSNS.On.Hello2 | TogetherJSNS.On.HelloBack2) {
     if(msg.type == "hello") {
         // Once a hello comes in, a bunch of hello-backs not intended for us will also
@@ -486,8 +481,6 @@ function documentClick(event: MouseEvent & { togetherjsInternal?: boolean }) {
     });
 }
 
-const CLICK_TRANSITION_TIME = 3000;
-
 session.hub.on("cursor-click", function(pos) {
     // When the click is calculated isn't always the same as how the
     // last cursor update was calculated, so we force the cursor to
@@ -514,6 +507,7 @@ session.hub.on("cursor-click", function(pos) {
     displayClick({ top: top, left: left }, pos.peer.color);
 });
 
+const CLICK_TRANSITION_TIME = 3000;
 function displayClick(pos: { top: number, left: number }, color: string) {
     // FIXME: should we hide the local click if no one else is going to see it?
     // That means tracking who might be able to see our screen.
@@ -534,7 +528,6 @@ function displayClick(pos: { top: number, left: number }, color: string) {
 
 let lastKeydown = 0;
 const MIN_KEYDOWN_TIME = 500;
-
 function documentKeydown() {
     setTimeout(function() {
         const now = Date.now();

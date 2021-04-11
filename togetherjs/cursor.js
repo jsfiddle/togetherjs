@@ -15,19 +15,6 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
     const CURSOR_HEIGHT = 50;
     const CURSOR_ANGLE = (35 / 180) * Math.PI;
     const CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
-    // Number of milliseconds after page load in which a scroll-update
-    // related hello-back message will be processed:
-    const SCROLL_UPDATE_CUTOFF = 2000;
-    session_1.session.hub.on("cursor-update", function (msg) {
-        if (msg.sameUrl) {
-            Cursor.getClient(msg.clientId).updatePosition(msg);
-        }
-        else {
-            // FIXME: This should be caught even before the cursor-update message,
-            // when the peer goes to another URL
-            Cursor.getClient(msg.clientId).hideOtherUrl();
-        }
-    });
     // FIXME: should check for a peer leaving and remove the cursor object
     class Cursor {
         constructor(clientId) {
@@ -213,6 +200,16 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
     }
     Cursor._cursors = {};
+    session_1.session.hub.on("cursor-update", function (msg) {
+        if (msg.sameUrl) {
+            Cursor.getClient(msg.clientId).updatePosition(msg);
+        }
+        else {
+            // FIXME: This should be caught even before the cursor-update message,
+            // when the peer goes to another URL
+            Cursor.getClient(msg.clientId).hideOtherUrl();
+        }
+    });
     function getClient(clientId) {
         return Cursor.getClient(clientId);
     }
@@ -225,13 +222,13 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
     peers_1.peers.on("identity-updated", cbCursor);
     peers_1.peers.on("status-updated", cbCursor);
     let lastTime = 0;
-    const MIN_TIME = 100;
+    const MIN_TIME_BETWEEN_MOUSE_MOVE = 100;
     let lastPosX = -1;
     let lastPosY = -1;
     let lastMessage = null;
     function mousemove(event) {
         const now = Date.now();
-        if (now - lastTime < MIN_TIME) {
+        if (now - lastTime < MIN_TIME_BETWEEN_MOUSE_MOVE) {
             return;
         }
         lastTime = now;
@@ -345,10 +342,10 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             msg.peer.view.scrollTo();
         }
     });
-    // In case there are multiple peers, we track that we've accepted one of their
-    // hello-based scroll updates, just so we don't bounce around (we don't intelligently
-    // choose which one to use, just the first that comes in)
+    // In case there are multiple peers, we track that we've accepted one of their hello-based scroll updates, just so we don't bounce around (we don't intelligently choose which one to use, just the first that comes in)
     let acceptedScrollUpdate = false;
+    // Number of milliseconds after page load in which a scroll-update related hello-back message will be processed:
+    const SCROLL_UPDATE_CUTOFF = 2000;
     function cbHelloHelloback(msg) {
         if (msg.type == "hello") {
             // Once a hello comes in, a bunch of hello-backs not intended for us will also
@@ -445,7 +442,6 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             displayClick({ top: event.pageY, left: event.pageX }, peers_1.peers.Self.color);
         });
     }
-    const CLICK_TRANSITION_TIME = 3000;
     session_1.session.hub.on("cursor-click", function (pos) {
         // When the click is calculated isn't always the same as how the
         // last cursor update was calculated, so we force the cursor to
@@ -471,6 +467,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
         displayClick({ top: top, left: left }, pos.peer.color);
     });
+    const CLICK_TRANSITION_TIME = 3000;
     function displayClick(pos, color) {
         // FIXME: should we hide the local click if no one else is going to see it?
         // That means tracking who might be able to see our screen.
