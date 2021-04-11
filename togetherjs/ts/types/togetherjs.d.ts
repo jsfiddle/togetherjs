@@ -837,15 +837,6 @@ declare global {
             [key: string]: CallbackForOn<T>;
         }
 
-        interface ConfigFunObj {
-            call<K extends keyof Config, V extends Config[K]>(attributeName: K, attributeValue: V): void;
-            (attributeName: string, attributeValue?: keyof Config): void;
-            get<K extends keyof Config>(name: K): Config[K];
-            track<K extends keyof Config>(name: K, callback: (value: Config[K], previous?: Config[K]) => void): (value: Config[K], previous?: Config[K]) => void;
-            has(name: string): boolean;
-            close<K extends keyof Config>(attributeName: K): Config[K] | undefined;
-        }
-
         interface CodeMirrorElement {
             CodeMirror: {
                 getValue: () => string,

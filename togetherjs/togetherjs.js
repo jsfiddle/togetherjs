@@ -6,7 +6,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "no" == "__" + "min__" ? false : "no" == "yes";
+let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
 function addStyle(styleSheetUrl, baseUrl, cacheBust) {
     const existing = document.getElementById("togetherjs-stylesheet");
     if (!existing) {
@@ -23,7 +23,7 @@ function addScript(url, baseUrl, cacheBust) {
     document.head.appendChild(script);
 }
 function computeBaseUrl() {
-    let baseUrl = "";
+    let baseUrl = "__baseUrl__";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -39,7 +39,7 @@ function computeBaseUrl() {
     return baseUrl;
 }
 function computeCacheBust() {
-    let cacheBust = "";
+    let cacheBust = "__gitCommit__";
     if (!cacheBust || cacheBust == "__" + "gitCommit__") {
         cacheBust = Date.now().toString();
     }
@@ -47,7 +47,7 @@ function computeCacheBust() {
 }
 // FIXME: we could/should use a version from the checkout, at least for production
 function computeVersion() {
-    let version = "";
+    let version = "__gitCommit__";
     if (!version || version == "__" + "gitCommit__") {
         version = "unknown";
     }
@@ -666,7 +666,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
+    let defaultHubBase = "__hubUrl__";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";
