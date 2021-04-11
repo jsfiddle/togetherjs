@@ -168,8 +168,7 @@ session.on("ui-ready", function() {
     $upload.on("change", function(this: DataTransfer) { // TODO is this really a DataTransfer? It was the most relevant type with a files field
         const reader = new FileReader();
         reader.onload = function() {
-            // FIXME: I don't actually know it's JPEG, but it's probably a
-            // good enough guess:
+            // FIXME: I don't actually know it's JPEG, but it's probably a good enough guess:
             const url = "data:image/jpeg;base64," + util.blobToBase64(this.result!); // TODO !
             convertImage(url, function(result) {
                 savePicture(result);

@@ -141,8 +141,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
         $upload.on("change", function () {
             const reader = new FileReader();
             reader.onload = function () {
-                // FIXME: I don't actually know it's JPEG, but it's probably a
-                // good enough guess:
+                // FIXME: I don't actually know it's JPEG, but it's probably a good enough guess:
                 const url = "data:image/jpeg;base64," + util_1.util.blobToBase64(this.result); // TODO !
                 convertImage(url, function (result) {
                     savePicture(result);
