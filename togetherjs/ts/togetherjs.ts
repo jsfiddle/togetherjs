@@ -166,13 +166,18 @@ class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<voi
 
 class ConfigClass {
     private readonly _configTrackers: Partial<{ [key in keyof TogetherJSNS.Config]: ((value: unknown, previous?: unknown) => void)[] }> = {};
+    private _configClosed: { [P in keyof TogetherJSNS.Config]?: boolean } = {};
 
-    constructor(private configuration: TogetherJSNS.Config) { }
+    constructor(private configuration: TogetherJSNS.Config, public running: boolean) { }
 
     call<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) {
         if(name == "loaded" || name == "callToStart") {
             console.error("Cannot change loaded or callToStart values");
             return;
+        }
+
+        if(this._configClosed[name] && this.running) {
+            throw new Error("The configuration " + name + " is finalized and cannot be changed");
         }
 
         const previous = this.configuration[name];
@@ -217,29 +222,32 @@ class ConfigClass {
         this._configTrackers[name]!.push(callback as any); // TODO ! and any cast
         return callback;
     }
-}
 
-// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
-function createConfigFunObj(confObj: ConfigClass): TogetherJSNS.ConfigFunObj {
-    const config: TogetherJSNS.ConfigFunObj = (<K extends keyof TogetherJSNS.Config, V extends TogetherJSNS.Config[K]>(name: K, maybeValue?: V) => confObj.call(name, maybeValue)) as TogetherJSNS.ConfigFunObj;
-    config.get = <K extends keyof TogetherJSNS.Config>(name: K) => confObj.get(name);
-    config.track = <K extends keyof TogetherJSNS.Config>(name: K, callback: (arg: TogetherJSNS.Config[K]) => void) => confObj.track(name, callback);
-    config.has = (name: string) => name in confObj;
-    return config;
+    /** Freeze the configuration attribute */
+    close<K extends keyof TogetherJSNS.Config>(name: K): TogetherJSNS.Config[K] | undefined {
+        if(!Object.prototype.hasOwnProperty.call(this.configuration, name)) {
+            throw new Error("Configuration is unknown: " + name);
+        }
+        this._configClosed[name] = true;
+        return this.get(name);
+    }
+
+    has(name: string) {
+        return name in this.configuration;
+    }
 }
 
 class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
     public startupReason: TogetherJSNS.Reason | null = null;
-    public running = false;
+    public _running = false;
     public require: Require | null = null;
-    public readonly config: TogetherJSNS.ConfigFunObj;
     public readonly hub: TogetherJSNS.Hub = new OnClass<TogetherJSNS.On.Map>();
     /** Time at which the page was loaded */
     public readonly pageLoaded: number = Date.now();
     public readonly editTrackers: { [trackerName: string]: TogetherJSNS.TrackerClass } = {};
 
     private requireObject: Require | null = null;
-    private configObject: ConfigClass;
+    public config: ConfigClass;
     /** a copy of startup to be used on _teardown */
     private startupInit: TogetherJSNS.Startup;
     private listener: TogetherJSNS.KeyboardListener | null = null;
@@ -254,9 +262,17 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         super();
         this.startupInit = Object.assign({}, startup);
         this._knownEvents = ["ready", "close"];
-        this.configObject = new ConfigClass(configuration)
-        this.config = createConfigFunObj(this.configObject);
+        this.config = new ConfigClass(configuration, this.running)
         this.startup.button = null;
+    }
+
+    get running() {
+        return this._running;
+    }
+
+    set running(running: boolean) {
+        this._running = running;
+        this.config.running = running;
     }
 
     start(event?: EventHtmlElement | HTMLElement | HTMLElement[]) {
@@ -287,7 +303,10 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
             console.warn("Error determining starting button:", e);
         }
         if(window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
-            this.config(window.TogetherJSConfig);
+            let attr: keyof typeof window.TogetherJSConfig;
+            for(attr in window.TogetherJSConfig) {
+                this.config.call(attr, window.TogetherJSConfig[attr]);
+            }
             window.TogetherJSConfig.loaded = true;
         }
 
@@ -302,7 +321,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
             }
             else if(attr.indexOf("TogetherJSConfig_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_").length) as keyof TogetherJSNS.Config;
-                this.config(attrName, window[attr] as unknown as TogetherJSNS.Config[keyof TogetherJSNS.Config]); // TODO this cast is here because Window has an index signature that always return a Window
+                this.config.call(attrName, window[attr] as unknown as TogetherJSNS.Config[keyof TogetherJSNS.Config]); // TODO this cast is here because Window has an index signature that always return a Window
             }
         }
         // FIXME: copy existing config?
@@ -315,7 +334,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
                 ons[attr] = globalOns[attr];
             }
         }
-        this.config("on", ons);
+        this.config.call("on", ons);
         for(attr in ons) {
             this.on(attr as keyof TogetherJSNS.On.Map, ons[attr]); // TODO check cast
         }
@@ -383,7 +402,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         else if(availableTranslations[lang] !== true) {
             lang = availableTranslations[lang];
         }
-        this.config("lang", lang);
+        this.config.call("lang", lang);
 
         const localeTemplates = "templates-" + lang;
         deps.splice(0, 0, localeTemplates);

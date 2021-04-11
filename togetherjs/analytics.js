@@ -6,6 +6,8 @@ define(["require", "exports"], function (require, exports) {
         activate() {
             const enable = TogetherJS.config.get("enableAnalytics");
             const code = TogetherJS.config.get("analyticsCode");
+            TogetherJS.config.close("enableAnalytics");
+            TogetherJS.config.close("analyticsCode");
             if (!(enable && code)) {
                 return;
             }

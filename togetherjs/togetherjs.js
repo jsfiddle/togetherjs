@@ -6,7 +6,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 // True if this file should use minimized sub-resources:
 //@ts-expect-error _min_ is replaced in packaging so comparison always looks false in raw code
 // eslint-disable-next-line no-constant-condition
-let min = "__min__" == "__" + "min__" ? false : "__min__" == "yes";
+let min = "no" == "__" + "min__" ? false : "no" == "yes";
 function addStyle(styleSheetUrl, baseUrl, cacheBust) {
     const existing = document.getElementById("togetherjs-stylesheet");
     if (!existing) {
@@ -23,7 +23,7 @@ function addScript(url, baseUrl, cacheBust) {
     document.head.appendChild(script);
 }
 function computeBaseUrl() {
-    let baseUrl = "__baseUrl__";
+    let baseUrl = "";
     if (baseUrl == "__" + "baseUrl__") {
         // Reset the variable if it doesn't get substituted
         baseUrl = "";
@@ -39,7 +39,7 @@ function computeBaseUrl() {
     return baseUrl;
 }
 function computeCacheBust() {
-    let cacheBust = "__gitCommit__";
+    let cacheBust = "";
     if (!cacheBust || cacheBust == "__" + "gitCommit__") {
         cacheBust = Date.now().toString();
     }
@@ -47,7 +47,7 @@ function computeCacheBust() {
 }
 // FIXME: we could/should use a version from the checkout, at least for production
 function computeVersion() {
-    let version = "__gitCommit__";
+    let version = "";
     if (!version || version == "__" + "gitCommit__") {
         version = "unknown";
     }
@@ -150,15 +150,20 @@ class OnClass {
     }
 }
 class ConfigClass {
-    constructor(configuration) {
+    constructor(configuration, running) {
         this.configuration = configuration;
+        this.running = running;
         this._configTrackers = {};
+        this._configClosed = {};
     }
     call(name, maybeValue) {
         var _a;
         if (name == "loaded" || name == "callToStart") {
             console.error("Cannot change loaded or callToStart values");
             return;
+        }
+        if (this._configClosed[name] && this.running) {
+            throw new Error("The configuration " + name + " is finalized and cannot be changed");
         }
         const previous = this.configuration[name];
         const value = maybeValue;
@@ -200,14 +205,17 @@ class ConfigClass {
         this._configTrackers[name].push(callback); // TODO ! and any cast
         return callback;
     }
-}
-// TODO we use this function because we can't really create an object with a call signature AND fields, in the future we will just use a ConfigClass object and use .call instead of a raw call
-function createConfigFunObj(confObj) {
-    const config = ((name, maybeValue) => confObj.call(name, maybeValue));
-    config.get = (name) => confObj.get(name);
-    config.track = (name, callback) => confObj.track(name, callback);
-    config.has = (name) => name in confObj;
-    return config;
+    /** Freeze the configuration attribute */
+    close(name) {
+        if (!Object.prototype.hasOwnProperty.call(this.configuration, name)) {
+            throw new Error("Configuration is unknown: " + name);
+        }
+        this._configClosed[name] = true;
+        return this.get(name);
+    }
+    has(name) {
+        return name in this.configuration;
+    }
 }
 class TogetherJSClass extends OnClass {
     constructor(requireConfig, version, baseUrl, configuration, startup) {
@@ -217,7 +225,7 @@ class TogetherJSClass extends OnClass {
         this.baseUrl = baseUrl;
         this.startup = startup;
         this.startupReason = null;
-        this.running = false;
+        this._running = false;
         this.require = null;
         this.hub = new OnClass();
         /** Time at which the page was loaded */
@@ -227,9 +235,15 @@ class TogetherJSClass extends OnClass {
         this.listener = null;
         this.startupInit = Object.assign({}, startup);
         this._knownEvents = ["ready", "close"];
-        this.configObject = new ConfigClass(configuration);
-        this.config = createConfigFunObj(this.configObject);
+        this.config = new ConfigClass(configuration, this.running);
         this.startup.button = null;
+    }
+    get running() {
+        return this._running;
+    }
+    set running(running) {
+        this._running = running;
+        this.config.running = running;
     }
     start(event) {
         const cacheBust = computeCacheBust();
@@ -258,7 +272,10 @@ class TogetherJSClass extends OnClass {
             console.warn("Error determining starting button:", e);
         }
         if (window.TogetherJSConfig && (!window.TogetherJSConfig.loaded)) {
-            this.config(window.TogetherJSConfig);
+            let attr;
+            for (attr in window.TogetherJSConfig) {
+                this.config.call(attr, window.TogetherJSConfig[attr]);
+            }
             window.TogetherJSConfig.loaded = true;
         }
         // This handles loading configuration from global variables.  This includes TogetherJSConfig_on_*, which are attributes folded into the "on" configuration value.
@@ -272,7 +289,7 @@ class TogetherJSClass extends OnClass {
             }
             else if (attr.indexOf("TogetherJSConfig_") === 0) {
                 attrName = attr.substr(("TogetherJSConfig_").length);
-                this.config(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
+                this.config.call(attrName, window[attr]); // TODO this cast is here because Window has an index signature that always return a Window
             }
         }
         // FIXME: copy existing config?
@@ -285,7 +302,7 @@ class TogetherJSClass extends OnClass {
                 ons[attr] = globalOns[attr];
             }
         }
-        this.config("on", ons);
+        this.config.call("on", ons);
         for (attr in ons) {
             this.on(attr, ons[attr]); // TODO check cast
         }
@@ -348,7 +365,7 @@ class TogetherJSClass extends OnClass {
         else if (availableTranslations[lang] !== true) {
             lang = availableTranslations[lang];
         }
-        this.config("lang", lang);
+        this.config.call("lang", lang);
         const localeTemplates = "templates-" + lang;
         deps.splice(0, 0, localeTemplates);
         const callback = ( /*_session: TogetherJSNS.Session, _jquery: JQuery*/) => {
@@ -649,7 +666,7 @@ function togetherjsMain() {
             'jquery-private': { 'jquery': 'jquery' }
         }
     };
-    let defaultHubBase = "__hubUrl__";
+    let defaultHubBase = "https://ks3371053.kimsufi.com:7071";
     if (defaultHubBase == "__" + "hubUrl" + "__") {
         // Substitution wasn't made
         defaultHubBase = "https://ks3371053.kimsufi.com:7071";

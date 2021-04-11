@@ -41,6 +41,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         TogetherJS.config.track("youtube", function (track, previous) {
             if (track && !previous) {
                 prepareYouTube();
+                TogetherJS.config.close("youtube"); // You can enable youtube dynamically, but can't turn it off:
             }
         });
     });
