@@ -133,8 +133,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
         const windowHeight = $window.height();
         boundPos.top -= $window.scrollTop();
         boundPos.left -= $window.scrollLeft();
-        // FIXME: I appear to have to add the padding to the width to get a "true"
-        // width.  But it's still not entirely consistent.
+        // FIXME: I appear to have to add the padding to the width to get a "true" width.  But it's still not entirely consistent.
         const height = win.height() + 5;
         const width = win.width() + 20;
         let left;
