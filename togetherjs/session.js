@@ -207,7 +207,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                     saved.date = Date.now();
                     storage_1.storage.tab.set("status", saved);
                 }
-                channel.close(); // TODO !
+                channel.close(); // TODO !!
                 channel = null;
                 this.shareId = null;
                 this.emit("shareId");
@@ -216,7 +216,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             });
         }
         _getChannel() {
-            return channel; // TODO !
+            return channel; // TODO !!
         }
     }
     exports.Session = Session;

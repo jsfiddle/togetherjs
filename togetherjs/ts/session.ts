@@ -46,7 +46,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     /** This is the hub we connect to: */
     public shareId: string | null = null;
     /** This is the ID that identifies this client: */
-    public clientId!: string; // TODO !
+    public clientId!: string; // TODO !!
     public router: Router = new Router();
     /** Indicates if TogetherJS has just started (not continuing from a saved session): */
     public firstRun = false;
@@ -229,7 +229,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
                 saved.date = Date.now();
                 storage.tab.set("status", saved);
             }
-            channel!.close(); // TODO !
+            channel!.close(); // TODO !!
             channel = null;
             this.shareId = null;
             this.emit("shareId");
@@ -239,7 +239,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
     }
 
     _getChannel() {
-        return channel!; // TODO !
+        return channel!; // TODO !!
     }
 }
 

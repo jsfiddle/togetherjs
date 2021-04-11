@@ -31,7 +31,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public defaultName: string = util.pickRandom(PeersSelf.DEFAULT_NICKNAMES); // TODO set to a random one to avoid non-null casting but is it a valid value?
     // private loaded = false;// TODO unused
     public isCreator = !session.isClient;
-    public view!: TogetherJSNS.PeerSelfView; // TODO !
+    public view!: TogetherJSNS.PeerSelfView; // TODO !!
     public url?: string;
     private static DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
 
@@ -193,7 +193,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
 }
 
 export class Peers extends OnClass<TogetherJSNS.On.Map> {
-    public Self!: PeersSelf; // TODO !
+    public Self!: PeersSelf; // TODO !!
     public readonly _SelfLoaded = util.Deferred();
 
     getPeer(id: string, message?: TogetherJSNS.ValueOf<TogetherJSNS.AnyMessage.MapForReceiving>): PeerClass | PeersSelf | null {

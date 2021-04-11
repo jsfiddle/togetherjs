@@ -584,7 +584,7 @@ export class PeerView extends PeerSelfView {
 }
 
 export class Ui {
-    public container!: JQuery; // TODO !
+    public container!: JQuery; // TODO !!
     public readonly PeerView = (peer: TogetherJSNS.PeerClass) => new PeerView(this, peer);
     public readonly PeerSelfView = (peer: TogetherJSNS.PeerSelf | TogetherJSNS.ExternalPeer) => new PeerSelfView(this, peer);
     public readonly chat = new Chat(this);
