@@ -37,7 +37,10 @@ export function templates(resourceName: keyof TogetherJSNS.Template) {
         }
     }
     assert(templatesLang, "Templates not yet loaded");
-    return clean(templatesLang[resourceName] || "");
+    const htmlString = clean(templatesLang[resourceName] || "");
+    const tmpDiv = document.createElement("div");
+    tmpDiv.innerHTML = htmlString;
+    return tmpDiv.firstElementChild as HTMLElement;
 }
 
 // FIXME: maybe it would be better to dynamically assemble the first

@@ -42,7 +42,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             this.playing = null;
         }
         command_help() {
-            const msg = util_1.util.trim(templates_1.templates("help"));
+            const msg = util_1.util.trim(templates_1.templates("help").innerHTML);
             ui_1.ui.chat.system({
                 text: msg
             });

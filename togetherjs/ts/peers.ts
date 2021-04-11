@@ -33,7 +33,7 @@ export class PeersSelf extends OnClass<TogetherJSNS.On.Map> {
     public isCreator = !session.isClient;
     public view!: TogetherJSNS.PeerSelfView; // TODO !!
     public url?: string;
-    private static DEFAULT_NICKNAMES = templates("names").split(/,\s*/g);
+    private static DEFAULT_NICKNAMES = templates("names").innerHTML.split(/,\s*/g);
 
     constructor(private peers: Peers) {
         super();

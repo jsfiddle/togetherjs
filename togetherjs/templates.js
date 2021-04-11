@@ -35,7 +35,10 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
             }
         }
         assert(templatesLang, "Templates not yet loaded");
-        return clean(templatesLang[resourceName] || "");
+        const htmlString = clean(templatesLang[resourceName] || "");
+        const tmpDiv = document.createElement("div");
+        tmpDiv.innerHTML = htmlString;
+        return tmpDiv.firstElementChild;
     }
     exports.templates = templates;
 });

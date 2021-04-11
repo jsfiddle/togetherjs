@@ -182,7 +182,7 @@ define(["require", "exports", "./session", "./storage", "./templates", "./util"]
         }
     }
     exports.PeersSelf = PeersSelf;
-    PeersSelf.DEFAULT_NICKNAMES = templates_1.templates("names").split(/,\s*/g);
+    PeersSelf.DEFAULT_NICKNAMES = templates_1.templates("names").innerHTML.split(/,\s*/g);
     class Peers extends OnClass {
         constructor() {
             super(...arguments);

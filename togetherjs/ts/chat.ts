@@ -51,7 +51,7 @@ class Commands {
     playing: TogetherJSNS.Logs | null = null;
 
     command_help() {
-        const msg = util.trim(templates("help"));
+        const msg = util.trim(templates("help").innerHTML);
         ui.chat.system({
             text: msg
         });
