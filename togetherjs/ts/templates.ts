@@ -40,7 +40,7 @@ export function templates(resourceName: keyof TogetherJSNS.Template) {
     const htmlString = clean(templatesLang[resourceName] || "");
     const tmpDiv = document.createElement("div");
     tmpDiv.innerHTML = htmlString;
-    return tmpDiv.firstElementChild as HTMLElement;
+    return tmpDiv as HTMLElement;
 }
 
 // FIXME: maybe it would be better to dynamically assemble the first

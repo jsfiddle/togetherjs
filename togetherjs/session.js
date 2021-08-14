@@ -464,7 +464,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
         exports.session.emit("resize");
     }
     if (TogetherJS.startup._launch) {
-        setTimeout(exports.session.start);
+        setTimeout(() => exports.session.start());
     }
     util_1.util.testExpose({
         getChannel: function () {

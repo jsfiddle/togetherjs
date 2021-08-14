@@ -38,7 +38,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         const htmlString = clean(templatesLang[resourceName] || "");
         const tmpDiv = document.createElement("div");
         tmpDiv.innerHTML = htmlString;
-        return tmpDiv.firstElementChild;
+        return tmpDiv;
     }
     exports.templates = templates;
 });

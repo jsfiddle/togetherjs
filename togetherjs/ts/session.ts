@@ -503,7 +503,7 @@ function resizeEvent() {
 }
 
 if(TogetherJS.startup._launch) {
-    setTimeout(session.start);
+    setTimeout(() => session.start());
 }
 
 util.testExpose({
