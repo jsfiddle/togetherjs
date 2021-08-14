@@ -60,9 +60,9 @@ function computeVersion() {
 }
 
 class OnClass<Map extends {[messageName: string]: TogetherJSNS.CallbackForOn<void>}> {
-    _knownEvents?: string[];
-    _listeners: { [name: string]: TogetherJSNS.CallbackForOn<void>[] } = {};
-    _listenerOffs?: [string, TogetherJSNS.CallbackForOn<void>][];
+    protected _knownEvents?: string[];
+    private _listeners: { [name: string]: TogetherJSNS.CallbackForOn<void>[] } = {};
+    private _listenerOffs?: [string, TogetherJSNS.CallbackForOn<void>][];
 
     on<T extends Extract<keyof Map, string>>(name: T, callback: Map[T]) {
         if(typeof callback != "function") {
