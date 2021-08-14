@@ -121,7 +121,6 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
         else if(type.search(/^app\./) === -1) {
             msg.type = `app.${type}` as const;
         }
-        msg.type = type;
         this.send(msg as TogetherJSNS.AnyMessage.AnyForSending); // TODO cast
     }
 

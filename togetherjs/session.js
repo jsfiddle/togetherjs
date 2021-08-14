@@ -105,7 +105,6 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             else if (type.search(/^app\./) === -1) {
                 msg.type = `app.${type}`;
             }
-            msg.type = type;
             this.send(msg); // TODO cast
         }
         makeHelloMessage(helloBack) {
