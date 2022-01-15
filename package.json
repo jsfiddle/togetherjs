@@ -34,7 +34,7 @@
     "grunt-contrib-copy": "~0.4.1",
     "grunt-http-server": "~0.0.5",
     "nunjucks": "~0.1.8a",
-    "marked": "~0.3.4",
+    "marked": "~4.0.10",
     "docco": "~0.6.2",
     "highlight.js": "~7.3.0",
     "optimist": "~0.6.0",
