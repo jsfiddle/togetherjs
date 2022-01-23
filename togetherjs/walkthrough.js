@@ -16,12 +16,12 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     let slides; // TODO init
     function show(index) {
         slides.hide();
-        jquery_1.default(slides[index]).show();
+        (0, jquery_1.default)(slides[index]).show();
         const bullets = container.find("#togetherjs-walkthrough-progress .togetherjs-walkthrough-slide-progress");
         bullets.removeClass("togetherjs-active");
-        jquery_1.default(bullets[index]).addClass("togetherjs-active");
-        const $next = jquery_1.default("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
-        const $previous = jquery_1.default("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
+        (0, jquery_1.default)(bullets[index]).addClass("togetherjs-active");
+        const $next = (0, jquery_1.default)("#togetherjs-walkthrough-next").removeClass("togetherjs-disabled");
+        const $previous = (0, jquery_1.default)("#togetherjs-walkthrough-previous").removeClass("togetherjs-disabled");
         if (index == slides.length - 1) {
             $next.addClass("togetherjs-disabled");
         }
@@ -60,12 +60,12 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
     class Walkthrough {
         start(firstTime, doneCallback = null) {
             if (!container) {
-                container = jquery_1.default(templates_1.templates("walkthrough"));
+                container = (0, jquery_1.default)((0, templates_1.templates)("walkthrough"));
                 container.hide();
                 ui_1.ui.container.append(container);
                 slides = container.find(".togetherjs-walkthrough-slide");
                 slides.hide();
-                const progress = jquery_1.default("#togetherjs-walkthrough-progress");
+                const progress = (0, jquery_1.default)("#togetherjs-walkthrough-progress");
                 slides.each(function (index) {
                     const bullet = templating_1.templating.sub("walkthrough-slide-progress", {});
                     progress.append(bullet);
@@ -77,11 +77,11 @@ define(["require", "exports", "./peers", "./session", "./templates", "./templati
                 container.find("#togetherjs-walkthrough-next").click(next);
                 ui_1.ui.prepareShareLink(container);
                 container.find(".togetherjs-self-name").bind("keyup", function (event) {
-                    const val = jquery_1.default(event.target).val();
+                    const val = (0, jquery_1.default)(event.target).val();
                     peers_1.peers.Self.update({ name: val });
                 });
                 container.find(".togetherjs-swatch").click(function () {
-                    const picker = jquery_1.default("#togetherjs-pick-color");
+                    const picker = (0, jquery_1.default)("#togetherjs-pick-color");
                     if (picker.is(":visible")) {
                         picker.hide();
                         return;

@@ -14,7 +14,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
     class Templating {
         clone(templateId) {
             const templateId2 = "#togetherjs-template-" + templateId;
-            let template = jquery_1.default(templateId2);
+            let template = (0, jquery_1.default)(templateId2);
             assert(template.length, "No template found with id:", templateId2);
             template = template.clone();
             template.attr("id", null);
@@ -53,7 +53,7 @@ define(["require", "exports", "./session", "./util", "jquery"], function (requir
                 const attrs = template.find("[" + attrName + "]");
                 attrs.each(function (_index, element) {
                     assert(typeof value == "string");
-                    const $element = jquery_1.default(element);
+                    const $element = (0, jquery_1.default)(element);
                     const subAttribute = $element.attr(attrName);
                     $element.attr(attrName, null);
                     $element.attr(subAttribute, value);

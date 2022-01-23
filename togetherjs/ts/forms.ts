@@ -247,7 +247,7 @@ class CodeMirrorEditor extends Editor<TogetherJSNS.CodeMirrorElement & HTMLEleme
     }
 
     static scan() {
-        const result: HTMLElement[] = [];
+        const result: Element[] = [];
         const els = document.body.getElementsByTagName("*");
         const _len = els.length;
         for(let i = 0; i < _len; i++) {

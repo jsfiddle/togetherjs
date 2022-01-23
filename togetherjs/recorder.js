@@ -14,10 +14,10 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
     let channel; // TODO potentially not initialized, why does TSC doesn't catch that?
     const clientId = "recorder";
     function display(elOrSelector) {
-        const el = jquery_1.default(elOrSelector);
+        const el = (0, jquery_1.default)(elOrSelector);
         const toggles = el.attr("data-toggles");
         if (toggles) {
-            jquery_1.default(toggles).hide();
+            (0, jquery_1.default)(toggles).hide();
         }
         el.show();
     }
@@ -53,19 +53,19 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
         channel.send({
             type: "logs",
             clientId: clientId,
-            logs: jquery_1.default("#record").val(),
+            logs: (0, jquery_1.default)("#record").val(),
             request: req
         });
     }
     class Recorder {
         start(options) {
-            jquery_1.default(() => {
-                jquery_1.default("#record").css({ height: jquery_1.default(window).height() - 50 });
-                jquery_1.default("#restart").click(function () {
+            (0, jquery_1.default)(() => {
+                (0, jquery_1.default)("#record").css({ height: (0, jquery_1.default)(window).height() - 50 });
+                (0, jquery_1.default)("#restart").click(function () {
                     location.reload();
                 });
-                jquery_1.default("#select").click(function () {
-                    jquery_1.default("#record").select();
+                (0, jquery_1.default)("#select").click(function () {
+                    (0, jquery_1.default)("#record").select();
                 });
                 this.activate(options);
             });
@@ -108,11 +108,11 @@ define(["require", "exports", "jquery", "./channels", "./util"], function (requi
         }
         logMessage(msg) {
             msg.date = Date.now(); // TODO abusive cast
-            const $record = jquery_1.default("#record");
+            const $record = (0, jquery_1.default)("#record");
             $record.val($record.val() + JSON.stringify(msg) + "\n\n");
         }
     }
-    jquery_1.default(window).unload(function () {
+    (0, jquery_1.default)(window).unload(function () {
         channel.send({
             type: "bye",
             clientId: clientId

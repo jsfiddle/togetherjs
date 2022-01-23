@@ -44,7 +44,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                 }
             });
             if (jquery_1.default.browser.msie) {
-                jquery_1.default("#togetherjs-browser-broken-is-ie").show();
+                (0, jquery_1.default)("#togetherjs-browser-broken-is-ie").show();
             }
         }
         browserUnsupported(next) {
@@ -68,7 +68,7 @@ define(["require", "exports", "./storage", "./windowing", "jquery"], function (r
                     }
                 }
             });
-            jquery_1.default("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
+            (0, jquery_1.default)("#togetherjs-intro .togetherjs-modal-dont-join").click(function () {
                 cancelled = true;
                 windowing_1.windowing.hide();
                 session.close("declined-join");

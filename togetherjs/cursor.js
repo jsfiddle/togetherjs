@@ -35,7 +35,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             else {
                 console.error("Could not find a peer with id", this.clientId);
             }
-            jquery_1.default(document.body).append(this.element);
+            (0, jquery_1.default)(document.body).append(this.element);
             this.element.animateCursorEntry();
         }
         updatePeer(peer) {
@@ -93,7 +93,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
                 this.atOtherUrl = false;
             }
             if ("element" in pos) {
-                const target = jquery_1.default(elementFinder_1.elementFinder.findElement(pos.element));
+                const target = (0, jquery_1.default)(elementFinder_1.elementFinder.findElement(pos.element));
                 const offset = target.offset(); // TODO !
                 top = offset.top + pos.offsetY;
                 left = offset.left + pos.offsetX;
@@ -118,7 +118,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         }
         // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
         rotateCursorDown() {
-            const e = jquery_1.default(this.element).find('svg');
+            const e = (0, jquery_1.default)(this.element).find('svg');
             e.animate({ borderSpacing: -150, opacity: 1 }, {
                 step: function (now, fx) {
                     if (fx.prop == "borderSpacing") {
@@ -138,8 +138,8 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             });
         }
         setPosition(top, left) {
-            const wTop = jquery_1.default(window).scrollTop();
-            const height = jquery_1.default(window).height();
+            const wTop = (0, jquery_1.default)(window).scrollTop();
+            const height = (0, jquery_1.default)(window).height();
             if (top < wTop) {
                 // FIXME: this is a totally arbitrary number, but is meant to be big enough
                 // to keep the cursor name from being off the top of the screen.
@@ -241,7 +241,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         lastPosX = pageX;
         lastPosY = pageY;
         let target = event.target;
-        const parent = jquery_1.default(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
+        const parent = (0, jquery_1.default)(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
         if (parent.length) {
             target = parent[0];
         }
@@ -257,7 +257,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             session_1.session.send(lastMessage);
             return;
         }
-        const $target = jquery_1.default(target);
+        const $target = (0, jquery_1.default)(target);
         const offset = $target.offset();
         if (!offset) {
             // FIXME: this really is walkabout.js's problem to fire events on the
@@ -276,7 +276,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         session_1.session.send(lastMessage);
     }
     function makeCursor(color) {
-        const canvas = jquery_1.default("<canvas></canvas>");
+        const canvas = (0, jquery_1.default)("<canvas></canvas>");
         canvas.attr("height", CURSOR_HEIGHT);
         canvas.attr("width", CURSOR_WIDTH);
         const canvas0 = canvas[0];
@@ -326,7 +326,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         });
         lastScrollMessage = {
             type: "scroll-update",
-            position: elementFinder_1.elementFinder.elementByPixel(jquery_1.default(window).scrollTop())
+            position: elementFinder_1.elementFinder.elementByPixel((0, jquery_1.default)(window).scrollTop())
         };
         session_1.session.send(lastScrollMessage);
     }
@@ -366,20 +366,20 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
     session_1.session.hub.on("hello-back", cbHelloHelloback);
     session_1.session.hub.on("hello", cbHelloHelloback);
     session_1.session.on("ui-ready", function () {
-        jquery_1.default(document).mousemove(mousemove);
+        (0, jquery_1.default)(document).mousemove(mousemove);
         document.addEventListener("click", documentClick, true);
         document.addEventListener("keydown", documentKeydown, true);
-        jquery_1.default(window).scroll(scroll);
+        (0, jquery_1.default)(window).scroll(scroll);
         scroll();
     });
     session_1.session.on("close", function () {
         Cursor.forEach(function (_c, clientId) {
             Cursor.destroy(clientId);
         });
-        jquery_1.default(document).unbind("mousemove", mousemove);
+        (0, jquery_1.default)(document).unbind("mousemove", mousemove);
         document.removeEventListener("click", documentClick, true);
         document.removeEventListener("keydown", documentKeydown, true);
-        jquery_1.default(window).unbind("scroll", scroll);
+        (0, jquery_1.default)(window).unbind("scroll", scroll);
     });
     session_1.session.hub.on("hello", function () {
         // Immediately get our cursor onto this new person's screen:
@@ -427,7 +427,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
                 return;
             }
             const location = elementFinder_1.elementFinder.elementLocation(element);
-            const offset = jquery_1.default(element).offset(); // TODO !
+            const offset = (0, jquery_1.default)(element).offset(); // TODO !
             const offsetX = event.pageX - offset.left;
             const offsetY = event.pageY - offset.top;
             session_1.session.send({
@@ -453,7 +453,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
             return;
         }
         Cursor.getClient(pos.clientId).updatePosition(pos);
-        const target = jquery_1.default(elementFinder_1.elementFinder.findElement(pos.element));
+        const target = (0, jquery_1.default)(elementFinder_1.elementFinder.findElement(pos.element));
         const offset = target.offset(); // TODO !
         const top = offset.top + pos.offsetY;
         const left = offset.left + pos.offsetX;
@@ -472,7 +472,7 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         // FIXME: should we hide the local click if no one else is going to see it?
         // That means tracking who might be able to see our screen.
         const element = templating_1.templating.clone("click");
-        jquery_1.default(document.body).append(element);
+        (0, jquery_1.default)(document.body).append(element);
         element.css({
             top: pos.top,
             left: pos.left,

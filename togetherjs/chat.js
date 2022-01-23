@@ -42,7 +42,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             this.playing = null;
         }
         command_help() {
-            const msg = util_1.util.trim(templates_1.templates("help").innerHTML);
+            const msg = util_1.util.trim((0, templates_1.templates)("help").innerHTML);
             ui_1.ui.chat.system({
                 text: msg
             });
@@ -81,7 +81,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
                 ui_1.ui.chat.system({
                     text: "Testing with walkabout.js"
                 });
-                const tmpl = jquery_1.default(templates_1.templates("walkabout"));
+                const tmpl = (0, jquery_1.default)((0, templates_1.templates)("walkabout"));
                 const container = ui_1.ui.container.find(".togetherjs-test-container");
                 container.empty();
                 container.append(tmpl);
@@ -160,7 +160,7 @@ define(["require", "exports", "./peers", "./playback", "./session", "./storage",
             ui_1.ui.chat.system({
                 text: "When you see the robot appear, the recording will have started"
             });
-            window.open(session_1.session.recordUrl(), "_blank", "left,width=" + (jquery_1.default(window).width() / 2));
+            window.open(session_1.session.recordUrl(), "_blank", "left,width=" + ((0, jquery_1.default)(window).width() / 2));
         }
         command_playback(url) {
             if (this.playing) {

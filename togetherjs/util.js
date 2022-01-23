@@ -238,7 +238,7 @@ define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, e
                 return !!selector;
             }
             try {
-                return jquery_1.default(el).is(selector);
+                return (0, jquery_1.default)(el).is(selector);
             }
             catch (e) {
                 console.warn("Bad selector:", selector, "error:", e);

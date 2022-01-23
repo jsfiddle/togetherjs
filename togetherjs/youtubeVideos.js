@@ -21,23 +21,23 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         }
     });
     session_1.session.on("close", function () {
-        jquery_1.default(youTubeIframes).each(function (_i, iframe) {
+        (0, jquery_1.default)(youTubeIframes).each(function (_i, iframe) {
             // detach players from iframes
-            jquery_1.default(iframe).removeData("togetherjs-player");
-            jquery_1.default(iframe).removeData("dontPublish");
-            jquery_1.default(iframe).removeData("currentVideoId");
+            (0, jquery_1.default)(iframe).removeData("togetherjs-player");
+            (0, jquery_1.default)(iframe).removeData("dontPublish");
+            (0, jquery_1.default)(iframe).removeData("currentVideoId");
             // disable iframeAPI
-            jquery_1.default(iframe).removeAttr("enablejsapi");
+            (0, jquery_1.default)(iframe).removeAttr("enablejsapi");
             // remove unique youtube iframe indicators
-            const id = jquery_1.default(iframe).attr("id") || "";
+            const id = (0, jquery_1.default)(iframe).attr("id") || "";
             if (id.indexOf("youtube-player") === 0) {
                 // An id we added
-                jquery_1.default(iframe).removeAttr("id");
+                (0, jquery_1.default)(iframe).removeAttr("id");
             }
             youTubeIframes = [];
         });
     });
-    jquery_1.default(function () {
+    (0, jquery_1.default)(function () {
         TogetherJS.config.track("youtube", function (track, previous) {
             if (track && !previous) {
                 prepareYouTube();
@@ -55,7 +55,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
             window.onYouTubeIframeAPIReady = function (oldf) {
                 return function () {
                     // YouTube API is ready
-                    jquery_1.default(youTubeIframes).each(function (_i, iframe) {
+                    (0, jquery_1.default)(youTubeIframes).each(function (_i, iframe) {
                         new YT.Player(iframe.id, {
                             events: {
                                 'onReady': insertPlayer,
@@ -84,17 +84,17 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         }
         // give each youtube iframe a unique id and set its enablejsapi param to true
         function setupYouTubeIframes() {
-            const iframes = jquery_1.default('iframe');
+            const iframes = (0, jquery_1.default)('iframe');
             iframes.each(function (i, f) {
                 const iframe = f;
                 // if the iframe's unique id is already set, skip it
                 // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
                 // maybe we should set iframes everytime togetherjs is reinitialized?
-                const osrc = jquery_1.default(iframe).attr("src");
+                const osrc = (0, jquery_1.default)(iframe).attr("src");
                 let src = osrc;
-                if ((src || "").indexOf("youtube") != -1 && !jquery_1.default(iframe).attr("id")) {
-                    jquery_1.default(iframe).attr("id", "youtube-player" + i);
-                    jquery_1.default(iframe).attr("enablejsapi", 1);
+                if ((src || "").indexOf("youtube") != -1 && !(0, jquery_1.default)(iframe).attr("id")) {
+                    (0, jquery_1.default)(iframe).attr("id", "youtube-player" + i);
+                    (0, jquery_1.default)(iframe).attr("enablejsapi", 1);
                     // we also need to add ?enablejsapi to the iframe src.
                     if (!/[?&]enablejsapi=1(&|$)/.test(src)) {
                         src += (/[?]/.test(src)) ? '&' : '?';
@@ -106,7 +106,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
                         src = 'https://' + src.replace(/^(\w+[:])?\/\//, '');
                     }
                     if (src !== osrc) {
-                        jquery_1.default(iframe).attr("src", src);
+                        (0, jquery_1.default)(iframe).attr("src", src);
                     }
                     youTubeIframes[i] = iframe;
                 }
@@ -117,13 +117,13 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
             const currentPlayer = event.target;
             const currentIframe = currentPlayer.getIframe();
             // check if a player is already attached in case of being reinitialized
-            if (!jquery_1.default(currentIframe).data("togetherjs-player")) {
-                jquery_1.default(currentIframe).data("togetherjs-player", currentPlayer);
+            if (!(0, jquery_1.default)(currentIframe).data("togetherjs-player")) {
+                (0, jquery_1.default)(currentIframe).data("togetherjs-player", currentPlayer);
                 // initialize its dontPublish flag as well
-                jquery_1.default(currentIframe).data("dontPublish", false);
+                (0, jquery_1.default)(currentIframe).data("dontPublish", false);
                 // store its current video's id
                 const currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
-                jquery_1.default(currentIframe).data("currentVideoId", currentVideoId);
+                (0, jquery_1.default)(currentIframe).data("currentVideoId", currentVideoId);
             }
         }
     } // end of prepareYouTube
@@ -135,14 +135,14 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         const currentTime = currentPlayer.getCurrentTime();
         //var currentTime = target.k.currentTime;
         const iframeLocation = elementFinder_1.elementFinder.elementLocation(currentIframe);
-        if (jquery_1.default(currentPlayer).data("seek")) {
-            jquery_1.default(currentPlayer).removeData("seek");
+        if ((0, jquery_1.default)(currentPlayer).data("seek")) {
+            (0, jquery_1.default)(currentPlayer).removeData("seek");
             return;
         }
         // do not publish if playerState was changed by other users
-        if (jquery_1.default(currentIframe).data("dontPublish")) {
+        if ((0, jquery_1.default)(currentIframe).data("dontPublish")) {
             // make it false again so it can start publishing events of its own state changes
-            jquery_1.default(currentIframe).data("dontPublish", false);
+            (0, jquery_1.default)(currentIframe).data("dontPublish", false);
             return;
         }
         // notify other people that I changed the player state
@@ -152,7 +152,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
                 // notify that I just loaded another video
                 publishDifferentVideoLoaded(iframeLocation, currentVideoId);
                 // update current video id
-                jquery_1.default(currentIframe).data("currentVideoId", currentVideoId);
+                (0, jquery_1.default)(currentIframe).data("currentVideoId", currentVideoId);
             }
             else {
                 session_1.session.send({
@@ -185,11 +185,11 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     }
     session_1.session.hub.on('playerStateChange', function (msg) {
         const iframe = elementFinder_1.elementFinder.findElement(msg.element);
-        const player = jquery_1.default(iframe).data("togetherjs-player");
+        const player = (0, jquery_1.default)(iframe).data("togetherjs-player");
         const currentTime = player.getCurrentTime();
         const currentState = player.getPlayerState();
         if (currentState != msg.playerState) {
-            jquery_1.default(iframe).data("dontPublish", true);
+            (0, jquery_1.default)(iframe).data("dontPublish", true);
         }
         if (msg.playerState == 1) {
             player.playVideo();
@@ -207,7 +207,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
             player.pauseVideo();
             if (areTooFarApart(currentTime, msg.playerTime)) {
                 // "seek" flag will help supress publishing unwanted state changes
-                jquery_1.default(player).data("seek", true);
+                (0, jquery_1.default)(player).data("seek", true);
                 player.seekTo(msg.playerTime, true);
             }
         }
@@ -220,11 +220,11 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     session_1.session.hub.on('synchronizeVideosOfLateGuest', function (msg) {
         // XXX can this message arrive before we're initialized?
         const iframe = elementFinder_1.elementFinder.findElement(msg.element);
-        const player = jquery_1.default(iframe).data("togetherjs-player");
+        const player = (0, jquery_1.default)(iframe).data("togetherjs-player");
         // check if another video had been loaded to an existing iframe before I joined
         const currentVideoId = getVideoIdFromUrl(player.getVideoUrl());
         if (msg.videoId != currentVideoId) {
-            jquery_1.default(iframe).data("currentVideoId", msg.videoId);
+            (0, jquery_1.default)(iframe).data("currentVideoId", msg.videoId);
             player.loadVideoById(msg.videoId, msg.playerTime, 'default');
         }
         else {
@@ -237,13 +237,13 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     session_1.session.hub.on('differentVideoLoaded', function (msg) {
         // load a new video if the host has loaded one
         const iframe = elementFinder_1.elementFinder.findElement(msg.element);
-        const player = jquery_1.default(iframe).data("togetherjs-player");
+        const player = (0, jquery_1.default)(iframe).data("togetherjs-player");
         player.loadVideoById(msg.videoId, 0, 'default');
-        jquery_1.default(iframe).data("currentVideoId", msg.videoId);
+        (0, jquery_1.default)(iframe).data("currentVideoId", msg.videoId);
     });
     function synchronizeVideosOfLateGuest() {
         youTubeIframes.forEach(function (iframe) {
-            const currentPlayer = jquery_1.default(iframe).data("togetherjs-player");
+            const currentPlayer = (0, jquery_1.default)(iframe).data("togetherjs-player");
             const currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
             const currentState = currentPlayer.getPlayerState();
             const currentTime = currentPlayer.getCurrentTime();
@@ -258,8 +258,8 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
         });
     }
     function isDifferentVideoLoaded(iframe) {
-        const lastVideoId = jquery_1.default(iframe).data("currentVideoId");
-        const currentPlayer = jquery_1.default(iframe).data("togetherjs-player");
+        const lastVideoId = (0, jquery_1.default)(iframe).data("currentVideoId");
+        const currentPlayer = (0, jquery_1.default)(iframe).data("togetherjs-player");
         const currentVideoId = getVideoIdFromUrl(currentPlayer.getVideoUrl());
         // since url forms of iframe src and player's video url are different,
         // I have to compare the video ids

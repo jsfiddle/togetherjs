@@ -17,6 +17,10 @@ declare global {
         webkitRTCIceCandidate?: typeof RTCIceCandidate;
     }
 
+    interface MediaStreamEvent {
+
+    }
+
     interface RTCPeerConnection {
         /** @deprecated */
         onaddstream: (event: MediaStreamEvent) => void;

@@ -16,17 +16,17 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     // animate participant cursor and box popping out when they leave the session
     // animate the participant cursor -> rotate down when they're down the page
     jquery_1.default.fn.rotateCursorDown = function () {
-        jquery_1.default('svg').animate({ borderSpacing: -150, opacity: 1 }, {
+        (0, jquery_1.default)('svg').animate({ borderSpacing: -150, opacity: 1 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    jquery_1.default(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
+                    (0, jquery_1.default)(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
                         .css('-moz-transform', 'rotate(' + now + 'deg)')
                         .css('-ms-transform', 'rotate(' + now + 'deg)')
                         .css('-o-transform', 'rotate(' + now + 'deg)')
                         .css('transform', 'rotate(' + now + 'deg)');
                 }
                 else {
-                    jquery_1.default(this).css(fx.prop, now);
+                    (0, jquery_1.default)(this).css(fx.prop, now);
                 }
             },
             duration: 500
@@ -42,17 +42,17 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
     };
     // animate the participant cursor -> rotate up when they're on the same frame as the user
     jquery_1.default.fn.rotateCursorDown = function () {
-        jquery_1.default('.togetherjs-cursor svg').animate({ borderSpacing: 0, opacity: 1 }, {
+        (0, jquery_1.default)('.togetherjs-cursor svg').animate({ borderSpacing: 0, opacity: 1 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    jquery_1.default(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
+                    (0, jquery_1.default)(this).css('-webkit-transform', 'rotate(' + now + 'deg)')
                         .css('-moz-transform', 'rotate(' + now + 'deg)')
                         .css('-ms-transform', 'rotate(' + now + 'deg)')
                         .css('-o-transform', 'rotate(' + now + 'deg)')
                         .css('transform', 'rotate(' + now + 'deg)');
                 }
                 else {
-                    jquery_1.default(this).css(fx.prop, now);
+                    (0, jquery_1.default)(this).css(fx.prop, now);
                 }
             },
             duration: 500
@@ -79,21 +79,21 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 "zIndex": 8888
             });
             //starting position for arrow
-            jquery_1.default('#togetherjs-window-pointer-right').css({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').css({
                 left: "+=74px",
                 opacity: 1,
                 "zIndex": 8888
             });
             //animate arrow out
-            jquery_1.default('#togetherjs-window-pointer-right').animate({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').animate({
                 opacity: 1,
                 left: "-=78px"
             }, {
                 duration: 60, easing: "linear"
             });
-            jquery_1.default('#togetherjs-window-pointer-right').queue();
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').queue();
             //bounce arrow back
-            jquery_1.default('#togetherjs-window-pointer-right').animate({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').animate({
                 left: '+=4px'
             }, {
                 duration: 60, easing: "linear"
@@ -121,21 +121,21 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 "zIndex": 8888
             });
             //starting position for arrow
-            jquery_1.default('#togetherjs-window-pointer-right').css({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').css({
                 left: "+=74px",
                 opacity: 1,
                 "zIndex": 8888
             });
             //animate arrow out
-            jquery_1.default('#togetherjs-window-pointer-right').animate({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').animate({
                 opacity: 1,
                 left: "-=78px"
             }, {
                 duration: 60, easing: "linear"
             });
-            jquery_1.default('#togetherjs-window-pointer-right').queue();
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').queue();
             //bounce arrow back
-            jquery_1.default('#togetherjs-window-pointer-right').animate({
+            (0, jquery_1.default)('#togetherjs-window-pointer-right').animate({
                 left: '+=4px'
             }, {
                 duration: 60, easing: "linear"
@@ -175,14 +175,14 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
         this.animate({ borderSpacing: -90, opacity: 0.5 }, {
             step: function (now, fx) {
                 if (fx.prop == "borderSpacing") {
-                    jquery_1.default(this).css('-webkit-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
+                    (0, jquery_1.default)(this).css('-webkit-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-moz-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-ms-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('-o-transform', 'perspective( 600px ) rotateX(' + now + 'deg)')
                         .css('transform', 'perspective( 600px ) rotateX(' + now + 'deg)');
                 }
                 else {
-                    jquery_1.default(this).css(fx.prop, now);
+                    (0, jquery_1.default)(this).css(fx.prop, now);
                 }
             },
             duration: 500

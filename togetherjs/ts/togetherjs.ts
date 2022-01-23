@@ -371,7 +371,7 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
         const deps = ["session", "jquery"];
         let lang = this.config.get("lang");
         // [igoryen]: We should generate this value in Gruntfile.js, based on the available translations
-        const availableTranslations = {
+        const availableTranslations: Record<string, string | true> = {
             "en-US": true,
             "en": "en-US",
             "es": "es-BO",
@@ -388,19 +388,19 @@ class TogetherJSClass extends OnClass<TogetherJSNS.On.Map> {
             // BCP 47 mandates hyphens, not underscores, to separate lang parts
             lang = navigator.language.replace(/_/g, "-");
         }
-
+        const translation = availableTranslations[lang];
         // TODO check if the updates of those conditions is right
         // if(/-/.test(lang) && !availableTranslations[lang]) {
-        if(/-/.test(lang) && (!("lang" in availableTranslations) || !availableTranslations[lang])) {
+        if(/-/.test(lang) && (!("lang" in availableTranslations) || !translation)) {
             lang = lang.replace(/-.*$/, '');
         }
         // if(!availableTranslations[lang]) {
-        if(!("lang" in availableTranslations) || !availableTranslations[lang]) {
-            lang = this.config.get("fallbackLang");
+        if(!("lang" in availableTranslations) || !translation) {
+            lang = this.config.get("fallbackLang") ?? "en-US";
         }
         // else if(availableTranslations[lang] !== true) {
-        else if(availableTranslations[lang] !== true) {
-            lang = availableTranslations[lang];
+        else if(translation !== true) {
+            lang = translation;
         }
         this.config.call("lang", lang);
 

@@ -30,7 +30,9 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             // If you have a type error here read the comment at webkitRTCPeerConnection in ts/types/backward-compat.ts
             return new webkitRTCPeerConnection(
             // TODO the key was "url" but the doc and the typing says it should be "urls", we would have liked to not update it (in the spirit of not changing the code) but it's not really possible to remove the error any other way (see backward-compat.d.ts for more explanation)
-            { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }, { "optional": [{ "DtlsSrtpKeyAgreement": true }] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
+            { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }, 
+            // @ts-expect-error
+            { "optional": [{ "DtlsSrtpKeyAgreement": true }] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
             );
         }
         if (window.mozRTCPeerConnection) {
@@ -66,15 +68,15 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
      */
     session_1.session.on("ui-ready", function () {
         let avatarData;
-        const $preview = jquery_1.default("#togetherjs-self-avatar-preview");
-        const $accept = jquery_1.default("#togetherjs-self-avatar-accept");
-        const $cancel = jquery_1.default("#togetherjs-self-avatar-cancel");
-        const $takePic = jquery_1.default("#togetherjs-avatar-use-camera");
-        const $video = jquery_1.default("#togetherjs-avatar-video");
+        const $preview = (0, jquery_1.default)("#togetherjs-self-avatar-preview");
+        const $accept = (0, jquery_1.default)("#togetherjs-self-avatar-accept");
+        const $cancel = (0, jquery_1.default)("#togetherjs-self-avatar-cancel");
+        const $takePic = (0, jquery_1.default)("#togetherjs-avatar-use-camera");
+        const $video = (0, jquery_1.default)("#togetherjs-avatar-video");
         const video0 = $video[0];
-        const $upload = jquery_1.default("#togetherjs-avatar-upload");
+        const $upload = (0, jquery_1.default)("#togetherjs-avatar-upload");
         let streaming = false;
-        jquery_1.default("#togetherjs-self-avatar").click(function () {
+        (0, jquery_1.default)("#togetherjs-self-avatar").click(function () {
             const avatar = peers_1.peers.Self.avatar;
             if (avatar) {
                 $preview.attr("src", avatar);
@@ -82,7 +84,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             ui_1.ui.displayToggle("#togetherjs-avatar-edit");
         });
         if (!session_1.session.RTCSupported) {
-            jquery_1.default("#togetherjs-avatar-edit-rtc").hide();
+            (0, jquery_1.default)("#togetherjs-avatar-edit-rtc").hide();
         }
         $takePic.click(function () {
             if (!streaming) {
@@ -100,13 +102,13 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             peers_1.peers.Self.update({ avatar: avatarData });
             ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: these probably shouldn't be two elements:
-            jquery_1.default("#togetherjs-participants-other").show();
+            (0, jquery_1.default)("#togetherjs-participants-other").show();
             $accept.attr("disabled", "1");
         });
         $cancel.click(function () {
             ui_1.ui.displayToggle("#togetherjs-no-avatar-edit");
             // FIXME: like above:
-            jquery_1.default("#togetherjs-participants-other").show();
+            (0, jquery_1.default)("#togetherjs-participants-other").show();
         });
         function startStreaming() {
             getUserMedia({
@@ -178,15 +180,15 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
     function audioButton(selector) {
         ui_1.ui.displayToggle(selector);
         if (selector == "#togetherjs-audio-incoming") {
-            jquery_1.default("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
+            (0, jquery_1.default)("#togetherjs-audio-button").addClass("togetherjs-animated").addClass("togetherjs-color-alert");
         }
         else {
-            jquery_1.default("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
+            (0, jquery_1.default)("#togetherjs-audio-button").removeClass("togetherjs-animated").removeClass("togetherjs-color-alert");
         }
     }
     session_1.session.on("ui-ready", function () {
-        jquery_1.default("#togetherjs-audio-button").click(function () {
-            if (jquery_1.default("#togetherjs-rtc-info").is(":visible")) {
+        (0, jquery_1.default)("#togetherjs-audio-button").click(function () {
+            if ((0, jquery_1.default)("#togetherjs-rtc-info").is(":visible")) {
                 windowing_1.windowing.hide();
                 return;
             }
@@ -205,7 +207,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
         let audioStream = null;
         let accepted = false;
         const connected = false;
-        const $audio = jquery_1.default("#togetherjs-audio-element");
+        const $audio = (0, jquery_1.default)("#togetherjs-audio-element");
         let offerSent = null;
         let offerReceived = null;
         let offerDescription = false;
@@ -257,7 +259,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             }
             audioButton("#togetherjs-audio-error");
             // FIXME: this title doesn't seem to display?
-            jquery_1.default("#togetherjs-audio-error").attr("title", s);
+            (0, jquery_1.default)("#togetherjs-audio-error").attr("title", s);
         }
         function startStreaming(callback) {
             /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
@@ -281,7 +283,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             });
         }
         function attachMedia(element, media) {
-            element = jquery_1.default(element)[0];
+            element = (0, jquery_1.default)(element)[0];
             console.log("Attaching", media, "to", element);
             if (window.mozRTCPeerConnection) {
                 element.mozSrcObject = media;

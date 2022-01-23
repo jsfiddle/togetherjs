@@ -19,7 +19,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     });
     session_1.session.on("ui-ready", setupListeners);
     function setupListeners() {
-        const videos = jquery_1.default('video');
+        const videos = (0, jquery_1.default)('video');
         setupMirroredEvents(videos);
         setupTimeSync(videos);
     }
@@ -49,7 +49,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     function setupTimeSync(videos) {
         videos.each(function (_i, video) {
             const onTimeUpdate = makeTimeUpdater();
-            jquery_1.default(video).on(TIME_UPDATE, onTimeUpdate);
+            (0, jquery_1.default)(video).on(TIME_UPDATE, onTimeUpdate);
             listeners.push({
                 name: TIME_UPDATE,
                 listener: onTimeUpdate
@@ -73,7 +73,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     }
     session_1.session.on("close", unsetListeners);
     function unsetListeners() {
-        const videos = jquery_1.default('video');
+        const videos = (0, jquery_1.default)('video');
         listeners.forEach(function (event) {
             videos.off(event.name, event.listener);
         });
@@ -97,7 +97,7 @@ define(["require", "exports", "./elementFinder", "./session", "jquery"], functio
     });
     //Currently does not discriminate between visible and invisible videos
     function $findElement(location) {
-        return jquery_1.default(elementFinder_1.elementFinder.findElement(location));
+        return (0, jquery_1.default)(elementFinder_1.elementFinder.findElement(location));
     }
     function setTime(video, time) {
         video.prop('currentTime', time);

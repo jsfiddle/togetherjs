@@ -162,7 +162,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
                         TogetherJS.running = true;
                         ui.prepareUI();
                         require(features, () => {
-                            jquery_1.default(() => {
+                            (0, jquery_1.default)(() => {
                                 const peersModule = require("peers");
                                 peers = peersModule.peers;
                                 const { startup } = require("startup");
@@ -444,15 +444,15 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
         });
     }
     exports.session.on("start", function () {
-        jquery_1.default(window).on("resize", resizeEvent);
+        (0, jquery_1.default)(window).on("resize", resizeEvent);
         if (includeHashInUrl) {
-            jquery_1.default(window).on("hashchange", hashchangeEvent);
+            (0, jquery_1.default)(window).on("hashchange", hashchangeEvent);
         }
     });
     exports.session.on("close", function () {
-        jquery_1.default(window).off("resize", resizeEvent);
+        (0, jquery_1.default)(window).off("resize", resizeEvent);
         if (includeHashInUrl) {
-            jquery_1.default(window).off("hashchange", hashchangeEvent);
+            (0, jquery_1.default)(window).off("hashchange", hashchangeEvent);
         }
     });
     function hashchangeEvent() {

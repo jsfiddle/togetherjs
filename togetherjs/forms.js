@@ -23,7 +23,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             return false;
         }
         else {
-            return jquery_1.default(element).is(ignoreForms.join(","));
+            return (0, jquery_1.default)(element).is(ignoreForms.join(","));
         }
     }
     function maybeChange(event) {
@@ -41,7 +41,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         });
     }
     function sendData(attrs) {
-        const el = jquery_1.default(attrs.element);
+        const el = (0, jquery_1.default)(attrs.element);
         assert(el);
         const tracker = "tracker" in attrs ? attrs.tracker : undefined;
         const value = attrs.value;
@@ -78,7 +78,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         session_1.session.send(msg);
     }
     function isCheckable(element) {
-        const el = jquery_1.default(element);
+        const el = (0, jquery_1.default)(element);
         const type = (el.prop("type") || "text").toLowerCase();
         if (el.prop("tagName") == "INPUT" && ["radio", "checkbox"].indexOf(type) != -1) {
             return true;
@@ -94,8 +94,8 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     // TODO factorize code between editors
     class AceEditor extends Editor {
         constructor(el) {
-            super("AceEditor", jquery_1.default(el)[0]);
-            assert(jquery_1.default(this.element).hasClass("ace_editor"));
+            super("AceEditor", (0, jquery_1.default)(el)[0]);
+            assert((0, jquery_1.default)(this.element).hasClass("ace_editor"));
             this._change = this._change.bind(this);
             this._editor().document.on("change", this._change);
         }
@@ -133,26 +133,26 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             return this._editor().document.getValue();
         }
         static scan() {
-            return jquery_1.default(".ace_editor");
+            return (0, jquery_1.default)(".ace_editor");
         }
         /** Non-static version */
         tracked(el) {
             return AceEditor.tracked(el);
         }
         static tracked(el) {
-            return !!jquery_1.default(el).closest(".ace_editor").length;
+            return !!(0, jquery_1.default)(el).closest(".ace_editor").length;
         }
     }
     AceEditor.trackerName = "AceEditor";
     class CodeMirrorEditor extends Editor {
         constructor(el) {
-            super("CodeMirrorEditor", jquery_1.default(el)[0]);
+            super("CodeMirrorEditor", (0, jquery_1.default)(el)[0]);
             assert("CodeMirror" in this.element);
             this._change = this._change.bind(this);
             this._editor().on("change", this._change);
         }
         tracked2(el) {
-            return this.element === jquery_1.default(el)[0];
+            return this.element === (0, jquery_1.default)(el)[0];
         }
         destroy() {
             this._editor().off("change", this._change);
@@ -198,14 +198,14 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                     result.push(el);
                 }
             }
-            return jquery_1.default(result);
+            return (0, jquery_1.default)(result);
         }
         /** Non-static version */
         tracked(el) {
             return CodeMirrorEditor.tracked(el);
         }
         static tracked(e) {
-            let el = jquery_1.default(e)[0];
+            let el = (0, jquery_1.default)(e)[0];
             while (el) {
                 if ("CodeMirror" in el) {
                     return true;
@@ -218,7 +218,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     CodeMirrorEditor.trackerName = "CodeMirrorEditor";
     class CKEditor extends Editor {
         constructor(el) {
-            super("CKEditor", jquery_1.default(el)[0]);
+            super("CKEditor", (0, jquery_1.default)(el)[0]);
             assert(CKEDITOR);
             assert(CKEDITOR.dom.element.get(this.element));
             this._change = this._change.bind(this);
@@ -226,7 +226,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             this._editor().on("change", this._change);
         }
         tracked2(el) {
-            return this.element === jquery_1.default(el)[0];
+            return this.element === (0, jquery_1.default)(el)[0];
         }
         destroy() {
             this._editor().removeListener("change", this._change);
@@ -274,7 +274,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                     result.push(editorInstance);
                 }
             }
-            return jquery_1.default(result);
+            return (0, jquery_1.default)(result);
         }
         /** Non-static version */
         tracked(el) {
@@ -284,20 +284,20 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (typeof CKEDITOR == "undefined") {
                 return false;
             }
-            const elem = jquery_1.default(el)[0];
+            const elem = (0, jquery_1.default)(el)[0];
             return !!(CKEDITOR.dom.element.get(elem) && CKEDITOR.dom.element.get(elem).getEditor());
         }
     }
     CKEditor.trackerName = "CKEditor";
     class tinymceEditor extends Editor {
         constructor(el) {
-            super("tinymceEditor", jquery_1.default(el)[0]);
-            assert(jquery_1.default(this.element).attr('id').indexOf('mce_') != -1);
+            super("tinymceEditor", (0, jquery_1.default)(el)[0]);
+            assert((0, jquery_1.default)(this.element).attr('id').indexOf('mce_') != -1);
             this._change = this._change.bind(this);
             this._editor().on("input keyup cut paste change", this._change);
         }
         tracked2(el) {
-            return this.element === jquery_1.default(el)[0];
+            return this.element === (0, jquery_1.default)(el)[0];
         }
         destroy() {
             this._editor().destroy(); // TODO was "destory", probably a typo, fixed
@@ -330,7 +330,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                 throw new Error("TinyEditor is undefined");
                 //return; // TODO was returning undefined, remove for now for easier typechecking
             }
-            return jquery_1.default(this.element).data("tinyEditor");
+            return (0, jquery_1.default)(this.element).data("tinyEditor");
         }
         getContent() {
             return this._editor().getContent();
@@ -341,12 +341,12 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                 return;
             }
             const result = [];
-            jquery_1.default(window.tinymce.editors).each(function (_i, ed) {
-                result.push(jquery_1.default('#' + ed.id));
+            (0, jquery_1.default)(window.tinymce.editors).each(function (_i, ed) {
+                result.push((0, jquery_1.default)('#' + ed.id));
                 //its impossible to retrieve a single editor from a container, so lets store it
-                jquery_1.default('#' + ed.id).data("tinyEditor", ed);
+                (0, jquery_1.default)('#' + ed.id).data("tinyEditor", ed);
             });
-            return jquery_1.default(result);
+            return (0, jquery_1.default)(result);
         }
         /** Non-static version */
         tracked(el) {
@@ -356,8 +356,8 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (typeof tinymce == "undefined") {
                 return false;
             }
-            const elem = jquery_1.default(el)[0];
-            return !!jquery_1.default(elem).data("tinyEditor");
+            const elem = (0, jquery_1.default)(el)[0];
+            return !!(0, jquery_1.default)(elem).data("tinyEditor");
             /*var flag = false;
             $(window.tinymce.editors).each(function (i, ed) {
                 if (el.id == ed.id) {
@@ -399,7 +399,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (els) {
                 jquery_1.default.each(els, function () {
                     const tracker = new TrackerClass(this);
-                    jquery_1.default(this).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
+                    (0, jquery_1.default)(this).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, tracker.getContent(), 1));
                     liveTrackers.push(tracker);
                 });
             }
@@ -424,7 +424,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         if (name === null) {
             return null;
         }
-        const el = jquery_1.default(e)[0];
+        const el = (0, jquery_1.default)(e)[0];
         for (let i = 0; i < liveTrackers.length; i++) {
             const tracker = liveTrackers[i];
             if (tracker.tracked(el)) {
@@ -440,7 +440,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     }
     const TEXT_TYPES = ("color date datetime datetime-local email " + "tel text time week").split(/ /g);
     function isText(e) {
-        const el = jquery_1.default(e);
+        const el = (0, jquery_1.default)(e);
         const tag = el.prop("tagName");
         const type = (el.prop("type") || "text").toLowerCase();
         if (tag == "TEXTAREA") {
@@ -453,7 +453,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
     }
     function getValue(e) {
         var _a;
-        const el = jquery_1.default(e);
+        const el = (0, jquery_1.default)(e);
         if (isCheckable(el)) {
             return el.prop("checked"); // "as boolean" serves as a reminder of the type of the value
         }
@@ -462,7 +462,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     function setValue(e, value) {
-        const el = jquery_1.default(e);
+        const el = (0, jquery_1.default)(e);
         let changed = false;
         if (isCheckable(el)) {
             assert(typeof value == "boolean"); // TODO normally any checkable element should be with a boolean value, getting a clearer logic might be good
@@ -514,7 +514,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         if (!msg.sameUrl) {
             return;
         }
-        const el = jquery_1.default(elementFinder_1.elementFinder.findElement(msg.element));
+        const el = (0, jquery_1.default)(elementFinder_1.elementFinder.findElement(msg.element));
         const el0 = el[0]; // TODO is this cast right?
         if (typeof msg.value === "boolean") {
             setValue(el, msg.value);
@@ -598,12 +598,12 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             pageAge: Date.now() - TogetherJS.pageLoaded,
             updates: []
         };
-        const els = jquery_1.default("textarea, input, select");
+        const els = (0, jquery_1.default)("textarea, input, select");
         els.each(function () {
             if (elementFinder_1.elementFinder.ignoreElement(this) || elementTracked(this) || suppressSync(this)) {
                 return;
             }
-            const el = jquery_1.default(this);
+            const el = (0, jquery_1.default)(this);
             const el0 = el[0];
             const value = getValue(el0);
             // TODO old code in /**/
@@ -645,10 +645,10 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         liveTrackers.forEach(function (tracker) {
             const init0 = tracker.makeInit();
             assert(tracker.tracked(init0.element));
-            const history = jquery_1.default(init0.element).data("togetherjsHistory");
+            const history = (0, jquery_1.default)(init0.element).data("togetherjsHistory");
             // TODO check the logic change
             const init = {
-                element: elementFinder_1.elementFinder.elementLocation(jquery_1.default(init0.element)),
+                element: elementFinder_1.elementFinder.elementLocation((0, jquery_1.default)(init0.element)),
                 tracker: init0.tracker,
                 value: init0.value,
             };
@@ -663,7 +663,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     }
     function setInit() {
-        const els = jquery_1.default("textarea, input, select");
+        const els = (0, jquery_1.default)("textarea, input, select");
         els.each(function () {
             if (elementTracked(this)) {
                 return;
@@ -671,7 +671,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             if (elementFinder_1.elementFinder.ignoreElement(this)) {
                 return;
             }
-            const el = jquery_1.default(this);
+            const el = (0, jquery_1.default)(this);
             const value = getValue(el[0]);
             if (typeof value === "string") { // no need to create an History if it's not a string value
                 // TODO maybe we should find a way to have a better use of getValue so that we can "guess" the type depending on the argument
@@ -720,12 +720,12 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
                     setValue(el, update.value);
                 }
                 if ("basis" in update && update.basis) {
-                    const history = jquery_1.default(el).data("togetherjsHistory");
+                    const history = (0, jquery_1.default)(el).data("togetherjsHistory");
                     // don't overwrite history if we're already up to date
                     // (we might have outstanding queued changes we don't want to lose)
                     if (!(history && history.basis === update.basis && history.basis !== 1)) {
                         // we check "history.basis !== 1" because if history.basis is 1, the form could have lingering edits from before togetherjs was launched.  that's too bad, we need to erase them to resynchronize with the peer we just asked to join.
-                        jquery_1.default(el).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, update.value, update.basis));
+                        (0, jquery_1.default)(el).data("togetherjsHistory", new ot_1.SimpleHistory(session_1.session.clientId, update.value, update.basis));
                     }
                 }
             }
@@ -773,7 +773,7 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
         }
     });
     function createFocusElement(peer, around) {
-        around = jquery_1.default(around);
+        around = (0, jquery_1.default)(around);
         const aroundOffset = around.offset();
         if (!aroundOffset) {
             console.warn("Could not get offset of element:", around[0]);
@@ -787,22 +787,22 @@ define(["require", "exports", "jquery", "./elementFinder", "./eventMaker", "./ot
             width: around.outerWidth() + (FOCUS_BUFFER * 2) + "px",
             height: around.outerHeight() + (FOCUS_BUFFER * 2) + "px"
         });
-        jquery_1.default(document.body).append(el);
+        (0, jquery_1.default)(document.body).append(el);
         return el;
     }
     session_1.session.on("ui-ready", function () {
-        jquery_1.default(document).on("change", change);
+        (0, jquery_1.default)(document).on("change", change);
         // note that textInput, keydown, and keypress aren't appropriate events
         // to watch, since they fire *before* the element's value changes.
-        jquery_1.default(document).on("input keyup cut paste", maybeChange);
-        jquery_1.default(document).on("focusin", focus);
-        jquery_1.default(document).on("focusout", blur);
+        (0, jquery_1.default)(document).on("input keyup cut paste", maybeChange);
+        (0, jquery_1.default)(document).on("focusin", focus);
+        (0, jquery_1.default)(document).on("focusout", blur);
     });
     session_1.session.on("close", function () {
-        jquery_1.default(document).off("change", change);
-        jquery_1.default(document).off("input keyup cut paste", maybeChange);
-        jquery_1.default(document).off("focusin", focus);
-        jquery_1.default(document).off("focusout", blur);
+        (0, jquery_1.default)(document).off("change", change);
+        (0, jquery_1.default)(document).off("input keyup cut paste", maybeChange);
+        (0, jquery_1.default)(document).off("focusin", focus);
+        (0, jquery_1.default)(document).off("focusout", blur);
     });
     session_1.session.hub.on("hello", function (msg) {
         if (msg.sameUrl) {

@@ -35,7 +35,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 el = el[0];
             }
             while (el) {
-                if (jquery_1.default(el).hasClass("togetherjs")) {
+                if ((0, jquery_1.default)(el).hasClass("togetherjs")) {
                     return true;
                 }
                 el = el.parentNode;
@@ -218,7 +218,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                 let last = null;
                 const children = start.children();
                 children.each(function () {
-                    const el = jquery_1.default(this);
+                    const el = (0, jquery_1.default)(this);
                     if (el.hasClass("togetherjs") || el.css("position") == "fixed" || !el.is(":visible")) {
                         return;
                     }
@@ -236,12 +236,12 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                         location: self.elementLocation(start[0]),
                         offset: height - start_offset_top,
                         absoluteTop: height,
-                        documentHeight: jquery_1.default(document).height()
+                        documentHeight: (0, jquery_1.default)(document).height()
                     };
                 }
                 return search(last, height);
             }
-            return search(jquery_1.default(document.body), height);
+            return search((0, jquery_1.default)(document.body), height);
         }
         pixelForPosition(position) {
             /* Inverse of elementFinder.elementByPixel */
@@ -251,7 +251,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             let el;
             try {
                 el = this.findElement(position.location);
-                const el_offset = jquery_1.default(el).offset();
+                const el_offset = (0, jquery_1.default)(el).offset();
                 if (el_offset === undefined) {
                     throw new Error("pixelForPosition called on element without offset");
                 }
@@ -266,7 +266,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
                     // We don't trust absoluteTop to be quite right locally, so we adjust
                     // for the total document height differences:
                     const percent = position.absoluteTop / position.documentHeight;
-                    return jquery_1.default(document).height() * percent;
+                    return (0, jquery_1.default)(document).height() * percent;
                 }
                 throw e;
             }

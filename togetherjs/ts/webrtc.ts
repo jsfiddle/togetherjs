@@ -38,6 +38,7 @@ function makePeerConnection() {
         return new webkitRTCPeerConnection(
             // TODO the key was "url" but the doc and the typing says it should be "urls", we would have liked to not update it (in the spirit of not changing the code) but it's not really possible to remove the error any other way (see backward-compat.d.ts for more explanation)
             { "iceServers": [{"urls": "stun:stun.l.google.com:19302"}] },
+            // @ts-expect-error
             { "optional": [{"DtlsSrtpKeyAgreement": true}] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
         );
     }

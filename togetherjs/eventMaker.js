@@ -37,7 +37,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             0, // button
             null // relatedTarget
             );
-            target = jquery_1.default(target)[0];
+            target = (0, jquery_1.default)(target)[0];
             const cancelled = target.dispatchEvent(event);
             if (cancelled) {
                 return;
@@ -53,7 +53,7 @@ define(["require", "exports", "jquery"], function (require, exports, jquery_1) {
             // FIXME: should run .onclick() as well
         }
         fireChange(target) {
-            target = jquery_1.default(target)[0];
+            target = (0, jquery_1.default)(target)[0];
             const event = document.createEvent("HTMLEvents");
             event.initEvent("change", true, true);
             target.dispatchEvent(event);

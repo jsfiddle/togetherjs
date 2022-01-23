@@ -11,7 +11,7 @@ define(["require", "exports", "./libs/random"], function (require, exports, rand
             this.whitespace = " \t\n";
             this.punctuation = "~`!@#$%^&*()_-+={}[]|\\;:'\"<>,./?";
             this.defaultChars = this.lower + this.upper + this.numberCharacters + this.whitespace + this.punctuation;
-            this.stream = random_1.RandomStream(seed);
+            this.stream = (0, random_1.RandomStream)(seed);
         }
         number(max) {
             return Math.floor(this.stream() * max);

@@ -1036,11 +1036,11 @@ declare global {
 
     interface Navigator {
         /** @deprecated */
-        mozGetUserMedia?: Navigator["getUserMedia"];
+        mozGetUserMedia?: MediaDevices["getUserMedia"];
         /** @deprecated */
-        webkitGetUserMedia?: Navigator["getUserMedia"];
+        webkitGetUserMedia?: MediaDevices["getUserMedia"];
         /** @deprecated */
-        msGetUserMedia?: Navigator["getUserMedia"];
+        msGetUserMedia?: MediaDevices["getUserMedia"];
     }
 
     interface Require {
