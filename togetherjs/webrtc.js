@@ -31,6 +31,7 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             return new webkitRTCPeerConnection(
             // TODO the key was "url" but the doc and the typing says it should be "urls", we would have liked to not update it (in the spirit of not changing the code) but it's not really possible to remove the error any other way (see backward-compat.d.ts for more explanation)
             { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }, 
+            // TODO fix
             // @ts-expect-error
             { "optional": [{ "DtlsSrtpKeyAgreement": true }] } // TODO search DtlsSrtpKeyAgreement in the page https://developer.mozilla.org/fr/docs/Web/API/WebRTC_API/Signaling_and_video_calling
             );
@@ -116,7 +117,8 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
                 audio: false
             }, function (stream) {
                 streaming = true;
-                video0.src = URL.createObjectURL(stream);
+                // was "video0.src = URL.createObjectURL(stream);", check that it does the same, see https://stackoverflow.com/questions/57090422/javascript-createobjecturl-url-fails-for-mediastream
+                video0.srcObject = stream;
                 video0.play();
             }, function (err) {
                 // FIXME: should pop up help or something in the case of a user
@@ -291,7 +293,8 @@ define(["require", "exports", "./peers", "./session", "./storage", "./ui", "./ut
             }
             else {
                 element.autoplay = true;
-                element.src = URL.createObjectURL(media);
+                // was "element.src = URL.createObjectURL(media);", check that it does the same, see https://stackoverflow.com/questions/57090422/javascript-createobjecturl-url-fails-for-mediastream
+                element.srcObject = media;
             }
         }
         function getConnection() {

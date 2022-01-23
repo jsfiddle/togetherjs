@@ -8,6 +8,8 @@ declare global {
         /** @deprecated */
         mozRTCPeerConnection?: mozRTCPeerConnection;
         /** @deprecated */
+        webkitRTCPeerConnection?: mozRTCPeerConnection;
+        /** @deprecated */
         mozRTCSessionDescription?: typeof RTCSessionDescription;
         /** @deprecated */
         webkitRTCSessionDescription?: typeof RTCSessionDescription;
@@ -17,8 +19,8 @@ declare global {
         webkitRTCIceCandidate?: typeof RTCIceCandidate;
     }
 
-    interface MediaStreamEvent {
-
+    interface MediaStreamEventInit extends EventInit {
+        stream?: MediaStream;
     }
 
     interface RTCPeerConnection {
@@ -77,4 +79,49 @@ declare global {
         /** @deprecated should be replaced by urls https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer Since we can't mark the urls field as optional adding this would not remove the type error so we update the "url" field to "urls" in the code */
         //url: string | string[];
     }
+
+    interface NavigatorUserMediaErrorCallback {
+        (error: MediaStreamError): void;
+    }
+    
+    interface MediaStreamError {
+        readonly constraintName: string | null;
+        readonly message: string | null;
+        readonly name: string;
+    }
+    
+    var MediaStreamError: {
+        prototype: MediaStreamError;
+        new(): MediaStreamError;
+    };
+    
+    interface webkitRTCPeerConnection extends RTCPeerConnection {
+        addEventListener<K extends keyof RTCPeerConnectionEventMap>(type: K, listener: (this: webkitRTCPeerConnection, ev: RTCPeerConnectionEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof RTCPeerConnectionEventMap>(type: K, listener: (this: webkitRTCPeerConnection, ev: RTCPeerConnectionEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    
+    var webkitRTCPeerConnection: {
+        prototype: webkitRTCPeerConnection;
+        new(configuration: RTCConfiguration): webkitRTCPeerConnection;
+    };
+    
+    interface NavigatorUserMediaSuccessCallback {
+        (stream: MediaStream): void;
+    }
+
+    interface Navigator {
+        getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;
+    }
+
+    interface MediaStreamEvent extends Event {
+        readonly stream: MediaStream | null;
+    }
+    
+    var MediaStreamEvent: {
+        prototype: MediaStreamEvent;
+        new(type: string, eventInitDict: MediaStreamEventInit): MediaStreamEvent;
+    };
 }
+
