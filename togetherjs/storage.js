@@ -28,7 +28,7 @@ define(["require", "exports", "./util"], function (require, exports, util_1) {
         get(name) {
             assert(Object.prototype.hasOwnProperty.call(this.storageInstance.settings.defaults, name), "Unknown setting:", name);
             const key = `settings.${name}`; // as keyof TogetherJSNS.StorageGet.MapForSettings;
-            const value = this.storageInstance.settings.defaults[name]; // TODO is it possible to avoid the as unknown?
+            const value = this.storageInstance.settings.defaults[name]; // TODO TS-IMPROVMENT // TODO is it possible to avoid the as unknown?
             return this.storageInstance.get(key, value);
         }
         set(name, value) {

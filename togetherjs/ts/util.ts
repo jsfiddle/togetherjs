@@ -208,6 +208,7 @@ export class Util {
                 return;
             }
             // eslint-disable-next-line no-use-before-define
+            // TODO check this weird thing, there should at least be an explanation for such a weird cast
             const allResults = [] as unknown as { -readonly [K in keyof T]: T[K] };
             let anyError = false;
             defs.forEach(function(arg, index) {

@@ -595,6 +595,7 @@ function togetherjsMain() {
         }
     }
     // Need this for a typesafe copy of two field with the same key between two object of the same type
+    // TODO TS-IMPROVMENT
     function copyWithSameKey(key, readFrom, writeIn) {
         writeIn[key] = readFrom[key];
     }

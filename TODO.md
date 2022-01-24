@@ -126,3 +126,7 @@ Cannot work for now. Would have to do an entrypoint that imports everything (nam
 # ESLint
 
 `node node_modules/eslint/bin/eslint.js -c .eslintrc.json --ignore-path .eslintignore togetherjs/ts/`
+
+# Hopefull TypeScript improvements
+
+Some lines have been tagged with `// TODO TS-IMPROVMENT`, thoses lines have been tweaked (usually with a cast) beacuse of the weaknesses of the TS type system. It may be insteresting to revisit them in the future to check if TS can now deal with these problems.

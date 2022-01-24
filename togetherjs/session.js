@@ -93,7 +93,7 @@ define(["require", "exports", "jquery", "./channels", "./storage", "./util"], fu
             if (DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
                 console.info("Send:", msg);
             }
-            const msg2 = msg;
+            const msg2 = msg; // TODO TS-IMPROVMENT
             msg2.clientId = this.clientId; // TODO !
             channel.send(msg2); // TODO !
         }

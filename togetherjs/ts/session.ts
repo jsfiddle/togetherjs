@@ -108,7 +108,7 @@ export class Session extends OnClass<TogetherJSNS.On.Map> {
         if(DEBUG && IGNORE_MESSAGES !== true && IGNORE_MESSAGES && IGNORE_MESSAGES.indexOf(msg.type) == -1) {
             console.info("Send:", msg);
         }
-        const msg2 = msg as TogetherJSNS.AnyMessage.MapInTransit[K];
+        const msg2 = msg as TogetherJSNS.AnyMessage.MapInTransit[K]; // TODO TS-IMPROVMENT
         msg2.clientId = this.clientId!; // TODO !
         channel!.send(msg2); // TODO !
     }
