@@ -1,9 +1,9 @@
 // =SECTION Setup expand-on-failure
 
-Test.require("ot", "util", "randomutil");
+Test.require("jquery", "ot", "util", "randomutil");
 // => Loaded...
 
-var generator = randomutil(1);
+var generator = randomutil.randomutil(1);
 generator.defaultChars = "XYZ/_ ";
 
 function run() {
@@ -41,7 +41,7 @@ function run() {
 // =SECTION Simple Test Setup expand-on-failure
 
 function r(start, length, text) {
-  return ot.TextReplace(start, length, text);
+  return new ot.TextReplace(start, length, text);
 }
 
 function trans(text, d1, d2) {

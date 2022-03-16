@@ -1,6 +1,6 @@
 // =SECTION Setup
 
-Test.require("peers", "templates-en-US");
+Test.require("jquery", "peers", "templates-en-US");
 // => Loaded modules: ...
 
 TogetherJSTestSpy.setIdleTime(100);
@@ -15,7 +15,7 @@ Test.newPeer();
 
 // =SECTION Test
 
-var peer = peers.getPeer("faker");
+var peer = peers.peers.getPeer("faker");
 print(peer.status, peer.idle);
 
 // => live active

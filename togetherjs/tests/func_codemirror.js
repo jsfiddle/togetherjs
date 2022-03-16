@@ -1,5 +1,8 @@
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 var cmSrc = "./codemirror4.js";
 var script = $("<script>").attr("onload", Spy("cmLoad", {wait: true})).attr("src", cmSrc);
 $(document.head).append(script);
@@ -43,7 +46,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+  avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false

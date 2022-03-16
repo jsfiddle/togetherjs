@@ -1,335 +1,262 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-define(["jquery", "jqueryPlugins"], function ($) {
-  var util = {};
-
-  util.Deferred = $.Deferred;
-  TogetherJS.$ = $;
-
-  /* A simple class pattern, use like:
-
-    var Foo = util.Class({
-      constructor: function (a, b) {
-        init the class
-      },
-      otherMethod: ...
-    });
-
-  You can also give a superclass as the optional first argument.
-
-  Instantiation does not require "new"
-
-  */
-  util.Class = function (superClass, prototype) {
-    var a;
-    if (prototype === undefined) {
-      prototype = superClass;
-    } else {
-      if (superClass.prototype) {
-        superClass = superClass.prototype;
-      }
-      var newPrototype = Object.create(superClass);
-      for (a in prototype) {
-        if (prototype.hasOwnProperty(a)) {
-          newPrototype[a] = prototype[a];
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this file,
+You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+define(["require", "exports", "jquery", "./jqueryPlugins"], function (require, exports, jquery_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.util = exports.Util = void 0;
+    jquery_1 = __importDefault(jquery_1);
+    class AssertionError extends Error {
+        constructor(message) {
+            super();
+            this.message = message || "";
+            this.name = "AssertionError";
         }
-      }
-      prototype = newPrototype;
     }
-    var ClassObject = function () {
-      var obj = Object.create(prototype);
-      obj.constructor.apply(obj, arguments);
-      obj.constructor = ClassObject;
-      return obj;
-    };
-    ClassObject.prototype = prototype;
-    if (prototype.constructor.name) {
-      ClassObject.className = prototype.constructor.name;
-      ClassObject.toString = function () {
-        return '[Class ' + this.className + ']';
-      };
-    }
-    if (prototype.classMethods) {
-      for (a in prototype.classMethods) {
-        if (prototype.classMethods.hasOwnProperty(a)) {
-          ClassObject[a] = prototype.classMethods[a];
+    class Util {
+        constructor() {
+            this.Deferred = jquery_1.default.Deferred;
+            this.AssertionError = AssertionError;
         }
-      }
-    }
-    return ClassObject;
-  };
-
-  /* Extends obj with other, or copies obj if no other is given. */
-  util.extend = TogetherJS._extend;
-
-  util.forEachAttr = function (obj, callback, context) {
-    context = context || obj;
-    for (var a in obj) {
-      if (obj.hasOwnProperty(a)) {
-        callback.call(context, obj[a], a);
-      }
-    }
-  };
-
-  /* Trim whitespace from a string */
-  util.trim = function trim(s) {
-    return s.replace(/^\s+/, "").replace(/\s+$/, "");
-  };
-
-  /* Convert a string into something safe to use as an HTML class name */
-  util.safeClassName = function safeClassName(name) {
-    return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
-  };
-
-  util.AssertionError = function (message) {
-    if (! this instanceof util.AssertionError) {
-      return new util.AssertionError(message);
-    }
-    this.message = message;
-    this.name = "AssertionError";
-  };
-  util.AssertionError.prototype = Error.prototype;
-
-  util.assert = function (cond) {
-    if (! cond) {
-      var args = ["Assertion error:"].concat(Array.prototype.slice.call(arguments, 1));
-      console.error.apply(console, args);
-      if (console.trace) {
-        console.trace();
-      }
-      throw new util.AssertionError(args.join(" "));
-    }
-  };
-
-  /* Generates a random ID */
-  util.generateId = function (length) {
-    length = length || 10;
-    var letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
-    var s = '';
-    for (var i=0; i<length; i++) {
-      s += letters.charAt(Math.floor(Math.random() * letters.length));
-    }
-    return s;
-  };
-
-  util.pickRandom = function (array) {
-    return array[Math.floor(Math.random() * array.length)];
-  };
-
-  util.mixinEvents = TogetherJS._mixinEvents;
-
-  util.Module = util.Class({
-    constructor: function (name) {
-      this._name = name;
-    },
-    toString: function () {
-      return '[Module ' + this._name + ']';
-    }
-  });
-
-  util.blobToBase64 = function (blob) {
-    // Oh this is just terrible
-    var binary = '';
-    var bytes = new Uint8Array(blob);
-    var len = bytes.byteLength;
-    for (var i=0; i<len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  };
-
-  util.truncateCommonDomain = function (url, base) {
-    /* Remove the scheme and domain from url, if it matches the scheme and domain
-       of base */
-    if (! base) {
-      return url;
-    }
-    var regex = /^https?:\/\/[^\/]*/i;
-    var match = regex.exec(url);
-    var matchBase = regex.exec(base);
-    if (match && matchBase && match[0] == matchBase[0]) {
-      // There is a common scheme and domain
-      return url.substr(match[0].length);
-    }
-    return url;
-  };
-
-  util.makeUrlAbsolute = function (url, base) {
-    if (url.search(/^(http|https|ws|wss):/i) === 0) {
-      // Absolute URL
-      return url;
-    }
-    if (url.search(/^\/\/[^\/]/) === 0) {
-      var scheme = (/^(http|https|ws|wss):/i).exec(base);
-      util.assert(scheme, "No scheme on base URL", base);
-      return scheme[1] + ":" + url;
-    }
-    if (url.search(/^\//) === 0) {
-      var domain = (/^(http|https|ws|wss):\/\/[^\/]+/i).exec(base);
-      util.assert(domain, "No scheme/domain on base URL", base);
-      return domain[0] + url;
-    }
-    var last = (/[^\/]+$/).exec(base);
-    util.assert(last, "Does not appear to be a URL?", base);
-    var lastBase = base.substr(0, last.index);
-    return lastBase + url;
-  };
-
-  util.assertValidUrl = function (url) {
-    /* This does some simple assertions that the url is valid:
-       - it must be a string
-       - it must be http(s)://... or data:...
-       - it must not contain a space, quotation, or close paren
-    */
-    util.assert(typeof url == "string", "URLs must be a string:", url);
-    util.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0,
-                "URL must have an http, https, data, or // scheme:", url);
-    util.assert(url.search(/[\)\'\"\ ]/) === -1,
-                "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
-  };
-
-  util.resolver = function (deferred, func) {
-    util.assert(deferred.then, "Bad deferred:", deferred);
-    util.assert(typeof func == "function", "Not a function:", func);
-    return function () {
-      var result;
-      try {
-        result = func.apply(this, arguments);
-      } catch (e) {
-        deferred.reject(e);
-        throw e;
-      }
-      if (result && result.then) {
-        result.then(function () {
-          deferred.resolveWith(this, arguments);
-        }, function () {
-          deferred.rejectWith(this, arguments);
-        });
-        // FIXME: doesn't pass progress through
-      } else if (result === undefined) {
-        deferred.resolve();
-      } else {
-        deferred.resolve(result);
-      }
-      return result;
-    };
-  };
-
-  /* Detects if a value is a promise.  Right now the presence of a
-     `.then()` method is the best we can do.
-  */
-  util.isPromise = function (obj) {
-    return typeof obj == "object" && obj.then;
-  };
-
-  /* Makes a value into a promise, by returning an already-resolved
-     promise if a non-promise objectx is given.
-  */
-  util.makePromise = function (obj) {
-    if (util.isPromise(obj)) {
-      return obj;
-    } else {
-      return $.Deferred(function (def) {
-        def.resolve(obj);
-      });
-    }
-  };
-
-  /* Resolves several promises (the promises are the arguments to the function)
-     or the first argument may be an array of promises.
-
-     Returns a promise that will resolve with the results of all the
-     promises.  If any promise fails then the returned promise fails.
-
-     FIXME: if a promise has more than one return value (like with
-     promise.resolve(a, b)) then the latter arguments will be lost.
-     */
-  util.resolveMany = function () {
-    var args;
-    var oneArg = false;
-    if (arguments.length == 1 && Array.isArray(arguments[0])) {
-      oneArg = true;
-      args = arguments[0];
-    } else {
-      args = Array.prototype.slice.call(arguments);
-    }
-    return util.Deferred(function (def) {
-      var count = args.length;
-      if (! count) {
-        def.resolve();
-        return;
-      }
-      var allResults = [];
-      var anyError = false;
-      args.forEach(function (arg, index) {
-        arg.then(function (result) {
-          allResults[index] = result;
-          count--;
-          check();
-        }, function (error) {
-          allResults[index] = error;
-          anyError = true;
-          count--;
-          check();
-        });
-      });
-      function check() {
-        if (! count) {
-          if (anyError) {
-            if (oneArg) {
-              def.reject(allResults);
-            } else {
-              def.reject.apply(def, allResults);
+        // TODO uses of forEachAttr could often be replaced by a loop
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        forEachAttr(obj, callback, context) {
+            context = context || obj;
+            let a;
+            for (a in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, a)) {
+                    callback.call(context, obj[a], a);
+                }
             }
-          } else {
-            if (oneArg) {
-              def.resolve(allResults);
-            } else {
-              def.resolve.apply(def, allResults);
-            }
-          }
         }
-      }
-    });
-  };
-
-  util.readFileImage = function (el) {
-    return util.Deferred(function (def) {
-      var reader = new FileReader();
-      reader.onload = function () {
-        def.resolve("data:image/jpeg;base64," + util.blobToBase64(this.result));
-      };
-      reader.onerror = function () {
-        def.reject(this.error);
-      };
-      reader.readAsArrayBuffer(el.files[0]);
-    });
-  };
-
-  util.matchElement = function(el, selector) {
-    var res = selector;
-    if (selector === true || ! selector) {
-      return !!selector;
+        trim(s) {
+            return s.replace(/^\s+/, "").replace(/\s+$/, "");
+        }
+        safeClassName(name) {
+            return name.replace(/[^a-zA-Z0-9_-]/g, "_") || "class";
+        }
+        assert(cond, ...args) {
+            if (!cond) {
+                const args2 = ["Assertion error:"].concat(args);
+                console.error.apply(console, args2);
+                if (console.trace) {
+                    console.trace();
+                }
+                throw new this.AssertionError(args2.join(" "));
+            }
+        }
+        /** Generates a random ID */
+        generateId(length = 10) {
+            const letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV0123456789';
+            let s = '';
+            for (let i = 0; i < length; i++) {
+                s += letters.charAt(Math.floor(Math.random() * letters.length));
+            }
+            return s;
+        }
+        pickRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+        blobToBase64(blob) {
+            // TODO
+            // Oh this is just terrible
+            let binary = '';
+            let bytes;
+            if (typeof blob === "string") {
+                const enc = new TextEncoder();
+                bytes = enc.encode(blob);
+            }
+            else {
+                bytes = new Uint8Array(blob);
+            }
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+        truncateCommonDomain(url, base) {
+            /* Remove the scheme and domain from url, if it matches the scheme and domain of base */
+            if (!base) {
+                return url;
+            }
+            const regex = /^https?:\/\/[^/]*/i;
+            const match = regex.exec(url);
+            const matchBase = regex.exec(base);
+            if (match && matchBase && match[0] == matchBase[0]) {
+                // There is a common scheme and domain
+                return url.substr(match[0].length);
+            }
+            return url;
+        }
+        makeUrlAbsolute(url, base) {
+            if (url.search(/^(http|https|ws|wss):/i) === 0) {
+                // Absolute URL
+                return url;
+            }
+            if (url.search(/^\/\/[^/]/) === 0) {
+                const scheme = (/^(http|https|ws|wss):/i).exec(base);
+                this.assert(scheme, "No scheme on base URL", base);
+                return scheme[1] + ":" + url;
+            }
+            if (url.search(/^\//) === 0) {
+                const domain = (/^(http|https|ws|wss):\/\/[^/]+/i).exec(base);
+                this.assert(domain, "No scheme/domain on base URL", base);
+                return domain[0] + url;
+            }
+            const last = (/[^/]+$/).exec(base);
+            this.assert(last, "Does not appear to be a URL?", base);
+            const lastBase = base.substr(0, last.index);
+            return lastBase + url;
+        }
+        assertValidUrl(url) {
+            /* This does some simple assertions that the url is valid:
+            - it must be a string
+            - it must be http(s)://... or data:...
+            - it must not contain a space, quotation, or close paren
+            */
+            this.assert(typeof url == "string", "URLs must be a string:", url);
+            this.assert(url.search(/^(http:\/\/|https:\/\/|\/\/|data:)/i) === 0, "URL must have an http, https, data, or // scheme:", url);
+            this.assert(url.search(/[)'" ]/) === -1, "URLs cannot contain ), ', \", or spaces:", JSON.stringify(url));
+        }
+        resolver(deferred, func) {
+            this.assert(deferred.then, "Bad deferred:", deferred);
+            this.assert(typeof func == "function", "Not a function:", func);
+            return function (...args) {
+                let result;
+                try {
+                    result = func.apply(this, args);
+                }
+                catch (e) {
+                    deferred.reject(e);
+                    throw e;
+                }
+                // in operator only works on objects
+                if (result && typeof (result) == "object" && "then" in result) {
+                    result.then(function () {
+                        deferred.resolveWith(this, args);
+                    }, function () {
+                        deferred.rejectWith(this, args);
+                    });
+                    // FIXME: doesn't pass progress through
+                }
+                else if (result === undefined) {
+                    deferred.resolve();
+                }
+                else {
+                    deferred.resolve(result);
+                }
+                return result;
+            };
+        }
+        // TODO this function accepts null value but it shouldn't
+        /** Detects if a value is a promise. Right now the presence of a `.then()` method is the best we can do. */
+        isPromise(obj) {
+            return typeof obj == "object" && obj != null && "then" in obj;
+        }
+        // TODO this function seems to never been used (even in tests)
+        /** Makes a value into a promise, by returning an already-resolved promise if a non-promise objectx is given. */
+        makePromise(obj) {
+            if (this.isPromise(obj)) {
+                return obj;
+            }
+            else {
+                return jquery_1.default.Deferred(function (def) {
+                    def.resolve(obj);
+                });
+            }
+        }
+        // TODO should we just replace resolveMany with promises and promise.all?
+        /** Resolves several promises givent as one argument as an array of promises.
+            Returns a promise that will resolve with the results of all the promises.  If any promise fails then the returned promise fails.
+            FIXME: if a promise has more than one return value (like with promise.resolve(a, b)) then the latter arguments will be lost.
+            Use like this:
+            const s = storage.settings;
+            util.resolveMany([s.get("name"), s.get("avatar"), s.get("defaultName"), s.get("color")] as const).then(args => {
+                let [name, avatar, defaultName, color] = args!; // for this example "!" is used because args can be undefined
+                // ...
+            }
+        */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resolveMany(defs) {
+            return this.Deferred(function (def) {
+                let count = defs.length;
+                if (!count) {
+                    def.resolve();
+                    return;
+                }
+                // eslint-disable-next-line no-use-before-define
+                // TODO check this weird thing, there should at least be an explanation for such a weird cast
+                const allResults = [];
+                let anyError = false;
+                defs.forEach(function (arg, index) {
+                    arg.then(function (result) {
+                        if (result) {
+                            allResults[index] = result;
+                        }
+                        count--;
+                        check();
+                    }, function (error) {
+                        allResults[index] = error;
+                        anyError = true;
+                        count--;
+                        check();
+                    });
+                });
+                function check() {
+                    if (!count) {
+                        if (anyError) {
+                            def.reject(allResults);
+                        }
+                        else {
+                            def.resolve(allResults);
+                        }
+                    }
+                }
+            });
+        }
+        readFileImage(file) {
+            return this.Deferred(function (def) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    if (this.result) {
+                        def.resolve("data:image/jpeg;base64," + Util.prototype.blobToBase64(this.result));
+                    }
+                };
+                reader.onerror = function () {
+                    def.reject(this.error);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        matchElement(el, selector) {
+            if (selector === true || !selector) {
+                return !!selector;
+            }
+            try {
+                return (0, jquery_1.default)(el).is(selector);
+            }
+            catch (e) {
+                console.warn("Bad selector:", selector, "error:", e);
+                return false;
+            }
+        }
+        // TODO what ???
+        testExpose(objs) {
+            const tsjTestSpy = window.TogetherJSTestSpy;
+            if (!tsjTestSpy) {
+                return;
+            }
+            this.forEachAttr(objs, function (value, attr) {
+                tsjTestSpy[attr] = value;
+            });
+        }
     }
-    try {
-      return $(el).is(selector);
-    } catch (e) {
-      console.warn("Bad selector:", selector, "error:", e);
-      return false;
-    }
-
-  };
-
-  util.testExpose = function (objs) {
-    if (typeof TogetherJSTestSpy == "undefined") {
-      return;
-    }
-    util.forEachAttr(objs, function (value, attr) {
-      TogetherJSTestSpy[attr] = value;
-    });
-  };
-
-  return util;
+    exports.Util = Util;
+    exports.util = new Util();
 });

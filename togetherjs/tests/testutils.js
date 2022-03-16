@@ -2,6 +2,19 @@ TogetherJSTestSpy = {};
 
 var Test = {};
 
+function extend(base, extensions) {
+  if(!extensions) {
+      extensions = base;
+      base = {};
+  }
+  for(const a in extensions) {
+      if(Object.prototype.hasOwnProperty.call(extensions, a)) {
+          base[a] = extensions[a];
+      }
+  }
+  return base;
+}
+
 /* Loads the modules that are listed as individual arguments, and adds
    them to the global scope.  Blocks on the loading.  Use like:
 
@@ -43,6 +56,9 @@ Test.require = function () {
       for (var i=0; i<modules.length; i++) {
         var localName = aliases[modules[i]] || modules[i];
         window[localName] = arguments[i];
+        if(localName == "jquery") {
+          window["$"] = arguments[i];
+        }
       }
       var msg = ["Loaded modules:"].concat(modules);
       print.apply(null, msg);
@@ -58,7 +74,7 @@ Test.require = function () {
     console.log("require.js already loaded; configuring");
     loadModules();
   } else {
-    window.require = TogetherJS._extend(TogetherJS.requireConfig);
+    window.require = extend(TogetherJS.requireConfig);
     window.require.callback = function () {
       TogetherJS.require = require.config({context: "togetherjs"});
       loadModules();
@@ -76,7 +92,7 @@ Test.IGNORE_MESSAGES = ["cursor-update", "scroll-update", "keypress"];
 
 Test.viewSend = function () {
   // Prints out all send() messages
-  var session = TogetherJS.require("session");
+  var session = TogetherJS.require("session").session;
   if (! TogetherJS.running) {
     session.once("start", Test.viewSend);
     return;
@@ -89,7 +105,7 @@ Test.viewSend = function () {
     if (Test.viewSend.running && Test.IGNORE_MESSAGES.indexOf(msg.type) == -1) {
       if (typeof print == "function") {
         print("send:", msg.type);
-        var shortMsg = TogetherJS._extend(msg);
+        var shortMsg = extend(msg);
         delete shortMsg.type;
         var r = repr(shortMsg, undefined, 10);
         r = "  " + r.replace(/^\{\s+/, "");
@@ -102,7 +118,103 @@ Test.viewSend = function () {
   };
 };
 
-TogetherJS._mixinEvents(Test.viewSend);
+/**/
+function mixinEvents(proto) {
+      proto.on = function on(name, callback) {
+          if(typeof callback != "function") {
+              console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+              throw "Error: .once() called with non-callback";
+          }
+          if(name.search(" ") != -1) {
+              var names = name.split(/ +/g);
+              names.forEach(function(n) {
+                  this.on(n, callback);
+              }, this);
+              return;
+          }
+          if(this._knownEvents && this._knownEvents.indexOf(name) == -1) {
+              var thisString = "" + this;
+              if(thisString.length > 20) {
+                  thisString = thisString.substr(0, 20) + "...";
+              }
+              console.warn(thisString + ".on('" + name + "', ...): unknown event");
+              if(console.trace) {
+                  console.trace();
+              }
+          }
+          if(!this._listeners) {
+              this._listeners = {};
+          }
+          if(!this._listeners[name]) {
+              this._listeners[name] = [];
+          }
+          if(this._listeners[name].indexOf(callback) == -1) {
+              this._listeners[name].push(callback);
+          }
+      };
+      proto.once = function once(name, callback) {
+          if(typeof callback != "function") {
+              console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
+              throw "Error: .once() called with non-callback";
+          }
+          var attr = "onceCallback_" + name;
+          // FIXME: maybe I should add the event name to the .once attribute:
+          if(!callback[attr]) {
+              callback[attr] = function onceCallback() {
+                  callback.apply(this, arguments);
+                  this.off(name, onceCallback);
+                  delete callback[attr];
+              };
+          }
+          this.on(name, callback[attr]);
+      };
+      proto.off = proto.removeListener = function off(name, callback) {
+          if(this._listenerOffs) {
+              // Defer the .off() call until the .emit() is done.
+              this._listenerOffs.push([name, callback]);
+              return;
+          }
+          if(name.search(" ") != -1) {
+              var names = name.split(/ +/g);
+              names.forEach(function(n) {
+                  this.off(n, callback);
+              }, this);
+              return;
+          }
+          if((!this._listeners) || !this._listeners[name]) {
+              return;
+          }
+          var l = this._listeners[name], _len = l.length;
+          for(var i = 0; i < _len; i++) {
+              if(l[i] == callback) {
+                  l.splice(i, 1);
+                  break;
+              }
+          }
+      };
+      proto.emit = function emit(name) {
+          var offs = this._listenerOffs = [];
+          if((!this._listeners) || !this._listeners[name]) {
+              return;
+          }
+          var args = Array.prototype.slice.call(arguments, 1);
+          var l = this._listeners[name];
+          l.forEach(function(callback) {
+
+              callback.apply(this, args);
+          }, this);
+          delete this._listenerOffs;
+          if(offs.length) {
+              offs.forEach(function(item) {
+                  this.off(item[0], item[1]);
+              }, this);
+          }
+
+      };
+      return proto;
+}
+
+mixinEvents(Test.viewSend);
 Test.viewSend.running = true;
 Test.viewSend.activate = function () {
   Test.viewSend.running = true;
@@ -119,7 +231,7 @@ Test.newPeer = function (options) {
     isClient: false,
     clientId: options.clientId || "faker",
     name: options.name || "Faker",
-    avatar: options.avatar || TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+    avatar: options.avatar || TogetherJS.baseUrl + "/images/robot-avatar.png",
     color: options.color || "#ff0000",
     url: options.url || location.href.replace(/#.*/, ""),
     urlHash: options.urlHash || "",
@@ -130,7 +242,7 @@ Test.newPeer = function (options) {
 };
 
 Test.waitEvent = function (context, event, options) {
-  var ops = TogetherJS._extend({wait: true, ignoreThis: true}, options);
+  var ops = extend({wait: true, ignoreThis: true}, options);
   context.once(event, Spy(event, ops));
 };
 
@@ -139,10 +251,10 @@ Test.waitMessage = function (messageType) {
 };
 
 Test.resetSettings = function () {
-  var util = TogetherJS.require("util");
-  var storage = TogetherJS.require("storage");
+  var util = TogetherJS.require("util").util;
+  var storage = TogetherJS.require("storage").storage;
   return $.Deferred(function (def) {
-    util.resolveMany(
+    util.resolveMany([
       storage.settings.set("name", ""),
       storage.settings.set("defaultName", "Jane Doe"),
       storage.settings.set("avatar", undefined),
@@ -152,7 +264,7 @@ Test.resetSettings = function () {
       storage.settings.set("seenWalkthrough", undefined),
       storage.settings.set("dontShowRtcInfo", undefined),
       storage.tab.set("chatlog", undefined)
-    ).then(function () {
+    ]).then(function () {
       def.resolve("Settings reset");
     });
   });
@@ -160,14 +272,14 @@ Test.resetSettings = function () {
 
 Test.startTogetherJS = function () {
   return $.Deferred(function (def) {
-    var session = TogetherJS.require("session");
+    var session = TogetherJS.require("session").session;
     Test.viewSend();
     session.once("ui-ready", function () {
       session.clientId = "me";
       def.resolve("TogetherJS started");
     });
     TogetherJS.startup._launch = true;
-    TogetherJS();
+    TogetherJS.start();
   });
 };
 

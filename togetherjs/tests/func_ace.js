@@ -1,5 +1,8 @@
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 $("#fixture").empty();
 var aceSrc = "./ace.js";
 var script = $("<script>").attr("onload", Spy("aceLoad", {wait: true})).attr("src", aceSrc);
@@ -49,7 +52,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+  avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false

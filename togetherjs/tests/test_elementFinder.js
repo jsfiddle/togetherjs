@@ -1,4 +1,4 @@
-Test.require("elementFinder");
+Test.require("jquery", "elementFinder");
 // => Loaded modules: ...
 
 var els = $(document.body).find("*");
@@ -6,13 +6,13 @@ els.each(function (index, el) {
   el = $(el);
   var loc;
   try {
-    loc = elementFinder.elementLocation(el);
+    loc = elementFinder.elementFinder.elementLocation(el);
   } catch (e) {
     console.trace();
     print("Error: cannot get location for", el, ":", e);
     return;
   }
-  var result = elementFinder.findElement(loc);
+  var result = elementFinder.elementFinder.findElement(loc);
   if (result != el[0]) {
     print("Bad element:", loc, el);
     print("Resolved to:", result);

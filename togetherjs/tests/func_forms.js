@@ -1,6 +1,9 @@
 /*global forms, session, ui, windowing, eventMaker */
 // =SECTION Setup
 
+Test.require("jquery");
+// => ...
+
 $("#fixture").append('<textarea id="textarea" style="width: 10em; height: 3em;"></textarea>');
 $("#fixture").append('<br>');
 $("#fixture").append('<div><label for="yes"><input type="radio" name="answer" id="yes"> Yes</label><label for="no"><input type="radio" name="answer" id="no"> No</label></div>');
@@ -12,13 +15,13 @@ Test.require("forms", "session", "ui", "windowing", "eventMaker", "templates-en-
 Test.normalStartup();
 // =>...
 
-var fireChange = eventMaker.fireChange;
+var fireChange = eventMaker.eventMaker.fireChange;
 var $yes = $("#yes");
 var $no = $("#no");
 var $textarea = $("#textarea");
 var $password = $("#password");
 
-windowing.hide("#togetherjs-share");
+windowing.windowing.hide("#togetherjs-share");
 
 // =SECTION Changes
 
@@ -46,7 +49,7 @@ send: form-update
 
 $password.val("New Password");
 fireChange($password);
-wait(100);
+wait(500);
 
 /* =>
  */
@@ -154,7 +157,7 @@ Test.incoming({
   url: location.href.replace(/\#.*/, ""),
   urlHash: "",
   name: "Faker",
-  avatar: TogetherJS.baseUrl + "/togetherjs/images/robot-avatar.png",
+  avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
   color: "#ff0000",
   title: document.title,
   rtcSupported: false
@@ -217,7 +220,7 @@ Test.incoming({
     }
   }
 });
-wait(function() { return $textarea.val()==='hELLO there'; });
+wait(function() { return $textarea.val()==='hELLO there'; }, 500);
 
 // =>
 
@@ -241,7 +244,7 @@ Test.incoming({
     }
   ]
 });
-wait(100);
+wait(500);
 
 // => true
 

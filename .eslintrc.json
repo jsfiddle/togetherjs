@@ -1,0 +1,32 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "no-invalid-this": "off",
+        "@typescript-eslint/no-this-alias": [ "error", { "allowDestructuring": true, "allowedNames": [ "self" ] } ],
+        "no-use-before-define": ["error", { "functions": false, "classes": false }],
+        "no-unused-vars": "off", // must disable the base rule as it can report incorrect errors
+        "@typescript-eslint/no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
+        "prefer-spread": "off",
+        "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }],
+        //"@typescript-eslint/no-var-requires": "off",
+        "prefer-const": ["warn", { "destructuring": "all" }],
+        "@typescript-eslint/no-var-requires": "off", // TODO maybe we should find other ways
+        "@typescript-eslint/explicit-module-boundary-types": "off", // TODO off for now
+        "@typescript-eslint/no-non-null-assertion": "off" // TODO turn it on later
+    }
+}
