@@ -533,7 +533,6 @@ input.togetherjs-upload-avatar {
     z-index: 10002;
     overflow: hidden;
   }
-
   #togetherjs-window-pointer::before {
     position: absolute;
     left: -5px;
@@ -543,34 +542,29 @@ input.togetherjs-upload-avatar {
     background: #fff;
     -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
     content: "";
   }
-
   #togetherjs-window-pointer.left::before {
     left: 25px;
     top: 10px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
   }
-
   #togetherjs-window-pointer.right::before {
     left: -5px;
     top: 10px;
     box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.5);
   }
-
   #togetherjs-window-pointer.top::before {
     left: 10px;
     top: 25px;
     background: #0095dd;
   }
-
   #togetherjs-window-pointer.bottom::before {
     left: 10px;
     top: -5px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   }
-
+  
   .togetherjs-window {
     .window;
     width: 286px;
@@ -799,12 +793,10 @@ input.togetherjs-upload-avatar {
     left: initial;
     right: 70px;
   }
-  
   .togetherjs-dock-top .togetherjs-dock-person-tooltip {
     left: initial;
     top: 70px;
   }
-
   .togetherjs-dock-bottom .togetherjs-dock-person-tooltip {
     left: initial;
     top: initial;
@@ -832,29 +824,26 @@ input.togetherjs-upload-avatar {
     line-height: 20px;
     opacity: 0.9;
   }
-
   .togetherjs-dock-left .togetherjs-person-tooltip-arrow {
     transform: scaleX(-1);
     left: -4px;
     top: 14px;
   }
-
   .togetherjs-dock-right .togetherjs-person-tooltip-arrow {
     right: -4px;
     top: 14px;
   }
-
   .togetherjs-dock-top .togetherjs-person-tooltip-arrow {
     transform: rotate(-90deg);
     left: 20px;
     top: -6px;
   }
-
   .togetherjs-dock-bottom .togetherjs-person-tooltip-arrow {
     transform: rotate(90deg);
     left: 20px;
     bottom: -6px;
   }
+
 }
 
 .togetherjs-triangle-up  {
@@ -1244,7 +1233,7 @@ section.togetherjs-buttons .togetherjs-same-url {
     }
     #togetherjs-buttons.on .togetherjs-button:last-of-type,
     #togetherjs-dock-participants .togetherjs-button:last-of-type {
-      border-radius: 0 0 @border-radius @border-radius;
+      border-radius: 0 0 4px 4px;
     }
   }
 
@@ -1281,30 +1270,6 @@ section.togetherjs-buttons .togetherjs-same-url {
     #togetherjs-buttons.on .togetherjs-button:last-of-type,
     #togetherjs-dock-participants .togetherjs-button:last-of-type {
       border-radius: 0 4px 4px 0;
-    }
-  }
-
-  &.togetherjs-dock-top {
-    padding: 0;
-    top: 40px;
-    left: 50%;
-    margin-left: -(@long-side / 2);
-    border-radius: @border-radius @border-radius 0 0;
-    height: @short-side;
-    width: @long-side;
-    #togetherjs-buttons, #togetherjs-dock-anchor {
-      display: inline;
-    }
-    #togetherjs-dock-anchor-vertical {
-      display: inline;
-    }
-    #togetherjs-dock-anchor-horizontal {
-      display: none;
-    }
-    #togetherjs-dock-anchor-vertical img {
-      width: 6px;
-      height: 6px;
-      padding: 2px;
     }
   }
 }
