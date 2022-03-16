@@ -8,7 +8,7 @@
 <div id="togetherjs-container" class="togetherjs">
 
   <!-- This is the main set of buttons: -->
-  <div id="togetherjs-dock" class="togetherjs-dock-right">
+  <div id="togetherjs-dock">
     <div id="togetherjs-dock-anchor" title="{{ gettext('Move the dock') }}">
       <span id="togetherjs-dock-anchor-horizontal">
         <img src="http://localhost:8080/togetherjs/images/icn-handle-circle@2x.png" alt="drag">
@@ -22,7 +22,7 @@
         <button id="togetherjs-template-dock-person" class="togetherjs-button togetherjs-dock-person">
           <div class="togetherjs-tooltip togetherjs-dock-person-tooltip">
             <span class="togetherjs-person-name"></span>
-            <span class="togetherjs-person-tooltip-arrow-r"></span>
+            <span class="togetherjs-person-tooltip-arrow"></span>
           </div>
           <div class="togetherjs-person togetherjs-person-status-overlay"></div>
         </button>
@@ -498,8 +498,7 @@
   </div>
 
   <!-- The pointer at the side of a window: -->
-  <div id="togetherjs-window-pointer-right" style="display: none"></div>
-  <div id="togetherjs-window-pointer-left" style="display: none"></div>
+  <div id="togetherjs-window-pointer" style="display: none"></div>
 
   <!-- The element that overlaps the background of the page during a modal dialog: -->
   <div id="togetherjs-modal-background" style="display: none"></div>

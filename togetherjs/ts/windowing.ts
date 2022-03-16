@@ -4,6 +4,7 @@
 
 import { session } from "./session";
 import { util } from "./util";
+import { ui } from './ui';
 import $ from "jquery";
 
 interface ShowOptions {
@@ -100,7 +101,7 @@ export class Windowing {
                 });
             }
         });
-        $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
+        $("#togetherjs-window-pointer").hide();
         if(onClose) {
             onClose();
             onClose = null;
@@ -131,13 +132,8 @@ function bind(window: HTMLElement | JQuery, bound: JQuery) {
     }
     const win = $(window);
     assert(bound.length, "Cannot find binding:", bound.selector, "from:", win.selector);
-    // FIXME: hardcoding
-    const ifacePos : "right" | "left" | "bottom" = "right";
-    //var ifacePos = panelPosition();
-    const boundPos = bound.offset()!; // TODO ! deal with !
-    const boundPosHeight = bound.height();
-    const boundPosWidth = bound.width();
-    const windowHeight = $window.height();
+    const ifacePos = ui.panelPosition()
+    const boundPos = bound.offset();
     boundPos.top -= $window.scrollTop();
     boundPos.left -= $window.scrollLeft();
     // FIXME: I appear to have to add the padding to the width to get a "true" width.  But it's still not entirely consistent.
@@ -145,41 +141,70 @@ function bind(window: HTMLElement | JQuery, bound: JQuery) {
     const width = win.width() + 20;
     let left: number;
     let top: number;
-    if(ifacePos == "right") {
+    if (ifacePos == "left") {
+        left = boundPos.left + bound.width() + 15;
+        top = boundPos.top + (bound.height() / 2) - (height / 2);
+    } else if (ifacePos == "right") {
         left = boundPos.left - 11 - width;
-        top = boundPos.top + (boundPosHeight / 2) - (height / 2);
-    }
-    else if(ifacePos == "left") {
-        left = boundPos.left + boundPosWidth + 15;
-        top = boundPos.top + (boundPosHeight / 2) - (height / 2);
-    }
-    else { // if(ifacePos == "bottom") {
-        left = (boundPos.left + boundPosWidth / 2) - (width / 2);
+        top = boundPos.top + (bound.height() / 2) - (height / 2);
+    } else if (ifacePos == "top") {
+        left = (boundPos.left + bound.width() / 2) - (width / 2);
+        top = boundPos.top + bound.width() + 15;
+    } else {
+        left = (boundPos.left + bound.width() / 2) - (width / 2);
         top = boundPos.top - 10 - height;
     }
-    top = Math.min(windowHeight - 10 - height, Math.max(10, top));
+    top = Math.min(window.height - 10 - height, Math.max(10, top));
     win.css({
+        left: left + "px",
+        right: "",
         top: top + "px",
-        left: left + "px"
+        bottom: ""
     });
-    if(win.hasClass("togetherjs-window")) {
-        $("#togetherjs-window-pointer-right, #togetherjs-window-pointer-left").hide();
-        const pointer = $("#togetherjs-window-pointer-" + ifacePos);
+    if (parseInt(win.css("left")) < 5)
+        win.css({
+            left: "5px"
+        })
+    else if (parseInt(win.css("right")) < 5)
+        win.css({
+            left: "",
+            right: "5px"
+        })
+    if (parseInt(win.css("top")) < 5)
+        win.css({
+            top: "5px"
+        })
+    else if (parseInt(win.css("bottom")) < 5)
+        win.css({
+            top: "",
+            bottom: "5px"
+        })
+    if (win.hasClass("togetherjs-window")) {
+        $("#togetherjs-window-pointer").hide();
+        var pointer = $("#togetherjs-window-pointer")
+        pointer.removeClass()
+        pointer.addClass(ifacePos)
         pointer.show();
-        if(ifacePos == "right") {
+        if (ifacePos == "left") {
             pointer.css({
-                top: boundPos.top + Math.floor(boundPosHeight / 2) + "px",
+                left: (left - 30) + "px",
+                top: (boundPos.top + Math.floor(boundPos.height / 2) - 13) + "px"
+            });
+        } else if (ifacePos == "right") {
+            pointer.css({
+                left: (left + win.width() + 14) + "px",
+                top: (boundPos.top + Math.floor(boundPos.height / 2) - 13) + "px"
+            });
+        } else if (ifacePos == "top") {
+            pointer.css({
+                top: boundPos.top + Math.floor(bound.height() / 2) + "px",
                 left: left + win.width() + 9 + "px"
             });
-        }
-        else if(ifacePos == "left") {
+        } else if (ifacePos == "bottom") {
             pointer.css({
-                top: boundPos.top + Math.floor(boundPosHeight / 2) + "px",
-                left: (left - 5) + "px"
+                left: (boundPos.left + Math.floor(boundPos.width / 2) - 13) + "px",
+                top: (top + win.height()) + "px"
             });
-        }
-        else {
-            console.warn("don't know how to deal with position:", ifacePos);
         }
     }
     win.data("boundTo", bound.selector || "#" + bound.attr("id"));

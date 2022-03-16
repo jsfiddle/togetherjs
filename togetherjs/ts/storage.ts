@@ -8,6 +8,7 @@ import { util } from "./util";
 const assert: typeof util.assert = util.assert.bind(util);
 const Deferred = util.Deferred;
 const DEFAULT_SETTINGS: TogetherJSNS.StorageGet.Settings = {
+    dockConfig: null,
     name: "",
     defaultName: "",
     avatar: null,
