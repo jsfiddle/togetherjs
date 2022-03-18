@@ -8,7 +8,7 @@ function isJQuery(o: unknown): o is JQuery {
     return o instanceof $;
 }
 
-class CannotFind {
+export class CannotFind {
     public prefix = "";
 
     constructor(
@@ -86,8 +86,8 @@ export class ElementFinder {
             if(child == el) {
                 break;
             }
-            if(child.nodeType == document.ELEMENT_NODE) {
-                if(child.className.indexOf("togetherjs") != -1) {
+            if (child.nodeType == document.ELEMENT_NODE) {
+                if (child.className.indexOf && child.className.indexOf("togetherjs") != -1) {
                     // Don't count our UI
                     continue;
                 }
@@ -180,12 +180,12 @@ export class ElementFinder {
             el = null;
             for(let i = 0; i < children.length; i++) {
                 const child = children[i] as HTMLElement;
-                if(child.nodeType == document.ELEMENT_NODE) {
-                    if(child.className.indexOf("togetherjs") != -1) {
+                if (child.nodeType == document.ELEMENT_NODE) {
+                    if (child.className.indexOf && child.className.indexOf("togetherjs") != -1) {
                         continue;
                     }
                     count--;
-                    if(count === 0) {
+                    if (count === 0) {
                         // this is the element
                         el = child;
                         break;

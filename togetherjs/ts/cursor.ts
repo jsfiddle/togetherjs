@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { elementFinder } from "./elementFinder";
+import { elementFinder, CannotFind } from "./elementFinder";
 import { eventMaker } from "./eventMaker";
 import { peers } from "./peers";
 import { session } from "./session";
@@ -97,17 +97,24 @@ class Cursor {
 
     updatePosition(pos: TogetherJSNS.SessionSend.CursorClick | TogetherJSNS.On.CursorUpdate) {
         let top, left;
-        if(this.atOtherUrl) {
+        if (this.atOtherUrl) {
             this.element.show();
             this.atOtherUrl = false;
         }
-        if("element" in pos) {
-            const target = $(elementFinder.findElement(pos.element));
-            const offset = target.offset()!; // TODO !
-            top = offset.top + pos.offsetY;
-            left = offset.left + pos.offsetX;
-        }
-        else {
+        if ("element" in pos) {
+            try {
+                const target = $(elementFinder.findElement(pos.element));
+                const offset = target.offset()!; // TODO !
+                top = offset.top + pos.offsetY;
+                left = offset.left + pos.offsetX;
+            } catch (error: any) {
+                if (error instanceof CannotFind) {
+                    top = pos.top;
+                    left = pos.left;
+                } else
+                    throw error;
+            }
+        } else {
             // No anchor, just an absolute position
             top = pos.top;
             left = pos.left;
@@ -296,6 +303,8 @@ function mousemove(event: JQueryMouseEventObject) {
     const offsetY = pageY - offset.top;
     lastMessage = {
         type: "cursor-update",
+        top: pageY,
+        left: pageX,
         element: elementFinder.elementLocation($target),
         offsetX: Math.floor(offsetX),
         offsetY: Math.floor(offsetY)
