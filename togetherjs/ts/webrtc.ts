@@ -133,22 +133,30 @@ session.on("ui-ready", function() {
     });
 
     function startStreaming() {
-        getUserMedia({
+        const constraints = {
             video: true,
             audio: false
-        },
-            function(stream) {
+        }
+        if (navigator.mediaDevices)
+            navigator.mediaDevices.getUserMedia(constraints).then(stream => {
                 streaming = true;
                 // was "video0.src = URL.createObjectURL(stream);", check that it does the same, see https://stackoverflow.com/questions/57090422/javascript-createobjecturl-url-fails-for-mediastream
                 video0.srcObject = stream;
                 video0.play();
-            },
-            function(err) {
-                // FIXME: should pop up help or something in the case of a user
-                // cancel
-                console.error("getUserMedia error:", err);
-            }
-        );
+            }).catch(e => { throw new Error(e) })
+        else
+            getUserMedia(constraints,
+                function(stream) {
+                    streaming = true;
+                    $video[0].src = URL.createObjectURL(stream);
+                    $video[0].play();
+                },
+                function(err) {
+                    // FIXME: should pop up help or something in the case of a user
+                    // cancel
+                    console.error("getUserMedia error:", err);
+                }
+            );
     }
 
     function takePicture() {
@@ -302,28 +310,37 @@ session.on("ui-ready", function() {
 
     function startStreaming(callback: () => void) {
         /** @deprecated https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia */
-        getUserMedia(
-            {
-                video: false,
-                audio: true
-            },
-            function(stream) {
+        const constraints = {
+            video: false,
+            audio: true
+        }
+        if (navigator.mediaDevices)
+            navigator.mediaDevices.getUserMedia(constraints).then(stream => {
                 audioStream = stream;
                 attachMedia("#togetherjs-local-audio", stream);
                 if(callback) {
                     callback();
                 }
-            },
-            function(err) {
-                // TODO this code can't work. getUserMedia gets a MediaStreamError but this callback act as if it was receiving a MediaError (https://developer.mozilla.org/en-US/docs/Web/API/MediaError) where a code of 1 would mean "The fetching of the associated resource was aborted by the user's request". I know that it can't work because MediaStreamError doesn't have a `code` field.
-                // FIXME: handle cancel case
-                if(err && (err as any).code == 1) { // TODO does .code actually exists? Maybe it's a MediaError and not a MediaStreamError
-                    // User cancel
-                    return;
+            }).catch(e => { throw new Error(e) })
+        else
+            getUserMedia(constraints,
+                function (stream) {
+                    audioStream = stream;
+                    attachMedia("#togetherjs-local-audio", stream);
+                    if (callback) {
+                        callback();
+                    }
+                },
+                function (err) {
+                    // TODO this code can't work. getUserMedia gets a MediaStreamError but this callback act as if it was receiving a MediaError (https://developer.mozilla.org/en-US/docs/Web/API/MediaError) where a code of 1 would mean "The fetching of the associated resource was aborted by the user's request". I know that it can't work because MediaStreamError doesn't have a `code` field.
+                    // FIXME: handle cancel case
+                    if (err && (err as any).code == 1) { // TODO does .code actually exists? Maybe it's a MediaError and not a MediaStreamError
+                        // User cancel
+                        return;
+                    }
+                    error("getUserMedia error:", err);
                 }
-                error("getUserMedia error:", err);
-            }
-        );
+            );
     }
 
     function attachMedia(element: HTMLMediaElement | JQuery | string, media: MediaStream) {
@@ -354,11 +371,11 @@ session.on("ui-ready", function() {
         }
         _connection.onaddstream = function(event: MediaStreamEvent) {
             console.log("got event", event.type, event);
-            if(event.stream == null) {
+            if (!event.stream && (!event.streams || !event.streams.length)) {
                 console.error("stream was null in the event", event);
                 return;
             }
-            attachMedia($audio, event.stream);
+            attachMedia($audio, event.stream || event.streams[0]);
             audioButton("#togetherjs-audio-active");
         };
         _connection.onstatechange = function() {
