@@ -70,134 +70,141 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
                     padding: 0,
                     opacity: 0
                 }, 200);
-            }
-            else {
-                //this.element.show();
-                this.element.animate({
-                    opacity: 0.3
-                }).animate({
-                    opacity: 1
-                });
-            }
+      } else {
+        //this.element.show();
+        this.element.animate({
+          opacity:0.3
+        }).animate({
+          opacity:1
+        });
+      }
+    },
+
+    setClass: function (name) {
+      if (name != this.elementClass) {
+        this.element.removeClass(this.elementClass).addClass(name);
+        this.elementClass = name;
+      }
+    },
+
+    updatePosition: function (pos) {
+      var top, left;
+      if (this.atOtherUrl) {
+        this.element.show();
+        this.atOtherUrl = false;
+      }
+      if (pos.element) {
+        try {
+          var target = $(elementFinder.findElement(pos.element));
+          var offset = target.offset();
+          top = offset.top + pos.offsetY;
+          left = offset.left + pos.offsetX;
+        } catch (e) {
+          if (e instanceof elementFinder.CannotFind) {
+            top = pos.top;
+            left = pos.left;
+          } else
+            throw e;
         }
-        setClass(name) {
-            if (name != this.elementClass) {
-                this.element.removeClass(this.elementClass).addClass(name);
-                this.elementClass = name;
-            }
-        }
-        updatePosition(pos) {
-            let top, left;
-            if (this.atOtherUrl) {
-                this.element.show();
-                this.atOtherUrl = false;
-            }
-            if ("element" in pos) {
-                const target = (0, jquery_1.default)(elementFinder_1.elementFinder.findElement(pos.element));
-                const offset = target.offset(); // TODO !
-                top = offset.top + pos.offsetY;
-                left = offset.left + pos.offsetX;
-            }
-            else {
-                // No anchor, just an absolute position
-                top = pos.top;
-                left = pos.left;
-            }
-            // These are saved for use by .refresh():
-            this.lastTop = top;
-            this.lastLeft = left;
-            this.setPosition(top, left);
-        }
-        hideOtherUrl() {
-            if (this.atOtherUrl) {
-                return;
-            }
-            this.atOtherUrl = true;
-            // FIXME: should show away status better:
-            this.element.hide();
-        }
-        // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
-        rotateCursorDown() {
-            const e = (0, jquery_1.default)(this.element).find('svg');
-            e.animate({ borderSpacing: -150, opacity: 1 }, {
-                step: function (now, fx) {
-                    if (fx.prop == "borderSpacing") {
-                        e.css('-webkit-transform', 'rotate(' + now + 'deg)')
-                            .css('-moz-transform', 'rotate(' + now + 'deg)')
-                            .css('-ms-transform', 'rotate(' + now + 'deg)')
-                            .css('-o-transform', 'rotate(' + now + 'deg)')
-                            .css('transform', 'rotate(' + now + 'deg)');
-                    }
-                    else {
-                        e.css(fx.prop, now);
-                    }
-                },
-                duration: 500
-            }, 'linear').promise().then(function () {
-                e.css('-webkit-transform', '').css('-moz-transform', '').css('-ms-transform', '').css('-o-transform', '').css('transform', '').css("opacity", "");
-            });
-        }
-        setPosition(top, left) {
-            const wTop = (0, jquery_1.default)(window).scrollTop();
-            const height = (0, jquery_1.default)(window).height();
-            if (top < wTop) {
-                // FIXME: this is a totally arbitrary number, but is meant to be big enough
-                // to keep the cursor name from being off the top of the screen.
-                top = 25;
-                this.setClass("togetherjs-scrolled-above");
-            }
-            else if (top > wTop + height - CURSOR_HEIGHT) {
-                top = height - CURSOR_HEIGHT - 5;
-                this.setClass("togetherjs-scrolled-below");
-            }
-            else {
-                this.setClass("togetherjs-scrolled-normal");
-            }
-            this.element.css({
-                top: top,
-                left: left
-            });
-        }
-        refresh() {
-            if (this.lastTop !== null && this.lastLeft !== null) {
-                this.setPosition(this.lastTop, this.lastLeft);
-            }
-        }
-        setKeydown() {
-            if (this.keydownTimeout) {
-                clearTimeout(this.keydownTimeout);
-            }
-            else {
-                this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
-            }
-            this.keydownTimeout = setTimeout(() => this.clearKeydown(), this.KEYDOWN_WAIT_TIME);
-        }
-        clearKeydown() {
-            this.keydownTimeout = null;
-            this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
-        }
-        _destroy() {
-            this.element.remove();
-            //this.element = null; // TODO I think we don't need to do that since the only time we call _destroy we also remove this element from memory
-        }
-        static getClient(clientId) {
-            let c = Cursor._cursors[clientId];
-            if (!c) {
-                c = Cursor._cursors[clientId] = new Cursor(clientId);
-            }
-            return c;
-        }
-        static forEach(callback, context = null) {
-            for (const a in Cursor._cursors) {
-                if (Object.prototype.hasOwnProperty.call(Cursor._cursors, a)) {
-                    callback.call(context, Cursor._cursors[a], a);
-                }
-            }
-        }
-        static destroy(clientId) {
-            Cursor._cursors[clientId]._destroy();
-            delete Cursor._cursors[clientId];
-        }
+      } else {
+        // No anchor, just an absolute position
+        top = pos.top;
+        left = pos.left;
+      }
+      // These are saved for use by .refresh():
+      this.lastTop = top;
+      this.lastLeft = left;
+      this.setPosition(top, left);
+    },
+
+    hideOtherUrl: function () {
+      if (this.atOtherUrl) {
+        return;
+      }
+      this.atOtherUrl = true;
+      // FIXME: should show away status better:
+      this.element.hide();
+    },
+
+    // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
+    rotateCursorDown: function(){
+      var e = $(this.element).find('svg');
+        e.animate({borderSpacing: -150, opacity: 1}, {
+        step: function(now, fx) {
+          if (fx.prop == "borderSpacing") {
+            e.css('-webkit-transform', 'rotate('+now+'deg)')
+              .css('-moz-transform', 'rotate('+now+'deg)')
+              .css('-ms-transform', 'rotate('+now+'deg)')
+              .css('-o-transform', 'rotate('+now+'deg)')
+              .css('transform', 'rotate('+now+'deg)');
+          } else {
+            e.css(fx.prop, now);
+          }
+        },
+        duration: 500
+      }, 'linear').promise().then(function () {
+        e.css('-webkit-transform', '')
+          .css('-moz-transform', '')
+          .css('-ms-transform', '')
+          .css('-o-transform', '')
+          .css('transform', '')
+          .css("opacity", "");
+      });
+    },
+
+    setPosition: function (top, left) {
+      var wTop = $(window).scrollTop();
+      var height = $(window).height();
+
+      if (top < wTop) {
+        // FIXME: this is a totally arbitrary number, but is meant to be big enough
+        // to keep the cursor name from being off the top of the screen.
+        top = 25;
+        this.setClass("togetherjs-scrolled-above");
+      } else if (top > wTop + height - CURSOR_HEIGHT) {
+        top = height - CURSOR_HEIGHT - 5;
+        this.setClass("togetherjs-scrolled-below");
+      } else {
+        this.setClass("togetherjs-scrolled-normal");
+      }
+      this.element.css({
+        top: top,
+        left: left
+      });
+    },
+
+    refresh: function () {
+      if (this.lastTop !== null) {
+        this.setPosition(this.lastTop, this.lastLeft);
+      }
+    },
+
+    setKeydown: function () {
+      if (this.keydownTimeout) {
+        clearTimeout(this.keydownTimeout);
+      } else {
+        this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
+      }
+      this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
+    },
+
+    clearKeydown: function () {
+      this.keydownTimeout = null;
+      this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
+    },
+
+    _destroy: function () {
+      this.element.remove();
+      this.element = null;
+    }
+  });
+
+  Cursor._cursors = {};
+
+  cursor.getClient = Cursor.getClient = function (clientId) {
+    var c = Cursor._cursors[clientId];
+    if (! c) {
+      c = Cursor._cursors[clientId] = Cursor(clientId);
     }
     Cursor._cursors = {};
     session_1.session.hub.on("cursor-update", function (msg) {
@@ -297,25 +304,57 @@ define(["require", "exports", "./elementFinder", "./eventMaker", "./peers", "./s
         context.fill();
         return canvas0.toDataURL("image/png");
     }
-    let scrollTimeout = null;
-    let scrollTimeoutSet = 0;
-    const SCROLL_DELAY_TIMEOUT = 75;
-    const SCROLL_DELAY_LIMIT = 300;
-    function scroll() {
-        const now = Date.now();
-        if (scrollTimeout) {
-            if (now - scrollTimeoutSet < SCROLL_DELAY_LIMIT) {
-                clearTimeout(scrollTimeout);
-            }
-            else {
-                // Just let it progress anyway
-                return;
-            }
-        }
-        scrollTimeout = setTimeout(_scrollRefresh, SCROLL_DELAY_TIMEOUT);
-        if (!scrollTimeoutSet) {
-            scrollTimeoutSet = now;
-        }
+    var offsetX = pageX - offset.left;
+    var offsetY = pageY - offset.top;
+    lastMessage = {
+      type: "cursor-update",
+      top: pageY,
+      left: pageX,
+      element: elementFinder.elementLocation(target),
+      offsetX: Math.floor(offsetX),
+      offsetY: Math.floor(offsetY)
+    };
+    session.send(lastMessage);
+  }
+
+  function makeCursor(color) {
+    var canvas = $("<canvas></canvas>");
+    canvas.attr("height", CURSOR_HEIGHT);
+    canvas.attr("width", CURSOR_WIDTH);
+    var context = canvas[0].getContext('2d');
+    context.fillStyle = color;
+    context.moveTo(0, 0);
+    context.beginPath();
+    context.lineTo(0, CURSOR_HEIGHT/1.2);
+    context.lineTo(Math.sin(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5,
+                   Math.cos(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5);
+    context.lineTo(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2,
+                   Math.cos(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2);
+    context.lineTo(0, 0);
+    context.shadowColor = 'rgba(0,0,0,0.3)';
+    context.shadowBlur = 2;
+    context.shadowOffsetX = 1;
+    context.shadowOffsetY = 2;
+	context.strokeStyle = "#ffffff";
+	context.stroke();
+    context.fill();
+    return canvas[0].toDataURL("image/png");
+  }
+
+  var scrollTimeout = null;
+  var scrollTimeoutSet = 0;
+  var SCROLL_DELAY_TIMEOUT = 75;
+  var SCROLL_DELAY_LIMIT = 300;
+
+  function scroll() {
+    var now = Date.now();
+    if (scrollTimeout) {
+      if (now - scrollTimeoutSet < SCROLL_DELAY_LIMIT) {
+        clearTimeout(scrollTimeout);
+      } else {
+        // Just let it progress anyway
+        return;
+      }
     }
     let lastScrollMessage = null;
     function _scrollRefresh() {
