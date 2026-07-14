@@ -2,23 +2,10 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
 * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*Fonts*/
-@font-face {
-  font-family: openSansRegular;
-  src: url('fonts/OpenSans-Regular.ttf');
-}
-
-@font-face {
-  font-family: openSansLight;
-  src: url('fonts/OpenSans-Light.ttf');
-}
-
-@font-face {
-  font-family: openSansBold;
-  src: url('fonts/OpenSans-Bold.ttf');
-}
-
-@default-font: openSansLight, Helvetica, 'Helvetica Neue', Arial, sans-serif;
+/* Base font: override by setting window.TogetherJSConfig_baseFont, e.g.
+   TogetherJSConfig_baseFont = "var(--font-base)" to reuse a CSS custom
+   property already defined on the host page's :root. */
+@default-font: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
 
 // Size of the buttons (they're square):
 @button-size: 40px;
@@ -44,7 +31,7 @@
 .togetherjs {
 
   /* General styles */
-  font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+  font-family: @default-font;
   font-size: 14px;
   line-height: 20px;
   color: rgb(51, 51, 51);
@@ -215,7 +202,8 @@ input.togetherjs-upload-avatar {
   min-width: 0;
   font-size:14px;
   color:#333333;
-  font-family: openSansLight, Helvetica;
+  font-family: @default-font;
+  font-weight: 300;
   vertical-align:-2px !important;
   &:hover {
     cursor: pointer;
@@ -247,7 +235,7 @@ input.togetherjs-upload-avatar {
     font-weight: bold;
     font-variant: normal;
     text-align: center;
-    font-family: openSansRegular, Helvetica;
+    font-family: @default-font;
     color: #fff;
     margin: 0 -7px 0 -7px;
     padding: 10px 4px 5px 30px;
@@ -427,7 +415,8 @@ input.togetherjs-upload-avatar {
     border-radius: 4px;
     border: 1px solid #cccccc;
     /*box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);*/
-    font-family: openSansLight, Helvetica, sans-serif;
+    font-family: @default-font;
+    font-weight: 300;
     &:focus {
       border:1px solid #0095DD;
     }
@@ -489,7 +478,7 @@ input.togetherjs-upload-avatar {
 
   .togetherjs-person-name-abbrev {
     color:rgba(51,51,51,1);
-    font-family:openSansRegular, Helvetica, sans-serif;
+    font-family: @default-font;
     padding-top: 2px;
   }
 
@@ -541,7 +530,7 @@ input.togetherjs-upload-avatar {
     font-weight: bold;
     font-variant: normal;
     text-align: center;
-    font-family: openSansRegular, Helvetica, sans-serif;
+    font-family: @default-font;
     color: #fff;
     margin: 0 -1px 0 -1px;
     padding: 10px 4px 5px 30px;
@@ -626,7 +615,8 @@ input.togetherjs-upload-avatar {
   }
 
   .togetherjs-notification .togetherjs-person-name {
-    font-family: openSansRegular, Helvetica Bold, 'Helvetica Neue', Arial;
+    font-family: @default-font;
+    font-weight: bold;
     font-size:14px;
   }
 
@@ -742,7 +732,8 @@ input.togetherjs-upload-avatar {
   }
 
   .togetherjs-dock-person-tooltip {
-    font-family: openSansLight, Helvetica, 'Helvetica Neue', Arial;
+    font-family: @default-font;
+    font-weight: 300;
     position: absolute;
     right: 70px;
     top: 0px;
@@ -849,15 +840,15 @@ input.togetherjs-upload-avatar {
 }
 
 .togetherjs-chat-join-item span.togetherjs-person-name{
-  font-family:openSansRegular, Helvetica;
+  font-family: @default-font;
 }
 
 .togetherjs-chat-left-item span.togetherjs-person-name{
-  font-family:openSansRegular, Helvetica;
+  font-family: @default-font;
 }
 
 .togetherjs-chat-url-change span.togetherjs-person-name{
-  font-family:openSansRegular, Helvetica;
+  font-family: @default-font;
 }
 
 .togetherjs-clear {
@@ -1473,7 +1464,7 @@ section.togetherjs-buttons .togetherjs-same-url {
     border-radius: 4px 4px 4px 4px;
     border: 1px solid rgb(204, 204, 204);
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
-    font-family: openSansRegular, Helvetica, sans-serif;
+    font-family: @default-font;
     margin: -20px 0px;
   }
 

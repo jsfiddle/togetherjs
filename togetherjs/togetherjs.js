@@ -74,7 +74,11 @@
     ignoreForms: [":password"],
     // When undefined, attempts to use the browser's language
     lang: undefined,
-    fallbackLang: "en-US"
+    fallbackLang: "en-US",
+    // Overrides the UI's font-family; accepts any CSS font-family value,
+    // including a reference to a CSS custom property already defined on
+    // the host page (e.g. "var(--font-base)")
+    baseFont: null
   };
 
   var styleSheet = "/togetherjs/togetherjs.css";
