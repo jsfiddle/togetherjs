@@ -1,0 +1,13 @@
+name = "togetherjs-hub"
+main = "src/index.ts"
+compatibility_date = "2025-07-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+# SQLite-backed Durable Objects run on the Workers Free plan.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

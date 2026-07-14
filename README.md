@@ -36,7 +36,7 @@ TogetherJS has two main pieces:
 
 * The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
 
-There is a TogetherJS hub server deployed at `https://hub.togetherjs.com` - and there's little need for other server deployments.  If you want to try TogetherJS out we recommend you use our hub server.  Note if you include TogetherJS on an https site, you must use an https hub server.
+There is no shared hub server anymore, so you'll need to host your own (see "Hosting the Hub Server" in `site/docs/index.md`). The recommended way is [`hub-worker/`](hub-worker/), a Cloudflare Workers + Durable Objects port of the relay logic that runs on Cloudflare's free plan. Note if you include TogetherJS on an https site, you must use an https/wss hub server (Cloudflare Workers handle this automatically).
 
 The files need to be lightly "built": we use [LESS](http://lesscss.org/) for styles, and a couple files are generated.  To develop you need to build the library using [Grunt](http://gruntjs.com/).
 
@@ -86,9 +86,10 @@ Then `static-myapp/togetherjs.js` and `static-myapp/togetherjs-min.js` will be i
 
 Running a local server
 ----------------------
-You shouldn't need to run your own version of the hub server.  But if you
-happen to make changes to the server, you can change the default hub
-URL by setting the HUB_URL environment variable when building.  For example:
+You'll need to run your own hub server (see "Hosting the Hub Server" in
+`site/docs/index.md` and [`hub-worker/`](hub-worker/)). If you make changes to
+the hub and want to point a local build at it, set the HUB_URL environment
+variable when building. For example:
 ```
 $ HUB_URL=http://localhost:8080 grunt devwatch
 ```

@@ -1,4 +1,5 @@
 node_modules
+.wrangler
 .DS_Store
 .env*
 addon/Profile

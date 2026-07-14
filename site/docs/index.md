@@ -444,35 +444,45 @@ We need your help!  If you're itching to help out, it would be great if you take
 
 ## Hosting the Hub Server
 
-We have a server at `https://hub.togetherjs.com` which you are welcome to use for peer-to-peer communications with TogetherJS.  But you may wish to host your own.  The server is fairly small and simple, so it should be reasonable.  Note that we haven't really "finished" the story around self-hosting, so the details of this are likely to change.  The server itself is quite stable.
+There is no officially hosted hub anymore (the old `hub.togetherjs.com` / Glitch-hosted
+instances are gone), so you'll need to host your own. The relay protocol is
+intentionally tiny — a room is just a set of peers who get every message anyone
+else in the room sends — so this is cheap to self-host.
 
-The server is located in `hub/server.js`, and is a simple Node.js application.  You can run this like `node hub/server.js` - use `node hub/server.js --help` to see the available options.  You will need to `npm install websocket optimist` to get the websocket library and option library installed.
+The recommended way is **`hub-worker/`**, a Cloudflare Workers + Durable Objects
+port of the relay logic, which runs comfortably on Cloudflare's free plan (no
+credit card required) and needs no server to babysit:
 
-If you want to use TogetherJS on an https site you must host the hub on https.  We don't have it set up in `server.js` for Node to do SSL directly, so we recommend a proxy. [stunnel](https://www.stunnel.org/) is an example of the kind of proxy you'd want – not all proxies support websockets.
-
-If you want to change the port or interface the server binds to, simply run `node hub/server.js -h` and it will show the command-line options as well as environmental variables.
-
-Once you have the hub installed you need to configure TogetherJS to use the hub, like:
-
-```javascript
-TogetherJSConfig_hubBase = "https://myhub.com";
+```sh
+cd hub-worker
+npm install
+npm run dev      # local dev server via wrangler
+npm run deploy   # deploy to your Cloudflare account
 ```
 
-If you are curious about the exact version of code on the server it should be always be [server.js on master](https://github.com/mozilla/togetherjs/blob/master/hub/server.js), and you can double-check by fetching [`/server-source`](https://hub.togetherjs.com/server-source).
+`wrangler deploy` will print the Worker's URL (a `*.workers.dev` subdomain by
+default, or your own domain if you configure a route in `wrangler.toml`). Point
+TogetherJS at it:
 
-### Deploying the hub server to Heroku
+```javascript
+TogetherJSConfig_hubBase = "https://your-worker-url";
+```
 
-You need a Heroku account. If you don't have one, their [Node.js getting started guide](https://devcenter.heroku.com/articles/getting-started-with-nodejs) is a good place to start.
+Each room is a separate Durable Object instance (keyed by the room id in
+`/hub/<id>`), so it maps directly onto the old `allConnections[id]` model from
+`hub/server.js` — see `hub-worker/src/room.ts` for the relay logic and
+`hub-worker/src/index.ts` for routing.
 
-What's about to happen: we clone the repo and create a new Heroku app within it. We need to set the HOST environment variable to get the app to bind to 0.0.0.0 instead of 127.0.0.1. It'll pick up the PORT variable automatically. We also need to enable WebSockets for the app. Then, push the code and we should be good to go!
-
-	git clone git@github.com:mozilla/togetherjs.git
-	cd togetherjs
-	heroku create
-	heroku config:add HOST=0.0.0.0
-	git push heroku master
-
-Make note of the app name after running `heroku create` You can check that everything is running by going to http://your-app-name-here.herokuapp.com/status
+The legacy `hub/server.js` — a plain Node.js HTTP + WebSocket server — is kept
+in the repo for reference and for anyone who'd rather run it themselves (e.g.
+as one more container alongside other services you already operate). It has no
+database or persistence requirements either, just a reachable Node process; see
+its `--help` output for port/host options. Note it does **not** implement the
+`/findroom` prefix-matching endpoint's Cloudflare counterpart out of the box —
+`hub-worker` currently omits `/findroom` since it needs a small shared registry
+across Durable Object instances (a second Durable Object or a D1 table). Add it
+if your integration relies on `TogetherJSConfig.findRoom = {prefix, max}`;
+otherwise it's safe to leave out.
 
 ## Addons
 
