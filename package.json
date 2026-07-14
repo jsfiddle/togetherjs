@@ -47,6 +47,7 @@
   },
   "scripts": {
     "start": "node hub/server.js",
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "grunt build"
   }
 }

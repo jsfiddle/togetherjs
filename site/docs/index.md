@@ -477,12 +477,13 @@ The legacy `hub/server.js` — a plain Node.js HTTP + WebSocket server — is ke
 in the repo for reference and for anyone who'd rather run it themselves (e.g.
 as one more container alongside other services you already operate). It has no
 database or persistence requirements either, just a reachable Node process; see
-its `--help` output for port/host options. Note it does **not** implement the
-`/findroom` prefix-matching endpoint's Cloudflare counterpart out of the box —
-`hub-worker` currently omits `/findroom` since it needs a small shared registry
-across Durable Object instances (a second Durable Object or a D1 table). Add it
-if your integration relies on `TogetherJSConfig.findRoom = {prefix, max}`;
-otherwise it's safe to leave out.
+its `--help` output for port/host options.
+
+`hub-worker` also implements `/findroom` (used by
+`TogetherJSConfig.findRoom = {prefix, max}`), backed by a second, singleton
+Durable Object (`hub-worker/src/registry.ts`) that tracks peer counts per room
+across the otherwise-isolated `Room` instances — see `hub-worker/README.md`
+for details.
 
 ## Addons
 

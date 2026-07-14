@@ -8,86 +8,26 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
   var webrtc = util.Module("webrtc");
   var assert = util.assert;
 
-  session.RTCSupported = !!(window.mozRTCPeerConnection ||
-                            window.webkitRTCPeerConnection ||
-                            window.RTCPeerConnection);
+  session.RTCSupported = !!window.RTCPeerConnection;
 
-  if (session.RTCSupported && $.browser.mozilla && parseInt($.browser.version, 10) <= 19) {
-    // In a few versions of Firefox (18 and 19) these APIs are present but
-    // not actually usable
-    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=828839
-    // Because they could be pref'd on we'll do a quick check:
-    try {
-      (function () {
-        var conn = new window.mozRTCPeerConnection();
-      })();
-    } catch (e) {
-      session.RTCSupported = false;
-    }
-  }
-
-  var mediaConstraints = {
-    mandatory: {
-      OfferToReceiveAudio: true,
-      OfferToReceiveVideo: false
-    }
+  // Passed to createOffer(); createAnswer() needs no equivalent since the
+  // answerer's directions are dictated by the received offer.
+  var offerOptions = {
+    offerToReceiveAudio: true,
+    offerToReceiveVideo: false
   };
-  if (window.mozRTCPeerConnection) {
-    mediaConstraints.mandatory.MozDontOfferDataChannel = true;
-  }
-
-  var URL = window.webkitURL || window.URL;
-  var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
-  var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
 
   function makePeerConnection() {
-    // Based roughly off: https://github.com/firebase/gupshup/blob/gh-pages/js/chat.js
-    if (window.webkitRTCPeerConnection) {
-      return new webkitRTCPeerConnection({
-        "iceServers": [{"url": "stun:stun.l.google.com:19302"}]
-      }, {
-        "optional": [{"DtlsSrtpKeyAgreement": true}]
-      });
-    }
-    if (window.mozRTCPeerConnection) {
-      return new mozRTCPeerConnection({
-        // Or stun:124.124.124..2 ?
-        "iceServers": [{"url": "stun:23.21.150.121"}]
-      }, {
-        "optional": []
-      });
-    }
-    throw new util.AssertionError("Called makePeerConnection() without supported connection");
-  }
-
-  function ensureCryptoLine(sdp) {
-    if (! window.mozRTCPeerConnection) {
-      return sdp;
-    }
-
-    var sdpLinesIn = sdp.split('\r\n');
-    var sdpLinesOut = [];
-
-    // Search for m line.
-    for (var i = 0; i < sdpLinesIn.length; i++) {
-      sdpLinesOut.push(sdpLinesIn[i]);
-      if (sdpLinesIn[i].search('m=') !== -1) {
-        sdpLinesOut.push("a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      }
-    }
-
-    sdp = sdpLinesOut.join('\r\n');
-    return sdp;
+    return new RTCPeerConnection({
+      iceServers: [{urls: "stun:stun.l.google.com:19302"}]
+    });
   }
 
   function getUserMedia(options, success, failure) {
     failure = failure || function (error) {
       console.error("Error in getUserMedia:", error);
     };
-    (navigator.getUserMedia ||
-     navigator.mozGetUserMedia ||
-     navigator.webkitGetUserMedia ||
-     navigator.msGetUserMedia).call(navigator, options, success, failure);
+    navigator.mediaDevices.getUserMedia(options).then(success, failure);
   }
 
   /****************************************
@@ -150,7 +90,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
         },
         function(stream) {
           streaming = true;
-          $video[0].src = URL.createObjectURL(stream);
+          $video[0].srcObject = stream;
           $video[0].play();
         },
         function(err) {
@@ -335,13 +275,15 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
 
     function attachMedia(element, media) {
       element = $(element)[0];
-      console.log("Attaching", media, "to", element);
-      if (window.mozRTCPeerConnection) {
-        element.mozSrcObject = media;
-        element.play();
-      } else {
-        element.autoplay = true;
-        element.src = URL.createObjectURL(media);
+      element.autoplay = true;
+      element.srcObject = media;
+      var playing = element.play();
+      if (playing && playing.catch) {
+        playing.catch(function (err) {
+          // Autoplay can be blocked until the user interacts with the page;
+          // the call is still connected, just silent until then.
+          console.warn("Could not autoplay media:", err);
+        });
       }
     }
 
@@ -356,16 +298,13 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
         error("Error creating PeerConnection:", e);
         throw e;
       }
-      _connection.onaddstream = function (event) {
-        console.log("got event", event, event.type);
-        attachMedia($audio, event.stream);
+      _connection.ontrack = function (event) {
+        attachMedia($audio, event.streams[0]);
         audioButton("#togetherjs-audio-active");
       };
-      _connection.onstatechange = function () {
-        // FIXME: this doesn't seem to work:
-        // Actually just doesn't work on Firefox
-        console.log("state change", _connection.readyState);
-        if (_connection.readyState == "closed") {
+      _connection.onconnectionstatechange = function () {
+        var state = _connection.connectionState;
+        if (state == "closed" || state == "failed" || state == "disconnected") {
           audioButton("#togetherjs-audio-ready");
         }
       };
@@ -381,7 +320,9 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
           });
         }
       };
-      _connection.addStream(audioStream);
+      audioStream.getTracks().forEach(function (track) {
+        _connection.addTrack(track, audioStream);
+      });
       return _connection;
     }
 
@@ -399,37 +340,28 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
           new RTCSessionDescription({
             type: "offer",
             sdp: offerReceived
-          }),
-          function () {
-            offerDescription = true;
-            addIceCandidate();
-            connect();
-          },
-          function (err) {
-            error("Error doing RTC setRemoteDescription:", err);
-          }
-        );
+          })
+        ).then(function () {
+          offerDescription = true;
+          addIceCandidate();
+          connect();
+        }, function (err) {
+          error("Error doing RTC setRemoteDescription:", err);
+        });
         return;
       }
       if (! (offerSent || offerReceived)) {
-        connection.createOffer(function (offer) {
-          console.log("made offer", offer);
-          offer.sdp = ensureCryptoLine(offer.sdp);
-          connection.setLocalDescription(
-            offer,
-            function () {
-              session.send({
-                type: "rtc-offer",
-                offer: offer.sdp
-              });
-              offerSent = offer;
-              audioButton("#togetherjs-audio-outgoing");
-            },
-            function (err) {
-              error("Error doing RTC setLocalDescription:", err);
-            },
-            mediaConstraints
-          );
+        connection.createOffer(offerOptions).then(function (offer) {
+          return connection.setLocalDescription(offer).then(function () {
+            session.send({
+              type: "rtc-offer",
+              offer: offer.sdp
+            });
+            offerSent = offer;
+            audioButton("#togetherjs-audio-outgoing");
+          }, function (err) {
+            error("Error doing RTC setLocalDescription:", err);
+          });
         }, function (err) {
           error("Error doing RTC createOffer:", err);
         });
@@ -441,25 +373,19 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
             error("createAnswer Timed out; reload or restart browser");
           }
         }, 2000);
-        connection.createAnswer(function (answer) {
-          answer.sdp = ensureCryptoLine(answer.sdp);
+        connection.createAnswer().then(function (answer) {
           clearTimeout(timeout);
-          connection.setLocalDescription(
-            answer,
-            function () {
-              session.send({
-                type: "rtc-answer",
-                answer: answer.sdp
-              });
-              answerSent = answer;
-            },
-            function (err) {
-              clearTimeout(timeout);
-              error("Error doing RTC setLocalDescription:", err);
-            },
-            mediaConstraints
-          );
+          return connection.setLocalDescription(answer).then(function () {
+            session.send({
+              type: "rtc-answer",
+              answer: answer.sdp
+            });
+            answerSent = answer;
+          }, function (err) {
+            error("Error doing RTC setLocalDescription:", err);
+          });
         }, function (err) {
+          clearTimeout(timeout);
           error("Error doing RTC createAnswer:", err);
         });
       }
@@ -486,16 +412,14 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
           new RTCSessionDescription({
             type: "offer",
             sdp: offerReceived
-          }),
-          function () {
-            offerDescription = true;
-            addIceCandidate();
-            connect();
-          },
-          function (err) {
-            error("Error doing RTC setRemoteDescription:", err);
-          }
-        );
+          })
+        ).then(function () {
+          offerDescription = true;
+          addIceCandidate();
+          connect();
+        }, function (err) {
+          error("Error doing RTC setRemoteDescription:", err);
+        });
       }
       if (! audioStream) {
         startStreaming(run);
@@ -520,16 +444,14 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
         new RTCSessionDescription({
           type: "answer",
           sdp: answerReceived
-        }),
-        function () {
-          answerDescription = true;
-          // FIXME: I don't think this connect is ever needed?
-          connect();
-        },
-        function (err) {
-          error("Error doing RTC setRemoteDescription:", err);
-        }
-      );
+        })
+      ).then(function () {
+        answerDescription = true;
+        // FIXME: I don't think this connect is ever needed?
+        connect();
+      }, function (err) {
+        error("Error doing RTC setRemoteDescription:", err);
+      });
     });
 
     session.hub.on("rtc-ice-candidate", function (msg) {
@@ -554,9 +476,8 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
     });
 
     session.hub.on("hello", function (msg) {
-      // FIXME: displayToggle should be set due to
-      // _connection.onstatechange, but that's not working, so
-      // instead:
+      // A peer reloading/navigating away tears down their end without us
+      // getting an onconnectionstatechange for it, so reset here too:
       audioButton("#togetherjs-audio-ready");
       if (accepted && (offerSent || answerSent)) {
         abort();
@@ -568,7 +489,7 @@ define(["require", "jquery", "util", "session", "ui", "peers", "storage", "windo
       answerSent = answerReceived = offerSent = offerReceived = null;
       answerDescription = offerDescription = false;
       _connection = null;
-      $audio[0].removeAttribute("src");
+      $audio[0].srcObject = null;
     }
 
   });

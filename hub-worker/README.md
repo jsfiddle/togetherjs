@@ -9,6 +9,11 @@ protocol, same behavior, no server to babysit:
   `"server-echo": true` on a message also sends it back to the sender.
 - On connect, the server sends `{"type": "init-connection", "peerCount": N}`
   where `N` is the number of peers already in the room.
+- `GET /findroom?prefix=CHARS&max=NUM` → `{"name": "<prefix>__<id>"}`, for
+  clients using `TogetherJSConfig.findRoom`. Picks an existing `prefix__*`
+  room with fewer than `max` peers (least-populated first, random tie-break),
+  or mints a new `prefix__<10-char id>` if none qualify — same algorithm as
+  the old server (`hub/server.js:167-194`).
 
 Each room is one Durable Object instance (`src/room.ts`), addressed by name
 from the room id (`src/index.ts`) — this mirrors the original's in-memory
@@ -17,9 +22,15 @@ lifecycle instead of a single long-running Node process. Rooms use the
 WebSocket Hibernation API, so an idle room's Durable Object can be evicted
 from memory between messages at no cost.
 
+`/findroom` is backed by a second, singleton Durable Object (`src/registry.ts`,
+`Registry`) that tracks peer counts per room — a single `Room` instance only
+knows about its own peers, not siblings sharing a prefix. `Room` reports its
+peer count to the registry on connect/disconnect, but only for rooms whose id
+contains `"__"` (i.e. rooms that came from `/findroom` in the first place),
+so ordinary share-link sessions never touch the registry.
+
 Not ported: the Hixie-76 (pre-RFC6455) websocket compat shim, `/server-source`,
-`/load` stats, and `/findroom` (prefix-based room auto-assignment) — see the
-note in `site/docs/index.md` if you need `/findroom`.
+and `/load` stats.
 
 ## Setup
 
