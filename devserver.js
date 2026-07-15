@@ -8,6 +8,11 @@ port = process.argv[2] || process.env['PORT'] || 8080;
 http.createServer(function(request, response) {
 
   var uri = url.parse(request.url).pathname
+  if (uri.includes('..')) {
+    response.writeHead(403);
+    response.end();
+    return;
+  }
   var filename = path.join(process.cwd(), 'build', uri);
 
   fs.exists(filename, function(exists) {
