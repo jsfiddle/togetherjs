@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TogetherJS example</title>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; margin: 0 auto; max-width: 40rem; padding: 2rem; }
+      label { display: block; margin: 1rem 0 .25rem; font-weight: 600; }
+      input, textarea { width: 100%; padding: .5rem; font: inherit; box-sizing: border-box; }
+      button { font: inherit; padding: .6rem 1.2rem; margin-top: 1.5rem; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>TogetherJS example</h1>
+    <p>
+      A minimal host page for developing the client. Start a session, then open
+      the share link in a second window to exercise cursors, chat, form sync
+      and the audio/video mesh.
+    </p>
+
+    <label for="name">Name</label>
+    <input id="name" type="text" placeholder="Type here and watch the other window">
+
+    <label for="notes">Notes</label>
+    <textarea id="notes" rows="5" placeholder="Form fields sync between peers"></textarea>
+
+    <button id="start-togetherjs" type="button" onclick="TogetherJS(this); return false">
+      Start TogetherJS
+    </button>
+
+    <script>
+      // Defaults to a locally-running hub-worker (npx wrangler dev in
+      // hub-worker/); override with ?hub=http://host:port so the same page can
+      // drive the automated tests.
+      var hub = new URLSearchParams(location.search).get("hub");
+      window.TogetherJSConfig_hubBase = hub || "http://localhost:8787";
+      window.TogetherJSConfig_enableVideo = true;
+      window.TogetherJSConfig_suppressJoinConfirmation = true;
+    </script>
+    <script src="../dist/togetherjs.js"></script>
+  </body>
+</html>
