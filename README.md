@@ -32,76 +32,70 @@ Setting up a development environment
 
 TogetherJS has two main pieces:
 
-* The [server](https://github.com/mozilla/togetherjs/blob/develop/hub/server.js), which echos messages back and forth between users.  The server doesn't do much, you may gaze upon its incredibly boring [history](https://github.com/mozilla/togetherjs/commits/develop/hub/server.js).
+* The hub in [`hub-worker/`](hub-worker/), which echoes messages back and forth between users.  It doesn't do much: it broadcasts whatever it receives to everyone else in the room, and understands none of it.
 
-* The client in [`togetherjs/`](https://github.com/mozilla/togetherjs/tree/develop/togetherjs) which does all the real work.
+* The client in [`src/`](src/), which does all the real work.
 
 There is no shared hub server anymore, so you'll need to host your own (see "Hosting the Hub Server" in `site/docs/index.md`). The recommended way is [`hub-worker/`](hub-worker/), a Cloudflare Workers + Durable Objects port of the relay logic that runs on Cloudflare's free plan. Note if you include TogetherJS on an https site, you must use an https/wss hub server (Cloudflare Workers handle this automatically).
 
-The files need to be lightly "built": we use [LESS](http://lesscss.org/) for styles, and a couple files are generated.  To develop you need to build the library using [Grunt](http://gruntjs.com/).
-
-To build a copy of the library, check out TogetherJS:
-
-```sh
-$ git clone git://github.com/mozilla/togetherjs.git
-$ cd togetherjs
-```
-
-Then [install npm](http://nodejs.org/download/) and run:
+The client is a set of ES modules under `src/`, bundled with
+[esbuild](https://esbuild.github.io/). To build it, install
+[Node](https://nodejs.org/) 20 or newer and run:
 
 ```sh
 $ npm install
-$ npm install -g grunt-cli
+$ npm run build
 ```
 
-This will install a bunch of stuff, most of which is only used for development.  The only "server" dependency is [WebSocket-Node](https://github.com/Worlize/WebSocket-Node) (and if you use our hub then you don't need to worry about the server).  By default everything is installed locally, i.e., in `node_modules/`.  This works just fine, but it is useful to install the `grunt` command-line program globally, which `npm install -g grunt-cli` does.
+That writes `dist/`:
 
-Now you can build TogetherJS, like:
+* `togetherjs.js` — the whole client, ready to drop into a page with
+  `<script src=".../togetherjs.js"></script>`
+* `togetherjs.min.js` — the same thing, minified, with a source map
+* `togetherjs.esm.js` — an ES module entry, for `import { TogetherJS } from "togetherjs"`
+* `togetherjs.css`, `images/` — the stylesheet and assets
+* `recorder.js`, `walkabout.js` — separate bundles, loaded on demand
+
+To develop, run a watching build with a static server:
 
 ```sh
-$ grunt build buildsite --no-hardlink
+$ npm run dev
 ```
 
-This will create a copy of the entire `togetherjs.com` site in `build/`.  You'll need to setup a local web server of your own pointed to the `build/` directory. To start a server on port 8080, run:
+Then open `examples/index.html`. It expects a hub at `http://localhost:8787`
+(run `npx wrangler dev` inside `hub-worker/`), or you can point it elsewhere
+with `?hub=http://host:port`.
+
+The hub URL baked into a build comes from the `HUB_URL` environment variable:
 
 ```sh
-$ node devserver.js
+$ HUB_URL=https://hub.example.com npm run build
 ```
 
-If you want to develop with TogetherJS you probably want the files built continually.  To do this use:
-
-```sh
-$ grunt devwatch
-```
-
-This will rebuild when changes are detected.  Note that Grunt is configured to create [hard links](http://en.wikipedia.org/wiki/Hard_link) instead of copying so that most changes you make to files in `togetherjs/` don't need to be rebuilt to show up in `build/togetherjs/`.  `--no-hardlink` turns this behavior off.
-
-You may wish to create a static copy of the TogetherJS client to distribute and use on your website.  To do this run:
-
-```sh
-$ grunt build --base-url https://myapp.com --no-hardlink --dest static-myapp
-```
-
-Then `static-myapp/togetherjs.js` and `static-myapp/togetherjs-min.js` will be in place, and the rest of the code will be under `static-myapp/togetherjs/`.  You would deploy these on your server.
-
-Running a local server
-----------------------
-You'll need to run your own hub server (see "Hosting the Hub Server" in
-`site/docs/index.md` and [`hub-worker/`](hub-worker/)). If you make changes to
-the hub and want to point a local build at it, set the HUB_URL environment
-variable when building. For example:
-```
-$ HUB_URL=http://localhost:8080 grunt devwatch
-```
+`BASE_URL` does the same for the URL the client's own assets are served from;
+leave it unset and the client works out where it was loaded from.
 
 Testing
 -------
 
-Tests are in `togetherjs/tests/` -- these are [doctest.js](http://doctestjs.org/) tests.  To actually run the tests build togetherjs, serve it up, and go to `http://localhost:PORT/togetherjs/tests/` -- from there the tests are linked to from the top of the page.  The actual tests are `*.js` files in `togetherjs/tests/`, generally `test_*.js` for unit-style tests, and `func_*.js` for functional tests.
+Unit tests use [Vitest](https://vitest.dev/) and live in `tests/unit/`:
 
-The "Manual testing" link is something that lets you simulate different conditions in TogetherJS without setting up a second browser/client.
+```sh
+$ npm test
+```
 
-There is unfortunately no automated runner for these tests.  It might be nice if [Karma](http://karma-runner.github.io/) could be setup with doctest.js in general, but so far that isn't done.
+End-to-end tests use [Playwright](https://playwright.dev/) and live in
+`tests/e2e/`. They drive two or three real browser contexts through a session
+against an in-process stand-in for the hub, covering cursors, chat, form sync
+and the audio/video mesh:
+
+```sh
+$ npm run test:e2e
+```
+
+Lint with `npm run lint` and format with `npm run format`.
+
+`examples/manual/` holds pages for poking at particular behaviours by hand.
 
 License
 -------

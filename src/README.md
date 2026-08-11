@@ -1,57 +1,98 @@
 TogetherJS client
 =================
 
-This is all the files for the TogetherJS client.
-An overview of the modules:
+The client is a set of ES modules bundled by `build/build.mjs` (esbuild). The
+entry point is `index.js`; everything else is grouped by what it does.
 
-- `libs/`: contains external libraries, sometimes as [git subtree inclusions](https://github.com/apenwarr/git-subtree) and sometimes just copied in.
+Two conventions are worth knowing before reading any of it:
 
-- `analytics.js`: a little library for handling Google Analytics opt-in support
+- **`core/togetherjs.js` is imported, not global.** It defines the `TogetherJS`
+  object and assigns `window.TogetherJS`, but every module that uses it imports
+  it explicitly. Under RequireJS the load order made the global safe to read at
+  module scope; in a single bundle it is not.
+- **Configuration is read lazily.** The bundle evaluates when the `<script>`
+  runs, which is *before* the host page's configuration has been applied, so
+  nothing may read `TogetherJS.config` at module scope.
 
-- `channels.js`: abstraction over WebSockets and other communication methods (like `postMessage`).  Buffers output while the connection is opening, handles JSON encoding/decoding.
+Modules on an import cycle (session ↔ ui, peers ↔ ui) publish themselves to
+`core/registry.js` and look each other up at call time. A static import would
+evaluate the dependency before the dependent's own body had run.
 
-- `chat.js`: handles the chat code, including logging old chat messages.  Doesn't actually include the chat UI, which is in `ui.js`
+### `core/`
 
-- `cursor.js`: handles the shared cursors, both displaying and capturing events.  Also handles clicks.  This *does* include the relevant UI.
+- `togetherjs.js`: the `TogetherJS` object — configuration, the event mixin,
+  startup state, and the public API surface. Depends on nothing else.
+- `session.js`: the most important module. Sets up the channel, routes
+  messages, tracks peers, and carries the lifecycle events other modules hang
+  off (`session.on("ui-ready")` is fired by `ui.js` but lives here).
+- `channels.js`: abstraction over WebSockets and `postMessage`. Buffers output
+  while the connection opens, handles JSON encoding, reconnects with backoff.
+- `peers.js`: the objects representing other participants and yourself.
+- `storage.js`: per-tab and per-client storage over `localStorage` /
+  `sessionStorage`, with a promise-shaped API.
+- `startup.js`: what to show when a session first starts — browser warnings,
+  the intro, the walkthrough, the share link.
+- `who.js`: peeks into another room's occupants without joining it.
+- `console.js`: TogetherJS's own log collector.
+- `util.js`: general-purpose support code — a class pattern, assertions, the
+  event mixin, and `util.Deferred`, a native-promise deferred that keeps the
+  progress notifications a couple of callers rely on.
+- `registry.js`: the lazy-module registry described above.
 
-- `elementFinder.js`: this generates a description/locator/path for any element, and finds elements based on those paths.  It generates something similar to a CSS selector.  It also includes a function to determine what elements should be ignored (generally TogetherJS's own elements).
+### `dom/`
 
-- `eventMaker.js`: this creates artificial events, like a fake click event.
+- `dom.js`: the jQuery replacement. Provides the subset of the jQuery API the
+  client actually used, and nothing more.
+- `animate.js`: the UI's animations, on the Web Animations API and CSS
+  transitions.
+- `elementFinder.js`: generates a locator for any element and finds elements
+  from those locators, so peers can point at each other's DOM. Also decides
+  which elements to ignore (TogetherJS's own, mostly).
+- `templating.js`: builds nodes from DOM templates, substituting by class name.
+- `eventMaker.js`: synthesises events, such as a fake click.
+- `linkify.js`: turns URLs in text into links.
 
-- `forms.js`: handles synchronization of forms, including CodeMirror and ACE support.
+### `ui/`
 
-- `jqueryPlugins.js`: some plugins for jQuery; doesn't export anything.
+- `ui.js`: most of the interface. Loads the markup and binds the controls;
+  `ui.activateUI()` is the entry point.
+- `windowing.js`: windows, notifications and modals.
+- `chat.js`: chat logic and the slash commands. The chat UI itself is in
+  `ui.js`.
+- `walkthrough.js`: the first-run walkthrough.
+- `visibility.js`: normalises the Page Visibility API into a session event.
 
-- `linkify.js`: detects and adds links to plain text.
+### `sync/`
 
-- `ot.js`: operational transformation support: what keeps big chunks of text in sync when multiple people are simultaneously editing those fields.
+- `cursor.js`: shared cursors and clicks — both capture and display.
+- `forms.js`: form field synchronisation, including Ace, CodeMirror, CKEditor
+  and TinyMCE.
+- `ot.js`: operational transformation, which is what keeps text fields
+  consistent when two people type into one at the same time.
+- `videos.js`: `<video>` / `<audio>` play, pause and seek.
+- `youtube.js`: the same for embedded YouTube players.
 
-- `peers.js`: handles the objects representing the peers and oneself.
+### `rtc/`
 
-- `playback.js`: handles the magic `/playback` command that plays recordings.
+Audio and video calling. See the header comment in `rtc/index.js`; the short
+version is one `RTCPeerConnection` per peer, negotiated with the WebRTC spec's
+perfect-negotiation pattern.
 
-- `randomutil.js`: some functions/methods for random numbers, really just for testing.
+- `media.js`: the local microphone and camera.
+- `connection.js`: a single peer connection.
+- `mesh.js`: the set of connections, and the signaling.
+- `ui.js`: the dock buttons and the video tiles.
 
-- `recorder.js`: this is used by `recorder.html`, which is a kind of alternate mini-client used to record sessions when you put `/record` in the chat box.
+### Other
 
-- `session.js`: probably the most important and most core module in the system.  This sets up the channels, routes messages, tracks peers, and is used for some communication (like `session.on("ui-ready")` - which is actually signalled by `ui.js` but is fired on the session module).
-
-- `startup.js`: handles the logic of what to display when TogetherJS is first started up (including warning messages, introductory stuff, the share link, confirmation of joining the session)
-
-- `storage.js`: an abstraction of per-tab and client storage.  Mostly uses `localStorage` (or `sessionStorage`), but designed so it could use an async backed someday, perhaps.
-
-- `templates.js`: this is generated dynamically, and includes the `*.html` content as inlined strings.  Basically just a container for these strings.
-
-- `templating.js`: handles creating nodes based on DOM templates.  Does some substitution based on specific class names.
-
-- `togetherjs.js`: this is the bootstrap code.  It is included on all pages, defines the `TogetherJS` variable, and handles configuration and initial loading.
-
-- `ui.js`: this has most of the UI.  It loads the UI and binds most of the methods.  It's a jumble of UI stuff.  `ui.activateUI()` is the most important function.
-
-- `util.js`: several bits of abstract support code are in here.  It doesn't depend on other things, and has fairly abstract general-purpose code.  It includes a pattern for creating classes, assertions, events.
-
-- `walkthrough.js`: implements the walkthrough help.
-
-- `webrtc.js`: handles the live audio chat and avatar editing.
-
-- `windowing.js`: handles creating the different windows, notifications, and modal windows.
+- `templates/`: `interface.html`, `walkthrough.html`, `help.txt` and the
+  `locale/*.json` translations. `build/templates.mjs` renders one copy per
+  locale into `generated.js`, which is bundled; `templates.js` picks the right
+  one at runtime.
+- `styles/`: plain CSS. Design tokens are custom properties on `:root`, so a
+  host page can restyle the client.
+- `vendor/`: third-party code. `walkabout/` (a fuzz tester, loaded on demand by
+  the `/test` chat command) and `whrandom/` (a seeded PRNG, used by tests).
+- `recorder.js` / `playback.js`: the `/record` and `/playback` commands.
+  `recorder.js` is its own bundle, loaded by `examples/recorder.html`.
+- `randomutil.js`: seeded random helpers, for tests.
