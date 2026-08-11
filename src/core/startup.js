@@ -16,7 +16,7 @@
 import TogetherJS from "./togetherjs.js";
 import { provide, need } from "./registry.js";
 import util from "./util.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import windowing from "../ui/windowing.js";
 import storage from "./storage.js";
 
@@ -65,9 +65,6 @@ var handlers = {
         session.close();
       }
     });
-    if ($.browser.msie) {
-      $("#togetherjs-browser-broken-is-ie").show();
-    }
   },
 
   browserUnsupported: function (next) {

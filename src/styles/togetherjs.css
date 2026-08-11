@@ -2103,3 +2103,36 @@ section.togetherjs-buttons .togetherjs-same-url {
 }
 /* We set this class on the <body> element when that last media query won't work
    but we detect in Javascript that the client should be treated as mobile */
+
+/* Typing indicator.
+   The three dots used to be driven from JS by a setInterval writing opacity
+   on each one (jqueryPlugins.js's animateKeyboard); it is a CSS animation
+   now, toggled by the togetherjs-typing-animating class. */
+.togetherjs .togetherjs-cursor-typing span[class^="togetherjs-typing-ellipse-"] {
+  opacity: 0.5;
+}
+
+.togetherjs .togetherjs-typing-animating span[class^="togetherjs-typing-ellipse-"] {
+  animation: togetherjs-typing-dot 1.2s infinite steps(1, end);
+}
+
+.togetherjs .togetherjs-typing-animating .togetherjs-typing-ellipse-two {
+  animation-delay: 0.3s;
+}
+
+.togetherjs .togetherjs-typing-animating .togetherjs-typing-ellipse-three {
+  animation-delay: 0.6s;
+}
+
+@keyframes togetherjs-typing-dot {
+  0% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .togetherjs .togetherjs-typing-animating span[class^="togetherjs-typing-ellipse-"] {
+    animation: none;
+    opacity: 1;
+  }
+}

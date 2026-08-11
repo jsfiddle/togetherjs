@@ -3,7 +3,7 @@
  * You can obtain one at http:// mozilla.org/MPL/2.0/. */
 
 import TogetherJS from "../core/togetherjs.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";

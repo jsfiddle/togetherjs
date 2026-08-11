@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import $ from "jquery";
+import $ from "./dom/dom.js";
 import util from "./core/util.js";
 import session from "./core/session.js";
 import storage from "./core/storage.js";
@@ -17,7 +17,7 @@ var ALWAYS_REPLAY = {
 
 playback.getLogs = function (url) {
   if (url.search(/^local:/) === 0) {
-    return $.Deferred(function (def) {
+    return util.Deferred(function (def) {
       storage.get("recording." + url.substr("local:".length)).then(function (logs) {
         if (! logs) {
           def.resolve(null);
@@ -30,18 +30,17 @@ playback.getLogs = function (url) {
       });
     });
   }
-  return $.Deferred(function (def) {
-    $.ajax({
-      url: url,
-      dataType: "text"
-    }).then(
-      function (logs) {
-        logs = parseLogs(logs);
-        def.resolve(logs);
-      },
-      function (error) {
-        def.reject(error);
-      });
+  return util.Deferred(function (def) {
+    fetch(url).then(function (resp) {
+      if (! resp.ok) {
+        throw new Error("Could not fetch logs: " + resp.status + " " + resp.statusText);
+      }
+      return resp.text();
+    }).then(function (logs) {
+      def.resolve(parseLogs(logs));
+    }, function (error) {
+      def.reject(error);
+    });
   });
 };
 

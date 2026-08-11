@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { provide } from "../core/registry.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
+import { slideIn, popinWindow, fadeOutWindow } from "../dom/animate.js";
 import util from "../core/util.js";
 import peers from "../core/peers.js";
 import session from "../core/session.js";
@@ -34,9 +35,9 @@ windowing.show = function (element, options) {
     bind(element, options.bind);
   }
   if (notification) {
-    element.slideIn();
+    slideIn(element);
   } else if (! modal) {
-    element.popinWindow();
+    popinWindow(element);
   }
   if (modal) {
     getModalBackground().show();
@@ -51,7 +52,7 @@ var onClose = null;
 /* Moves a window to be attached to data-bind-to, e.g., the button
    that opened the window. Or you can provide an element that it should bind to. */
 function bind(win, bound) {
-  if ($.browser.mobile) {
+  if ($.isMobile()) {
     return;
   }
   win = $(win);
@@ -143,8 +144,8 @@ windowing.hide = function (els) {
     element.data("boundTo", null);
     bound.removeClass("togetherjs-active");
     if (element.hasClass("togetherjs-notification")) {
-      element.fadeOut().promise().then(function () {
-        this.hide();
+      fadeOutWindow(element).then(function () {
+        element.hide();
       });
     }
   });
@@ -200,7 +201,7 @@ var modalEscape = {
     $(document).keydown(modalEscape.onKeydown);
   },
   unbind: function () {
-    $(document).unbind("keydown", modalEscape.onKeydown);
+    $(document).off("keydown", modalEscape.onKeydown);
   },
   onKeydown: function (event) {
     if (event.which == 27) {

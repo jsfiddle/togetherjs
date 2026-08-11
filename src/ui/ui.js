@@ -4,7 +4,8 @@
 
 import TogetherJS from "../core/togetherjs.js";
 import { provide, need } from "../core/registry.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
+import { animateDockEntry, animateDockExit, easeTo } from "../dom/animate.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import templates from "../templates/templates.js";
@@ -223,7 +224,7 @@ ui.activateUI = function () {
   var container = ui.container;
 
   //create the overlay
-  if($.browser.mobile) {
+  if($.isMobile()) {
     // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: 0; background-color: rgba(0,0,0,0); width: 120%; height: 100%; z-index: 1000; margin: -10px'>\x3c/div>" );
   }
 
@@ -240,7 +241,7 @@ ui.activateUI = function () {
 
   // The chat input element:
   var input = container.find("#togetherjs-chat-input");
-  input.bind("keydown", function (event) {
+  input.on("keydown", function (event) {
     if (event.which == 13 && !event.shiftKey) { // Enter without Shift pressed
       submitChat();
       return false;
@@ -253,7 +254,7 @@ ui.activateUI = function () {
 
   function submitChat() {
     var val = input.val();
-    if ($.trim(val)) {
+    if (util.trim(val)) {
       input.val("");
       // triggering the event manually to avoid the addition of newline character to the textarea:
       input.trigger("input").trigger("propertychange");
@@ -324,15 +325,15 @@ ui.activateUI = function () {
         startPos = null;
       }
     }
-    $(document).bind("mousemove", mousemove);
+    $(document).on("mousemove", mousemove);
     // If you don't turn selection off it will still select text, and show a
     // text selection cursor:
-    $(document).bind("selectstart", selectoff);
+    $(document).on("selectstart", selectoff);
     // FIXME: it seems like sometimes we lose the mouseup event, and it's as though
     // the mouse is stuck down:
     $(document).one("mouseup", function () {
-      $(document).unbind("mousemove", mousemove);
-      $(document).unbind("selectstart", selectoff);
+      $(document).off("mousemove", mousemove);
+      $(document).off("selectstart", selectoff);
     });
     return false;
   });
@@ -414,7 +415,7 @@ ui.activateUI = function () {
   }
 
   // Setting the anchor button + dock mobile actions
-  if($.browser.mobile) {
+  if($.isMobile()) {
 
     // toggle the audio button
     $("#togetherjs-audio-button").click(function () {
@@ -439,10 +440,16 @@ ui.activateUI = function () {
     var src = "/images/togetherjs-logo-close.png";
     $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
 
-    $("#togetherjs-dock-anchor").toggle(function() {
-        closeDock();
-      },function(){
+    // Was $(...).toggle(fn1, fn2), a signature jQuery removed in 1.9 — so
+    // this handler had silently done nothing for years.
+    var dockOpen = true;
+    $("#togetherjs-dock-anchor").click(function () {
+      dockOpen = ! dockOpen;
+      if (dockOpen) {
         openDock();
+      } else {
+        closeDock();
+      }
     });
   }
 
@@ -451,7 +458,7 @@ ui.activateUI = function () {
   });
 
   $("#togetherjs-profile-button").click(function (event) {
-    if ($.browser.mobile) {
+    if ($.isMobile()) {
       windowing.show("#togetherjs-menu-window");
       return false;
     }
@@ -487,7 +494,7 @@ ui.activateUI = function () {
     $("#togetherjs-edit-name-window input").focus();
   });
 
-  $("#togetherjs-menu .togetherjs-self-name").bind("keyup change", function (event) {
+  $("#togetherjs-menu .togetherjs-self-name").on("keyup change", function (event) {
     console.log("alrighty", event);
     if (event.which == 13) {
       ui.displayToggle("#togetherjs-self-name-display");
@@ -562,7 +569,7 @@ ui.activateUI = function () {
 
   session.on("display-window", function (id, element) {
     if (id == "togetherjs-chat") {
-      if (! $.browser.mobile) {
+      if (! $.isMobile()) {
         $("#togetherjs-chat-input").focus();
       }
     } else if (id == "togetherjs-share") {
@@ -742,7 +749,7 @@ function showMenu(event) {
   assert(el.length);
   el.show();
   bindMenu();
-  $(document).bind("click", maybeHideMenu);
+  $(document).on("click", maybeHideMenu);
 }
 
 function bindMenu() {
@@ -785,7 +792,7 @@ function toggleMenu() {
 function hideMenu() {
   var el = $("#togetherjs-menu");
   el.hide();
-  $(document).unbind("click", maybeHideMenu);
+  $(document).off("click", maybeHideMenu);
   ui.displayToggle("#togetherjs-self-name-display");
   $("#togetherjs-pick-color").hide();
 }
@@ -836,7 +843,7 @@ function updateShareLink() {
 
 session.on("close", function () {
 
-  if($.browser.mobile) {
+  if($.isMobile()) {
     // remove bg overlay
     //$(".overlay").remove();
 
@@ -1276,7 +1283,7 @@ ui.PeerView = util.Class({
     });
     this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
     ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
-    this.dockElement.find(".togetherjs-person").animateDockEntry();
+    animateDockEntry(this.dockElement.find(".togetherjs-person"));
     adjustDockSize(1);
     this.detailElement = templating.sub("participant-window", {
       peer: this.peer
@@ -1325,7 +1332,7 @@ ui.PeerView = util.Class({
     if (! this.dockElement) {
       return;
     }
-    this.dockElement.animateDockExit().promise().then((function () {
+    animateDockExit(this.dockElement).then((function () {
       this.dockElement.remove();
       this.dockElement = null;
       this.detailElement.remove();
@@ -1344,7 +1351,7 @@ ui.PeerView = util.Class({
       return;
     }
     pos = elementFinder.pixelForPosition(pos);
-    $("html, body").easeTo(pos);
+    easeTo(pos);
   },
 
   updateFollow: function () {

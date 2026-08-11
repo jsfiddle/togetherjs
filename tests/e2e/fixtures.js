@@ -92,6 +92,9 @@ export async function openClient(browser, hub, { url } = {}) {
     // Keep the modal flow out of the way of assertions.
     window.TogetherJSConfig_suppressJoinConfirmation = true;
     window.TogetherJSConfig_suppressInvite = true;
+    // The first-run walkthrough is a modal and its backdrop covers the dock,
+    // so present as a returning user unless a test says otherwise.
+    localStorage.setItem("togetherjs.settings.seenIntroDialog", "true");
   });
   const target = url || `/examples/index.html?hub=${encodeURIComponent(hub.url)}`;
   await page.goto(target);

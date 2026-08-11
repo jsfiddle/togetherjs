@@ -4,7 +4,7 @@
 
 // WebRTC support -- Note that this relies on parts of the interface code that usually goes in ui.js
 
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import ui from "../ui/ui.js";

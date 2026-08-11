@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";

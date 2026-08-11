@@ -6,7 +6,7 @@ import { provide } from "../core/registry.js";
 import TogetherJS from "../core/togetherjs.js";
 import util from "../core/util.js";
 import ui from "./ui.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import windowing from "./windowing.js";
 import templates from "../templates/templates.js";
 import templating from "../dom/templating.js";
@@ -38,7 +38,7 @@ walkthrough.start = function (firstTime, doneCallback) {
     container.find("#togetherjs-walkthrough-previous").click(previous);
     container.find("#togetherjs-walkthrough-next").click(next);
     ui.prepareShareLink(container);
-    container.find(".togetherjs-self-name").bind("keyup", function (event) {
+    container.find(".togetherjs-self-name").on("keyup", function (event) {
       var val = $(event.target).val();
       peers.Self.update({name: val});
     });

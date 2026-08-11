@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import util from "../core/util.js";
-import $ from "jquery";
+import $ from "./dom.js";
 
 var elementFinder = util.Module("elementFinder");
 var assert = util.assert;

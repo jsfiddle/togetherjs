@@ -88,3 +88,40 @@ test("closing a session leaves the other peer with no peers", async ({ browser, 
   await a.context().close();
   await b.context().close();
 });
+
+test("cursor positions propagate to the other peer", async ({ browser, hub, statics }) => {
+  const a = await openClient(browser, hub);
+  const shareUrl = await startSession(a);
+  const b = await openClient(browser, hub, { url: shareUrl });
+  await b.waitForFunction(() => window.TogetherJS.running);
+  await expect.poll(() => peerCount(a)).toBe(1);
+
+  await a.mouse.move(300, 200);
+  await a.mouse.move(320, 220);
+
+  // B should render a cursor element for A.
+  await expect.poll(() => b.locator(".togetherjs-cursor").count()).toBeGreaterThan(0);
+
+  await a.context().close();
+  await b.context().close();
+});
+
+test("the dock, chat pane and share window open", async ({ browser, hub, statics }) => {
+  const page = await openClient(browser, hub);
+  await startSession(page);
+
+  // Exercises windowing.js + the animation module that replaced the jQuery
+  // plugins: each of these is shown by popinWindow()/slideIn().
+  await page.click("#togetherjs-chat-button");
+  await expect(page.locator("#togetherjs-chat")).toBeVisible();
+
+  await page.click("#togetherjs-share-button");
+  await expect(page.locator("#togetherjs-share")).toBeVisible();
+  // interface.html carries both a mobile and a desktop share input.
+  await expect(page.locator("#togetherjs-share .togetherjs-share-link").first()).toHaveValue(
+    /togetherjs=/,
+  );
+
+  expect(page.errors).toEqual([]);
+  await page.context().close();
+});

@@ -3,12 +3,75 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import TogetherJS from "./togetherjs.js";
-import $ from "jquery";
-import "../dom/jqueryPlugins.js";
+import $ from "../dom/dom.js";
 
 var util = {};
 
-util.Deferred = $.Deferred;
+/* A deferred built on native promises.
+ *
+ * This replaces jQuery's $.Deferred. Two of its features are actually used by
+ * the client and so are kept: the synchronous `Deferred(fn)` initializer form,
+ * and progress notifications (who.js reports users as it discovers them, and
+ * ui.js refreshes the invite list from each notification). Everything else
+ * delegates to a real promise, which — unlike a jQuery Deferred — reports
+ * unhandled rejections instead of swallowing them.
+ */
+util.Deferred = function Deferred(initializer) {
+  var resolveFn;
+  var rejectFn;
+  var progressListeners = [];
+  var promise = new Promise(function (resolve, reject) {
+    resolveFn = resolve;
+    rejectFn = reject;
+  });
+  var def = {
+    resolve: function (value) {
+      resolveFn(value);
+      return def;
+    },
+    reject: function (error) {
+      rejectFn(error);
+      return def;
+    },
+    /* jQuery's resolveWith/rejectWith rebind `this` for the callbacks. No
+       caller in this client depends on that, so only the value carries over. */
+    resolveWith: function (context, args) {
+      resolveFn(args && args[0]);
+      return def;
+    },
+    rejectWith: function (context, args) {
+      rejectFn(args && args[0]);
+      return def;
+    },
+    notify: function (value) {
+      progressListeners.forEach(function (listener) {
+        listener(value);
+      });
+      return def;
+    },
+    progress: function (listener) {
+      progressListeners.push(listener);
+      return def;
+    },
+    then: function (onResolved, onRejected) {
+      return promise.then(onResolved, onRejected);
+    },
+    catch: function (onRejected) {
+      return promise.catch(onRejected);
+    },
+    finally: function (onFinally) {
+      return promise.finally(onFinally);
+    },
+    promise: function () {
+      return def;
+    }
+  };
+  if (initializer) {
+    initializer(def);
+  }
+  return def;
+};
+
 TogetherJS.$ = $;
 
 /* A simple class pattern, use like:
@@ -205,12 +268,12 @@ util.resolver = function (deferred, func) {
       throw e;
     }
     if (result && result.then) {
-      result.then(function () {
-        deferred.resolveWith(this, arguments);
-      }, function () {
-        deferred.rejectWith(this, arguments);
+      result.then(function (value) {
+        deferred.resolve(value);
+      }, function (error) {
+        deferred.reject(error);
       });
-      // FIXME: doesn't pass progress through
+      // Note: progress notifications are not forwarded through a resolver.
     } else if (result === undefined) {
       deferred.resolve();
     } else {
@@ -234,7 +297,7 @@ util.makePromise = function (obj) {
   if (util.isPromise(obj)) {
     return obj;
   } else {
-    return $.Deferred(function (def) {
+    return util.Deferred(function (def) {
       def.resolve(obj);
     });
   }

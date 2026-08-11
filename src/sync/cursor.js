@@ -6,7 +6,8 @@
 
 import { provide } from "../core/registry.js";
 import TogetherJS from "../core/togetherjs.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
+import { animateKeyboard, stopKeyboardAnimation } from "../dom/animate.js";
 import ui from "../ui/ui.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
@@ -48,7 +49,7 @@ var Cursor = util.Class({
     this.updatePeer(peers.getPeer(clientId));
     this.lastTop = this.lastLeft = null;
     $(document.body).append(this.element);
-    this.element.animateCursorEntry();
+
     this.keydownTimeout = null;
     this.clearKeydown = this.clearKeydown.bind(this);
     this.atOtherUrl = false;
@@ -139,31 +140,6 @@ var Cursor = util.Class({
     this.element.hide();
   },
 
-  // place Cursor rotate function down here FIXME: this doesnt do anything anymore.  This is in the CSS as an animation
-  rotateCursorDown: function(){
-    var e = $(this.element).find('svg');
-      e.animate({borderSpacing: -150, opacity: 1}, {
-      step: function(now, fx) {
-        if (fx.prop == "borderSpacing") {
-          e.css('-webkit-transform', 'rotate('+now+'deg)')
-            .css('-moz-transform', 'rotate('+now+'deg)')
-            .css('-ms-transform', 'rotate('+now+'deg)')
-            .css('-o-transform', 'rotate('+now+'deg)')
-            .css('transform', 'rotate('+now+'deg)');
-        } else {
-          e.css(fx.prop, now);
-        }
-      },
-      duration: 500
-    }, 'linear').promise().then(function () {
-      e.css('-webkit-transform', '')
-        .css('-moz-transform', '')
-        .css('-ms-transform', '')
-        .css('-o-transform', '')
-        .css('transform', '')
-        .css("opacity", "");
-    });
-  },
 
   setPosition: function (top, left) {
     var wTop = $(window).scrollTop();
@@ -196,14 +172,14 @@ var Cursor = util.Class({
     if (this.keydownTimeout) {
       clearTimeout(this.keydownTimeout);
     } else {
-      this.element.find(".togetherjs-cursor-typing").show().animateKeyboard();
+      animateKeyboard(this.element.find(".togetherjs-cursor-typing").show());
     }
     this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
   },
 
   clearKeydown: function () {
     this.keydownTimeout = null;
-    this.element.find(".togetherjs-cursor-typing").hide().stopKeyboardAnimation();
+    stopKeyboardAnimation(this.element.find(".togetherjs-cursor-typing").hide());
   },
 
   _destroy: function () {
@@ -403,10 +379,10 @@ session.on("close", function () {
   Cursor.forEach(function (c, clientId) {
     Cursor.destroy(clientId);
   });
-  $(document).unbind("mousemove", mousemove);
+  $(document).off("mousemove", mousemove);
   document.removeEventListener("click", documentClick, true);
   document.removeEventListener("keydown", documentKeydown, true);
-  $(window).unbind("scroll", scroll);
+  $(window).off("scroll", scroll);
 });
 
 session.hub.on("hello", function (msg) {

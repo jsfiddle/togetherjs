@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import TogetherJS from "../core/togetherjs.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";
@@ -442,9 +442,9 @@ function buildTrackers() {
   util.forEachAttr(editTrackers, function (TrackerClass) {
     var els = TrackerClass.scan();
     if (els) {
-      $.each(els, function () {
-        var tracker = new TrackerClass(this);
-        $(this).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
+      $(els).each(function (index, el) {
+        var tracker = new TrackerClass(el);
+        $(el).data("togetherjsHistory", ot.SimpleHistory(session.clientId, tracker.getContent(), 1));
         liveTrackers.push(tracker);
       });
     }

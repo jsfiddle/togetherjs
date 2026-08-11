@@ -22,7 +22,6 @@
     "dist"
   ],
   "dependencies": {
-    "jquery": "^3.7.1",
     "tinycolor2": "^1.6.0"
   },
   "devDependencies": {

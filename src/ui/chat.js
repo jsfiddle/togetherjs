@@ -4,7 +4,7 @@
 /*jshint evil:true */
 import TogetherJS from "../core/togetherjs.js";
 import { provide } from "../core/registry.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import ui from "./ui.js";

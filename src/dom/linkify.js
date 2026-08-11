@@ -4,7 +4,9 @@
 /* Finds any links in the text of an element (or its children) and turns them
    into anchors (with target=_blank) */
 function linkify(el) {
-  if (el.jquery) {
+  // Accepts a DomList (which was a jQuery object before the rewrite) or a
+  // bare element.
+  if (el && !el.nodeType && el[0]) {
     el = el[0];
   }
   el.normalize();

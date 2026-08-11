@@ -6,7 +6,7 @@ import TogetherJS from "./togetherjs.js";
 import { provide, need } from "./registry.js";
 import util from "./util.js";
 import channels from "./channels.js";
-import $ from "jquery";
+import $ from "../dom/dom.js";
 import storage from "./storage.js";
 
 

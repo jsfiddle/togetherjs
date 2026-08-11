@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import TogetherJS from "./core/togetherjs.js";
-import $ from "jquery";
+import $ from "./dom/dom.js";
 import util from "./core/util.js";
 import channels from "./core/channels.js";
 
@@ -102,7 +102,7 @@ recorder.logMessage = function (msg) {
   $record.val($record.val() + msg + "\n\n");
 };
 
-$(window).unload(function () {
+$(window).on("pagehide", function () {
   channel.send({
     type: "bye",
     clientId: clientId
