@@ -196,11 +196,15 @@ ui.prepareUI = function () {
   });
 
   TogetherJS.config.track("disableWebRTC", function (hide, previous) {
+    var buttons = "#togetherjs-audio-button, #togetherjs-video-button";
     if (hide && ! previous) {
-      ui.container.find("#togetherjs-audio-button").hide();
+      ui.container.find(buttons).hide();
       adjustDockSize(-1);
     } else if ((! hide) && previous) {
       ui.container.find("#togetherjs-audio-button").show();
+      if (TogetherJS.config.get("enableVideo")) {
+        ui.container.find("#togetherjs-video-button").show();
+      }
       adjustDockSize(1);
     }
   });
@@ -416,11 +420,6 @@ ui.activateUI = function () {
 
   // Setting the anchor button + dock mobile actions
   if($.isMobile()) {
-
-    // toggle the audio button
-    $("#togetherjs-audio-button").click(function () {
-      windowing.toggle("#togetherjs-rtc-not-supported");
-    });
 
     // toggle the profile button
     $("#togetherjs-profile-button").click(function () {

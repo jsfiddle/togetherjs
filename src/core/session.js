@@ -135,6 +135,14 @@ function openChannel() {
       console.warn("Got message without clientId, where clientId is required", msg);
       return;
     }
+    // The hub is a blind relay: it broadcasts every message to everyone in the
+    // room and understands none of them. Peer-to-peer messages (the WebRTC
+    // signaling) therefore carry an explicit recipient that we filter on here.
+    // Note this is addressing, not privacy — every client still receives the
+    // frame, exactly as before.
+    if (msg.to && msg.to !== session.clientId) {
+      return;
+    }
     if (msg.clientId) {
       msg.peer = peers.getPeer(msg.clientId, msg);
     }

@@ -1,7 +1,7 @@
 /* Ported from togetherjs/tests/test_linkify.js */
 
 import { describe, it, expect } from "vitest";
-import $ from "jquery";
+import $ from "../../src/dom/dom.js";
 import linkify from "../../src/dom/linkify.js";
 
 // linkify() takes a jQuery object or an element and returns the raw element.

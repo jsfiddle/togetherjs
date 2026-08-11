@@ -37,8 +37,6 @@
         </span>
         <span id="togetherjs-audio-ready" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
-        <span id="togetherjs-audio-outgoing" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
-        </span>
         <span id="togetherjs-audio-incoming" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
         <span id="togetherjs-audio-active" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
@@ -48,6 +46,7 @@
         <span id="togetherjs-audio-error" class="togetherjs-audio-set" data-toggles=".togetherjs-audio-set" style="display: none">
         </span>
       </button>
+      <button id="togetherjs-video-button" class="togetherjs-button" title="{{ gettext('Turn on camera') }}" style="display: none"></button>
       <button id="togetherjs-chat-button" class="togetherjs-button" title="{{ gettext('Chat') }}"></button>
       <div id="togetherjs-dock-participants"></div>
     </div>
@@ -265,11 +264,16 @@
         {{ gettext('Activate your <strong>browser microphone</strong> near your URL bar above.') }}
       </p>
       <p>
-        {{ gettext('Talking on your microphone through your web browser is an experimental feature.') }}
+        {{ gettext('Click the microphone button again to mute yourself.') }}
       </p>
-      <p>
-        {{ gettext('Read more about Audio Chat') }} <a href="https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC" target="_blank">{{ gettext('here') }}</a>.
-      </p>
+      <div class="togetherjs-rtc-device-row" style="display: none">
+        <label for="togetherjs-rtc-audio-device">{{ gettext('Microphone') }}</label>
+        <select id="togetherjs-rtc-audio-device"></select>
+      </div>
+      <div class="togetherjs-rtc-device-row" style="display: none">
+        <label for="togetherjs-rtc-video-device">{{ gettext('Camera') }}</label>
+        <select id="togetherjs-rtc-video-device"></select>
+      </div>
     </section>
 
     <section class="togetherjs-buttons">
@@ -277,7 +281,58 @@
         <input class="togetherjs-dont-show-again" id="togetherjs-rtc-info-dismiss" type="checkbox">
         {{ gettext('Don\'t show again.') }}
       </label>
+      <button id="togetherjs-rtc-hangup" class="togetherjs-default" type="button">{{ gettext('Leave call') }}</button>
       <button class="togetherjs-default togetherjs-dismiss" type="button">{{ gettext('Close') }}</button>
+    </section>
+  </div>
+
+  <!-- Video tiles. Audio deliberately lives outside this panel, in one hidden
+       <audio> element per peer, so closing it does not mute the call. -->
+  <div id="togetherjs-video" class="togetherjs-window"
+       data-bind-to="#togetherjs-video-button"
+       style="display: none">
+    <header> {{ gettext('Video') }} </header>
+    <section>
+      <div id="togetherjs-video-tiles">
+        <div id="togetherjs-video-self" class="togetherjs-video-tile" style="display: none">
+          <video autoplay playsinline muted></video>
+          <div class="togetherjs-video-label"><span class="togetherjs-video-name">{{ gettext('You') }}</span></div>
+        </div>
+      </div>
+      <p id="togetherjs-video-empty">{{ gettext('No one has their camera on yet.') }}</p>
+    </section>
+  </div>
+
+  <!-- Shown when the page is not on a secure origin: getUserMedia is simply
+       unavailable there, and no permission prompt will change that. -->
+  <div id="togetherjs-rtc-needs-https" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
+       style="display: none">
+    <header> {{ gettext('Audio Chat') }} </header>
+    <section>
+      <p>{{ gettext('Audio and video chat need a secure connection.') }}</p>
+      <p>{{ gettext('This page was loaded over http, so your browser will not allow access to the microphone or camera. Load it over https and try again.') }}</p>
+    </section>
+    <section class="togetherjs-buttons">
+      <div class="togetherjs-rtc-dialog-btn">
+        <button class="togetherjs-default togetherjs-dismiss" type="button">{{ gettext('Close') }}</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Shown when the mesh is at maxRtcPeers. -->
+  <div id="togetherjs-rtc-full" class="togetherjs-window"
+       data-bind-to="#togetherjs-audio-button"
+       style="display: none">
+    <header> {{ gettext('Call is full') }} </header>
+    <section>
+      <p>{{ gettext('This call has as many people as it can carry.') }}</p>
+      <p>{{ gettext('Everyone sends their audio and video directly to everyone else, which stops working well beyond a handful of people.') }}</p>
+    </section>
+    <section class="togetherjs-buttons">
+      <div class="togetherjs-rtc-dialog-btn">
+        <button class="togetherjs-default togetherjs-dismiss" type="button">{{ gettext('Close') }}</button>
+      </div>
     </section>
   </div>
 
@@ -289,12 +344,8 @@
     <header> {{ gettext('Audio Chat') }} </header>
 
     <section>
-      <p>{{ gettext('Audio chat requires you to use a <a href=\'https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\' target=\'_blank\'>newer browser</a>!') }}</p>
       <p>
-        {{ gettext('Live audio chat requires a newer (or different) browser than you\'re using.') }}
-      </p>
-      <p>
-        {{ gettext('See <a href=\'https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC\' target=\'_blank\'>this page</a>for more information and a list of supported browsers.') }}
+        {{ gettext('Live audio and video chat require a newer (or different) browser than you\'re using.') }}
       </p>
     </section>
 
@@ -392,8 +443,6 @@
   </div>
 
   <!-- Invisible elements that handle the RTC audio: -->
-  <audio id="togetherjs-audio-element"></audio>
-  <audio id="togetherjs-local-audio" muted="true" volume="0.3"></audio>
   <audio id="togetherjs-notification" src="{{baseUrl}}/images/notification.ogg"></audio>
 
   <!-- The intro screen for someone who joins a session the first time: -->

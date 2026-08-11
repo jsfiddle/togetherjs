@@ -6,7 +6,7 @@
    on the wrong node. */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import $ from "jquery";
+import $ from "../../src/dom/dom.js";
 import elementFinder from "../../src/dom/elementFinder.js";
 
 const FIXTURE = `

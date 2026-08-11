@@ -64,6 +64,58 @@ export const test = base.extend({
 
 export const expect = base.expect;
 
+/* Chromium's --use-fake-device-for-media-capture produces no devices in this
+   container (enumerateDevices returns an empty list in every headless mode),
+   so getUserMedia is backed by tracks synthesised in the page instead.
+
+   These are real MediaStreamTracks — a canvas capture and a WebAudio
+   destination — so they negotiate, encode and flow over an RTCPeerConnection
+   exactly like camera and microphone tracks. Only the device layer is
+   substituted; everything the mesh does is exercised for real. */
+function installSyntheticMedia() {
+  function videoTrack() {
+    const canvas = Object.assign(document.createElement("canvas"), {
+      width: 320,
+      height: 240,
+    });
+    const ctx = canvas.getContext("2d");
+    let frame = 0;
+    // Keep painting: a static canvas produces no frames after the first.
+    setInterval(() => {
+      frame++;
+      ctx.fillStyle = `hsl(${frame % 360}, 70%, 50%)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }, 100);
+    return canvas.captureStream(10).getVideoTracks()[0];
+  }
+
+  function audioTrack() {
+    const ctx = new AudioContext();
+    const oscillator = ctx.createOscillator();
+    const destination = ctx.createMediaStreamDestination();
+    oscillator.connect(destination);
+    oscillator.start();
+    return destination.stream.getAudioTracks()[0];
+  }
+
+  const fakeDevices = [
+    { deviceId: "fake-audio", kind: "audioinput", label: "Fake microphone", groupId: "fake" },
+    { deviceId: "fake-video", kind: "videoinput", label: "Fake camera", groupId: "fake" },
+  ];
+
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {};
+  }
+  navigator.mediaDevices.getUserMedia = async (constraints = {}) => {
+    const tracks = [];
+    if (constraints.audio) tracks.push(audioTrack());
+    if (constraints.video) tracks.push(videoTrack());
+    if (!tracks.length) throw new DOMException("No constraints", "NotFoundError");
+    return new MediaStream(tracks);
+  };
+  navigator.mediaDevices.enumerateDevices = async () => fakeDevices;
+}
+
 /** Open a fresh browser context pointed at the example page. */
 export async function openClient(browser, hub, { url } = {}) {
   const context = await browser.newContext();
@@ -95,7 +147,11 @@ export async function openClient(browser, hub, { url } = {}) {
     // The first-run walkthrough is a modal and its backdrop covers the dock,
     // so present as a returning user unless a test says otherwise.
     localStorage.setItem("togetherjs.settings.seenIntroDialog", "true");
+    // util.testExpose() only publishes internals when this object already
+    // exists, so it has to be created before the bundle evaluates.
+    window.TogetherJSTestSpy = {};
   });
+  await page.addInitScript(installSyntheticMedia);
   const target = url || `/examples/index.html?hub=${encodeURIComponent(hub.url)}`;
   await page.goto(target);
   return page;
