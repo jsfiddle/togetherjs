@@ -24,6 +24,13 @@ function unescapeLiteral(s) {
   return s.replace(/\\(['"\\])/g, "$1");
 }
 
+/* Every locale carries its own copy of the markup, so anything that survives
+   into the bundle is paid for five times over. HTML comments are notes to
+   whoever edits interface.html; they mean nothing at runtime. */
+function stripComments(source) {
+  return source.replace(/<!--[\s\S]*?-->\n?/g, "");
+}
+
 function translate(source, translation, missing) {
   return source.replace(GETTEXT, (_match, _quote, raw) => {
     const key = unescapeLiteral(raw);
@@ -53,8 +60,8 @@ export async function buildTemplates() {
     const missing = new Set();
 
     locales[lang] = {
-      interface: translate(interfaceHtml, translation, missing),
-      walkthrough: translate(walkthroughHtml, translation, missing),
+      interface: stripComments(translate(interfaceHtml, translation, missing)),
+      walkthrough: stripComments(translate(walkthroughHtml, translation, missing)),
       help: translate(helpTxt, translation, missing),
       names: translation.names || "",
     };
