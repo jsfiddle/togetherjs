@@ -830,7 +830,7 @@ define(["require", "jquery", "util", "session", "templates", "templating", "link
       // remove bg overlay
       //$(".overlay").remove();
 
-      //after hitting End, reset window draggin
+      //after hitting End, reset window dragging
       $("body").css({
         "position": "",
         top: "",

@@ -257,7 +257,7 @@ define(["jquery"], function ($) {
   // avatar animate out, reverse of above
   $.fn.animateDockExit = function () {
 
-    // get the current avatar dimenensions
+    // get the current avatar dimensions
     var height = this.height();
     var width = this.width();
     var backgroundSize = height + 4;

@@ -388,7 +388,7 @@ define(["util"], function (util) {
 
       // First we check if we need to modify this change because we
       // know about changes that it should know about (changes that
-      // preceed it that are in our local history).
+      // precede it that are in our local history).
       var clientsToCheck = StringSet();
       for (var clientId in this.known) {
         if (! this.known.hasOwnProperty(clientId)) {

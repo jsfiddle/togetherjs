@@ -69,7 +69,7 @@ define(["util", "ui", "jquery", "windowing", "templates", "templating", "session
           container.find("#togetherjs-avatar-when-unsaved").show();
         }
       });
-      // This triggers substititions in the walkthrough:
+      // This triggers substitutions in the walkthrough:
       peers.Self.update({});
       session.emit("new-element", container);
     }
