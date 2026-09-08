@@ -91,7 +91,7 @@ function ($, util, session, elementFinder) {
       iframes.each(function (i, iframe) {
         // if the iframe's unique id is already set, skip it
         // FIXME: what if the user manually sets an iframe's id (i.e. "#my-youtube")?
-        // maybe we should set iframes everytime togetherjs is reinitialized?
+        // maybe we should set iframes every time togetherjs is reinitialized?
         var osrc = $(iframe).attr("src"), src = osrc;
         if ((src || "").indexOf("youtube") != -1 && !$(iframe).attr("id")) {
           $(iframe).attr("id", "youtube-player"+i);
@@ -213,7 +213,7 @@ function ($, util, session, elementFinder) {
       // We must prevent advanced videos from going out of sync
       player.pauseVideo();
       if (areTooFarApart(currentTime, msg.playerTime)) {
-        // "seek" flag will help supress publishing unwanted state changes
+        // "seek" flag will help suppress publishing unwanted state changes
         $(player).data("seek", true);
         player.seekTo(msg.playerTime, true);
       }

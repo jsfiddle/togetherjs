@@ -262,7 +262,7 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
           storage.set("identityId", identityId);
         }
         session.identityId = identityId;
-        // We don't actually have to wait for the set to succede, so
+        // We don't actually have to wait for the set to succeed, so
         // long as session.identityId is set
         def.resolve();
       });
@@ -460,8 +460,8 @@ define(["require", "util", "channels", "jquery", "storage"], function (require, 
   });
 
   function hashchangeEvent() {
-    // needed because when message arives from peer this variable will be checked to
-    // decide weather to show actions or not
+    // needed because when message arrives from peer this variable will be checked to
+    // decide whether to show actions or not
     sendHello(false);
   }
 

@@ -95,7 +95,7 @@ function ($, util, session, elementFinder) {
     var oldTime = element.prop('currentTime');
     var newTime = msg.position;
 
-    //to help throttle uneccesary position changes
+    //to help throttle unnecessary position changes
     if(areTooFarApart(oldTime, newTime)){
       setTime(element, msg.position);
     }

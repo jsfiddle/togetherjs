@@ -355,7 +355,7 @@ define(["jquery", "util", "session", "elementFinder", "eventMaker", "templating"
     },
 
     destroy: function (el) {
-      this._editor().destory();
+      this._editor().destroy();
     },
 
     update: function (msg) {
