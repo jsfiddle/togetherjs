@@ -5,7 +5,6 @@ import { provide } from "../core/registry.js";
 import $ from "../dom/dom.js";
 import { slideIn, popinWindow, fadeOutWindow } from "../dom/animate.js";
 import util from "../core/util.js";
-import peers from "../core/peers.js";
 import session from "../core/session.js";
 import { dockPosition } from "./dock-position.js";
 

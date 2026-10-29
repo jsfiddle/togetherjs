@@ -621,26 +621,6 @@ ui.activateUI = function () {
     $(item).append(button);
   });
 
-  $("#togetherjs-avatar-done").click(function () {
-    ui.displayToggle("#togetherjs-no-avatar-edit");
-  });
-
-  $("#togetherjs-self-color").css({backgroundColor: peers.Self.color});
-
-  var avatar = peers.Self.avatar;
-  if (avatar) {
-    $("#togetherjs-self-avatar").attr("src", avatar);
-  }
-
-  var starterButton = $("#togetherjs-starter button");
-  starterButton.click(function () {
-    windowing.show("#togetherjs-about");
-  }).addClass("togetherjs-running");
-  if (starterButton.text() == "Start TogetherJS") {
-    starterButton.attr("data-start-text", starterButton.text());
-    starterButton.text("End TogetherJS Session");
-  }
-
   ui.activateAvatarEdit(container, {
     onSave: function () {
       windowing.hide("#togetherjs-avatar-edit");
@@ -708,25 +688,51 @@ ui.activateAvatarEdit = function (container, options) {
 
 };
 
+/* Scales a picture down to a square avatar.
+ *
+ * Two things the original got wrong: it scaled by height alone, so a wide
+ * picture overflowed the canvas and a tall one left a gutter down the side;
+ * and it waited for the image with a bare setTimeout, which only worked when
+ * the decode happened to have finished, and produced a blank avatar when it
+ * had not. This covers the square and crops to the centre, and waits for the
+ * image properly. */
 function sizeDownImage(imageUrl) {
   return util.Deferred(function (def) {
-    var $canvas = $("<canvas>");
-    $canvas[0].height = session.AVATAR_SIZE;
-    $canvas[0].width = session.AVATAR_SIZE;
-    var context = $canvas[0].getContext("2d");
+    var size = session.AVATAR_SIZE;
+    var canvas = $("<canvas>")[0];
+    canvas.width = canvas.height = size;
+    var context = canvas.getContext("2d");
     var img = new Image();
-    img.src = imageUrl;
-    // Sometimes the DOM updates immediately to call
-    // naturalWidth/etc, and sometimes it doesn't; using setTimeout
-    // gives it a chance to catch up
-    setTimeout(function () {
+
+    function draw() {
       var width = img.naturalWidth || img.width;
       var height = img.naturalHeight || img.height;
-      width = width * (session.AVATAR_SIZE / height);
-      height = session.AVATAR_SIZE;
-      context.drawImage(img, 0, 0, width, height);
-      def.resolve($canvas[0].toDataURL("image/png"));
-    });
+      if (! width || ! height) {
+        def.reject(new Error("Could not read the image's dimensions"));
+        return;
+      }
+      // Cover: scale so the shorter side fills the square, then centre.
+      var scale = Math.max(size / width, size / height);
+      var drawWidth = width * scale;
+      var drawHeight = height * scale;
+      context.drawImage(img, (size - drawWidth) / 2, (size - drawHeight) / 2,
+                        drawWidth, drawHeight);
+      def.resolve(canvas.toDataURL("image/png"));
+    }
+
+    img.onerror = function () {
+      def.reject(new Error("Could not load the image"));
+    };
+    img.onload = function () {
+      // decode() resolves once the pixels are ready to draw; onload alone
+      // does not promise that in every engine.
+      if (img.decode) {
+        img.decode().then(draw, draw);
+      } else {
+        draw();
+      }
+    };
+    img.src = imageUrl;
   });
 }
 
@@ -752,21 +758,6 @@ ui.prepareShareLink = function (container) {
     $(this).select();
   }).change(function () {
     updateShareLink();
-  });
-  container.find("a.togetherjs-share-link").click(function () {
-    // FIXME: this is currently opening up Bluetooth, not sharing a link
-    if (false && window.MozActivity) {
-      var activity = new MozActivity({
-        name: "share",
-        data: {
-          type: "url",
-          url: $(this).attr("href")
-        }
-      });
-    }
-    // FIXME: should show some help if you actually try to follow the link
-    // like this, instead of simply suppressing it
-    return false;
   });
   updateShareLink();
 };
@@ -995,18 +986,9 @@ function maybeHideMenu(event) {
 // Misc
 
 function updateShareLink() {
-  var input = $("input.togetherjs-share-link");
-  var link = $("a.togetherjs-share-link");
-  var display = $("#togetherjs-session-id");
-  if (! session.shareId) {
-    input.val("");
-    link.attr("href", "#");
-    display.text("(none)");
-  } else {
-    input.val(session.shareUrl());
-    link.attr("href", session.shareUrl());
-    display.text(session.shareId);
-  }
+  /* There used to be an <a class="togetherjs-share-link"> and a
+     #togetherjs-session-id here too; neither exists in the markup. */
+  $("input.togetherjs-share-link").val(session.shareId ? session.shareUrl() : "");
 }
 
 session.on("close", function () {
@@ -1030,12 +1012,6 @@ session.on("close", function () {
   }
   // Clear out any other spurious elements:
   $(".togetherjs").remove();
-  var starterButton = $("#togetherjs-starter button");
-  starterButton.removeClass("togetherjs-running");
-  if (starterButton.attr("data-start-text")) {
-    starterButton.text(starterButton.attr("data-start-text"));
-    starterButton.attr("data-start-text", "");
-  }
   if (TogetherJS.startTarget) {
     var el = $(TogetherJS.startTarget);
     if (el.attr("data-start-togetherjs-html")) {
@@ -1351,7 +1327,13 @@ ui.PeerView = class PeerView {
           el.val(this.peer.name);
         }
       }).bind(this));
-      $("#togetherjs-menu-avatar").attr("src", this.peer.avatar);
+      var menuAvatar = $(".togetherjs-menu-avatar");
+      if (this.peer.avatar) {
+        menuAvatar.css({backgroundImage: "url(" + this.peer.avatar + ")"});
+      } else {
+        menuAvatar.css({backgroundImage: ""});
+      }
+      menuAvatar.css({borderColor: this.peer.color});
       if (! this.peer.name) {
         $("#togetherjs-menu .togetherjs-person-name-self").text(this.peer.defaultName);
       }

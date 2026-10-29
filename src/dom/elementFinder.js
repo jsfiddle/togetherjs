@@ -85,7 +85,7 @@ elementFinder.CannotFind = class CannotFind extends Error {
     var loc;
     try {
       loc = elementFinder.elementLocation(this.context);
-    } catch (e) {
+    } catch {
       loc = this.context;
     }
     return (

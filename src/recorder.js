@@ -8,9 +8,7 @@ import util from "./core/util.js";
 import channels from "./core/channels.js";
 
 var recorder = util.Module("recorder");
-var assert = util.assert;
 var channel = null;
-var baseUrl = null;
 var clientId = "recorder";
 
 function display(el) {
@@ -37,7 +35,6 @@ recorder.start = function (options) {
 
 recorder.activate = function (options) {
   var match;
-  baseUrl = options.baseUrl;
   recorder.shareId = TogetherJS.startup._joinShareId;
   if (! recorder.shareId) {
     match = /\&togetherjs=([^&]+)/.exec(location.hash);

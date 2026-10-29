@@ -4,7 +4,6 @@
 
 import TogetherJS from "../core/togetherjs.js";
 import $ from "../dom/dom.js";
-import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";
 
@@ -66,7 +65,9 @@ function prepareYouTube() {
       return function() {
         // YouTube API is ready
         $(youTubeIframes).each(function (i, iframe) {
-          var player = new YT.Player(iframe.id, { // get the reference to the already existing iframe
+          // Constructed for its side effect: it binds the handlers below
+          // to the iframe that is already on the page.
+          new YT.Player(iframe.id, {
             events: {
               'onReady': insertPlayer,
               'onStateChange': publishPlayerStateChange

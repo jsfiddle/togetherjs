@@ -319,8 +319,7 @@ util.readFileImage = function (el) {
   });
 };
 
-util.matchElement = function(el, selector) {
-  var res = selector;
+util.matchElement = function (el, selector) {
   if (selector === true || ! selector) {
     return !!selector;
   }

@@ -16,14 +16,6 @@ function joinAudio(page) {
   return page.evaluate(() => window.TogetherJSTestSpy.rtc.startAudio());
 }
 
-/** Every peer connection's state, as this page sees it. */
-function connectionStates(page) {
-  return page.evaluate(() => {
-    const mesh = window.TogetherJSTestSpy.rtc.mesh;
-    return mesh.peerIds().map((id) => ({ id, state: mesh.stateFor(id) }));
-  });
-}
-
 function meshSize(page) {
   return page.evaluate(() => window.TogetherJSTestSpy.rtc.mesh.size());
 }

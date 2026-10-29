@@ -98,7 +98,6 @@ class Peer {
 
   updateFromHello(msg) {
     var urlUpdated = false;
-    var activeRTC = false;
     var identityUpdated = false;
     if (msg.url && msg.url != this.url) {
       this.url = msg.url;
@@ -241,7 +240,9 @@ Peer.peers = {};
 
 Peer.deserialize = function (obj) {
   obj.fromStorage = true;
-  var peer = new Peer(obj.id, obj);
+  // The constructor registers itself in Peer.peers; there is nothing to
+  // return it to.
+  new Peer(obj.id, obj);
 };
 
 peers.Self = undefined;

@@ -17,9 +17,7 @@ import { provide, need } from "./registry.js";
 import util from "./util.js";
 import $ from "../dom/dom.js";
 import windowing from "../ui/windowing.js";
-import storage from "./storage.js";
 
-var assert = util.assert;
 var startup = util.Module("startup");
 // Avoid circular import:
 var session = null;

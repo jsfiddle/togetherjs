@@ -145,7 +145,7 @@ function readOverride(key) {
   var parsed;
   try {
     parsed = JSON.parse(raw);
-  } catch (e) {
+  } catch {
     parsed = null;
   }
   if (!parsed || parsed.expiresAt < Date.now()) {

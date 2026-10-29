@@ -18,15 +18,17 @@ who.getList = function (hubUrl) {
     var channel = new channels.WebSocketChannel(hubUrl);
     var users = {};
     var responded = 0;
-    var firstResponse = 0;
     var lateResponseTimeout;
     channel.onmessage = function (msg) {
       if (msg.type == "init-connection") {
         expected = msg.peerCount;
       }
       if (msg.type == "who") {
-        // Our message back to ourselves probably
-        firstResponse = setTimeout(function () {
+        /* Our own message echoed back. Store the handle in the variable
+           close() actually clears: it used to be assigned to a leftover
+           `firstResponse`, so lateResponseTimeout was always undefined and
+           this timer fired after the channel had already been closed. */
+        lateResponseTimeout = setTimeout(function () {
           close();
         }, MAX_LATE_RESPONSE);
       }
@@ -41,7 +43,6 @@ who.getList = function (hubUrl) {
           }
         }
       }
-      console.log("users", users);
     };
     channel.send({
       type: "who",

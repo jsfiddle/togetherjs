@@ -13,13 +13,17 @@
  *    input on the host page, faded every disabled button on it, and turned
  *    them all TogetherJS blue on hover.
  *
- *    Deliberately NOT in a cascade layer. A layer would let a host page's
- *    rules win by default, which sounds polite until the host's plain
- *    `button { padding: .6rem 1.2rem }` reshapes our round colour swatches
- *    into ovals -- and it would, because layer order beats specificity. The
- *    scoping above is what keeps us out of the host's way; the tokens below
- *    are the supported way in. A host that really does want to override a
- *    rule can still outrank `.togetherjs .x` easily.
+ *    The token defaults, and only those, sit in `@layer togetherjs.tokens`.
+ *    That is what makes a host's own `.togetherjs { --tj-accent: ... }` win:
+ *    an unlayered rule beats a layered one whatever its specificity, and the
+ *    client's stylesheet is injected after the host's, so equal specificity
+ *    alone would have gone the wrong way.
+ *
+ *    The component rules below are deliberately NOT layered. Putting them in
+ *    one too would hand the host every rule by default, which sounds polite
+ *    until its plain `button { padding: .6rem 1.2rem }` reshapes our round
+ *    colour swatches into ovals. Scoping keeps us out of the host's way;
+ *    the tokens are the way in.
  *
  * 2. Colour, spacing, type and depth come from custom properties declared in
  *    one place. Setting `--tj-accent` recolours the whole UI, because the
@@ -39,61 +43,81 @@
    Tokens
    ====================================================================== */
 
-.togetherjs {
-  /* --- Colour: the three a host is most likely to set --- */
-  --tj-accent: #0a7cc1;
-  --tj-surface: #ffffff;
-  --tj-text: #16181d;
+@layer togetherjs.tokens {
 
-  /* --- Derived from the above; override only for fine control --- */
-  --tj-accent-text: #ffffff;
-  --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, black);
-  --tj-accent-quiet: color-mix(in oklab, var(--tj-accent) 10%, var(--tj-surface));
-  --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, black);
+  .togetherjs {
+    /* --- Colour: the three a host is most likely to set --- */
+    --tj-accent: #0a7cc1;
+    --tj-surface: #ffffff;
+    --tj-text: #16181d;
 
-  --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 4%, var(--tj-surface));
-  --tj-surface-hover: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
-  --tj-text-muted: color-mix(in oklab, var(--tj-text) 62%, var(--tj-surface));
-  --tj-border: color-mix(in oklab, var(--tj-text) 14%, var(--tj-surface));
-  --tj-border-strong: color-mix(in oklab, var(--tj-text) 26%, var(--tj-surface));
-  --tj-danger: #c0392b;
+    /* --- Derived from the above; override only for fine control --- */
+    --tj-accent-text: #ffffff;
+    --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, black);
+    --tj-accent-quiet: color-mix(in oklab, var(--tj-accent) 10%, var(--tj-surface));
+    --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, black);
 
-  /* --- Geometry --- */
-  --tj-space: 8px;
-  --tj-radius: 6px;
-  --tj-radius-lg: 10px;
-  --tj-radius-pill: 999px;
-  --tj-button-size: 40px;
-  --tj-avatar-size: 30px;
-  --tj-dock-width: 52px;
-  --tj-panel-width: 290px;
+    --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 4%, var(--tj-surface));
+    --tj-surface-hover: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+    --tj-text-muted: color-mix(in oklab, var(--tj-text) 62%, var(--tj-surface));
+    --tj-border: color-mix(in oklab, var(--tj-text) 14%, var(--tj-surface));
+    --tj-border-strong: color-mix(in oklab, var(--tj-text) 26%, var(--tj-surface));
+    --tj-danger: #c0392b;
 
-  /* --- Depth: 1px borders carry the structure, shadow only lifts --- */
-  --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.07);
-  --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.07), 0 12px 32px rgb(0 0 0 / 0.13);
-  --tj-backdrop: rgb(16 18 22 / 0.42);
+    /* --- Geometry --- */
+    --tj-space: 8px;
+    --tj-radius: 6px;
+    --tj-radius-lg: 10px;
+    --tj-radius-pill: 999px;
+    --tj-button-size: 40px;
+    --tj-avatar-size: 30px;
+    --tj-dock-width: 52px;
+    --tj-panel-width: 290px;
 
-  /* --- Type: inherited from the host page by default --- */
-  --tj-font: inherit;
-  --tj-font-size: 14px;
-  --tj-font-size-sm: 12px;
-  --tj-line-height: 1.45;
+    /* --- Depth: 1px borders carry the structure, shadow only lifts --- */
+    --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.07);
+    --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.07), 0 12px 32px rgb(0 0 0 / 0.13);
+    --tj-backdrop: rgb(16 18 22 / 0.42);
 
-  /* --- Motion --- */
-  --tj-duration: 0.15s;
-  --tj-ease: cubic-bezier(0.2, 0, 0.1, 1);
+    /* --- Type: inherited from the host page by default --- */
+    --tj-font: inherit;
+    --tj-font-size: 14px;
+    --tj-font-size-sm: 12px;
+    --tj-line-height: 1.45;
 
-  /* --- Stacking. One base; everything below is `calc(var(--tj-z) + n)`,
-         so a host with its own high-z chrome moves TogetherJS in one go. */
-  --tj-z: 10000;
-}
+    /* --- Motion --- */
+    --tj-duration: 0.15s;
+    --tj-ease: cubic-bezier(0.2, 0, 0.1, 1);
 
-/* Dark mode. data-tj-theme goes on <html>, not on the container: cursors,
-   clicks and focus rings are appended to <body>, outside the container, and
-   they need the same tokens. The media query is matched on :root so that an
-   explicit data-tj-theme="light" still wins on a dark system. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tj-theme="light"]) .togetherjs {
+    /* --- Stacking. One base; everything below is `calc(var(--tj-z) + n)`,
+           so a host with its own high-z chrome moves TogetherJS in one go. */
+    --tj-z: 10000;
+  }
+
+  /* Dark mode. data-tj-theme goes on <html>, not on the container: cursors,
+     clicks and focus rings are appended to <body>, outside the container, and
+     they need the same tokens. The media query is matched on :root so that an
+     explicit data-tj-theme="light" still wins on a dark system. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tj-theme="light"]) .togetherjs {
+      --tj-accent: #4aa3e0;
+      --tj-surface: #1c1f24;
+      --tj-text: #e9ebee;
+      --tj-accent-text: #0c1116;
+      --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
+      --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
+      --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+      --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
+      --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
+      --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
+      --tj-danger: #e06a5c;
+      --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
+      --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
+      --tj-backdrop: rgb(0 0 0 / 0.6);
+    }
+  }
+
+  :root[data-tj-theme="dark"] .togetherjs {
     --tj-accent: #4aa3e0;
     --tj-surface: #1c1f24;
     --tj-text: #e9ebee;
@@ -109,23 +133,6 @@
     --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
     --tj-backdrop: rgb(0 0 0 / 0.6);
   }
-}
-
-:root[data-tj-theme="dark"] .togetherjs {
-  --tj-accent: #4aa3e0;
-  --tj-surface: #1c1f24;
-  --tj-text: #e9ebee;
-  --tj-accent-text: #0c1116;
-  --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
-  --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
-  --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
-  --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
-  --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
-  --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
-  --tj-danger: #e06a5c;
-  --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
-  --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
-  --tj-backdrop: rgb(0 0 0 / 0.6);
 }
 
 /* ======================================================================

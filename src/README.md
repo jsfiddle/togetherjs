@@ -31,12 +31,14 @@ evaluate the dependency before the dependent's own body had run.
 - `storage.js`: per-tab and per-client storage over `localStorage` /
   `sessionStorage`, with a promise-shaped API.
 - `startup.js`: what to show when a session first starts — browser warnings,
-  the intro, the walkthrough, the share link.
+  the intro, the share link.
 - `who.js`: peeks into another room's occupants without joining it.
 - `console.js`: TogetherJS's own log collector.
-- `util.js`: general-purpose support code — a class pattern, assertions, the
-  event mixin, and `util.Deferred`, a native-promise deferred that keeps the
-  progress notifications a couple of callers rely on.
+- `util.js`: general-purpose support code — assertions, URL handling, and
+  `util.Deferred`, a native-promise deferred that keeps the progress
+  notifications a couple of callers rely on.
+- `events.js`: the event system. `EventEmitter` for classes, `mixinEvents()`
+  for the module singletons; one implementation behind both.
 - `registry.js`: the lazy-module registry described above.
 
 ### `dom/`
@@ -59,7 +61,10 @@ evaluate the dependency before the dependent's own body had run.
 - `windowing.js`: windows, notifications and modals.
 - `chat.js`: chat logic and the slash commands. The chat UI itself is in
   `ui.js`.
-- `walkthrough.js`: the first-run walkthrough.
+- `icons.js`: the icon set, as inline SVG painted with `currentColor`.
+- `palette.js`: the peer colours — an even OKLCH ramp — and colour validation.
+- `dock-position.js`: which edge the dock is on, shared between `ui.js` and
+  `windowing.js` without a circular import.
 - `visibility.js`: normalises the Page Visibility API into a session event.
 
 ### `sync/`
@@ -68,7 +73,9 @@ evaluate the dependency before the dependent's own body had run.
 - `forms.js`: form field synchronisation, including Ace, CodeMirror, CKEditor
   and TinyMCE.
 - `ot.js`: operational transformation, which is what keeps text fields
-  consistent when two people type into one at the same time.
+  consistent when two people type into one at the same time. `SimpleHistory`
+  leans on the hub to serialise changes and transposes the local queue around
+  whatever comes back.
 - `videos.js`: `<video>` / `<audio>` play, pause and seek.
 - `youtube.js`: the same for embedded YouTube players.
 
@@ -85,12 +92,14 @@ perfect-negotiation pattern.
 
 ### Other
 
-- `templates/`: `interface.html`, `walkthrough.html`, `help.txt` and the
-  `locale/*.json` translations. `build/templates.mjs` renders one copy per
-  locale into `generated.js`, which is bundled; `templates.js` picks the right
-  one at runtime.
-- `styles/`: plain CSS. Design tokens are custom properties on `:root`, so a
-  host page can restyle the client.
+- `templates/`: `interface.html`, `help.txt` and the `locale/*.json`
+  translations. `build/templates.mjs` renders one copy per locale into
+  `generated.js`, which is bundled; `templates.js` picks the right one at
+  runtime. Locale keys are the English source strings, so rewording one drops
+  its translations — the build reports the count on every run.
+- `styles/`: plain CSS. Every selector is scoped to a TogetherJS root, and the
+  design tokens (`--tj-*`, declared on `.togetherjs`) are the supported way
+  for a host page to restyle the client.
 - `vendor/`: third-party code. `walkabout/` (a fuzz tester, loaded on demand by
   the `/test` chat command) and `whrandom/` (a seeded PRNG, used by tests).
 - `recorder.js` / `playback.js`: the `/record` and `/playback` commands.

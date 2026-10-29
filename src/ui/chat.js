@@ -140,28 +140,29 @@ var commands = {
       if (isNaN(times) || ! times) {
         times = 100;
       }
-      ui.chat.system({
-        text: "Testing with walkabout.js"
-      });
-      var tmpl = $(templates("walkabout"));
-      var container = ui.container.find(".togetherjs-test-container");
-      container.empty();
-      container.append(tmpl);
-      container.show();
-      var statusContainer = container.find(".togetherjs-status");
-      statusContainer.text("starting...");
+      /* Progress is reported through chat rather than a status panel: the
+         panel came from a templates("walkabout") template and a
+         .togetherjs-test-container element, neither of which exists -- so
+         this threw on the templates() lookup before it ran anything. */
+      ui.chat.system({text: "Testing with walkabout.js (" + times + " actions)"});
+      var self = this;
+      var lastReport = 0;
       this._testCancel = Walkabout.runManyActions({
         ondone: function () {
-          statusContainer.text("done");
-          statusContainer.one("click", function () {
-            container.hide();
-          });
-          this._testCancel = null;
+          ui.chat.system({text: "Testing done"});
+          self._testCancel = null;
         },
         onstatus: function (status) {
-          var note = "actions: " + status.actions.length + " running: " +
-            (status.times - status.remaining) + " / " + status.times;
-          statusContainer.text(note);
+          // One line per second at most; otherwise this floods the chat.
+          var now = Date.now();
+          if (now - lastReport < 1000) {
+            return;
+          }
+          lastReport = now;
+          ui.chat.system({
+            text: "Testing: " + (status.times - status.remaining) + " / " +
+                  status.times + " (" + status.actions.length + " actions)"
+          });
         }
       });
       return;

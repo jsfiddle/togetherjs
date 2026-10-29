@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 import $ from "./dom.js";
 import util from "../core/util.js";
-import peers from "../core/peers.js";
-import windowing from "../ui/windowing.js";
 import session from "../core/session.js";
 
 var assert = util.assert;

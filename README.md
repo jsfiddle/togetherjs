@@ -53,7 +53,8 @@ That writes `dist/`:
   `<script src=".../togetherjs.js"></script>`
 * `togetherjs.min.js` — the same thing, minified, with a source map
 * `togetherjs.esm.js` — an ES module entry, for `import { TogetherJS } from "togetherjs"`
-* `togetherjs.css`, `images/` — the stylesheet and assets
+* `togetherjs.css`, `images/` — the stylesheet and the two remaining
+  assets (the cursor SVG and the notification sound; the icons are inline)
 * `recorder.js`, `walkabout.js` — separate bundles, loaded on demand
 
 To develop, run a watching build with a static server:
@@ -74,6 +75,49 @@ $ HUB_URL=https://hub.example.com npm run build
 
 `BASE_URL` does the same for the URL the client's own assets are served from;
 leave it unset and the client works out where it was loaded from.
+
+Theming
+-------
+
+The client's appearance is driven by custom properties declared on
+`.togetherjs`. Setting one in your own stylesheet is enough — the hover,
+border and muted variants are derived from the base with `color-mix()`, so
+you do not have to restate them:
+
+```css
+.togetherjs {
+  --tj-accent: #c0392b;   /* buttons, active states, links */
+  --tj-surface: #fffdf7;  /* panel and dock background */
+  --tj-text: #1b1a17;     /* body text */
+}
+```
+
+Geometry and type have tokens too: `--tj-radius`, `--tj-radius-lg`,
+`--tj-space` (an 8px scale), `--tj-font`, `--tj-font-size`, `--tj-shadow`,
+`--tj-button-size`, `--tj-avatar-size`, `--tj-panel-width` and `--tj-z`, which
+is the base of every z-index the client uses.
+
+Typography is inherited from the host page by default. `TogetherJSConfig_baseFont`
+overrides it with any CSS `font-family` value, including a reference to a
+custom property you already define:
+
+```html
+<script>TogetherJSConfig_baseFont = "var(--font-base)";</script>
+```
+
+Dark mode follows `prefers-color-scheme`. To force one or the other, set
+`TogetherJSConfig_theme` to `"light"`, `"dark"` or `"auto"` (the default); the
+client writes `data-tj-theme` on `<html>`, which is where cursors and click
+ripples pick it up too.
+
+Every rule in `togetherjs.css` is scoped to a TogetherJS root, so the client
+cannot restyle the page it is embedded in. It is deliberately not in a cascade
+layer: a layer would let your plain `button { ... }` rule win over the
+client's own layout, which is not usually what anyone means. Override through
+the tokens, or with a more specific selector if you need to.
+
+Icons are inline SVG painted with `currentColor`, so they follow whatever text
+colour applies to them.
 
 Testing
 -------

@@ -294,3 +294,49 @@ test("TogetherJS does not restyle the host page", async ({ browser, hub, statics
   expect(after).toEqual(before);
   await page.context().close();
 });
+
+test("a host page can retheme the client with the tokens", async ({ browser, hub, statics }) => {
+  /* The two halves of the cascade contract, which pull in opposite
+     directions and so need testing together:
+
+     1. The host's own `.togetherjs { --tj-accent: ... }` must win. Equal
+        specificity would not be enough, because the client's stylesheet is
+        injected after the host's -- hence the token defaults living in
+        @layer togetherjs.tokens.
+     2. The host's plain `button { ... }` must NOT reach inside the client.
+        That is why the component rules are not layered: layer order beats
+        specificity, so a layered swatch rule would lose to it. */
+  const page = await openClient(browser, hub);
+  await page.addStyleTag({
+    content: `
+      .togetherjs { --tj-accent: #c0392b; --tj-surface: #fffdf7; }
+      button { padding: 3rem 4rem; border-radius: 0; }
+    `,
+  });
+  await startSession(page);
+
+  const dockBackground = await page.evaluate(
+    () => getComputedStyle(document.querySelector("#togetherjs-dock")).backgroundColor,
+  );
+  expect(dockBackground).toBe("rgb(255, 253, 247)");
+
+  // The accent reaches a derived value, not just the raw token.
+  await page.click("#togetherjs-chat-button");
+  const accent = await page.evaluate(
+    () => getComputedStyle(document.querySelector("#togetherjs-chat-button")).backgroundColor,
+  );
+  expect(accent).not.toBe("rgb(10, 124, 193)"); // not the default blue
+  expect(accent).toMatch(/oklab|rgb/);
+
+  // ...while the host's button padding stays outside.
+  await page.click("#togetherjs-profile-button");
+  await page.click("#togetherjs-menu-update-color");
+  const swatch = await page
+    .locator("#togetherjs-swatches .togetherjs-swatch")
+    .first()
+    .boundingBox();
+  expect(swatch.width).toBe(26);
+  expect(swatch.height).toBe(26);
+
+  await page.context().close();
+});

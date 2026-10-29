@@ -512,20 +512,6 @@ function getValue(el) {
   }
 }
 
-function getElementType(el) {
-  el = $(el)[0];
-  if (el.tagName == "TEXTAREA") {
-    return "textarea";
-  }
-  if (el.tagName == "SELECT") {
-    return "select";
-  }
-  if (el.tagName == "INPUT") {
-    return (el.getAttribute("type") || "text").toLowerCase();
-  }
-  return "?";
-}
-
 function setValue(el, value) {
   el = $(el);
   var changed = false;
@@ -780,8 +766,7 @@ function focus(event) {
   }
 }
 
-function blur(event) {
-  var target = event.target;
+function blur() {
   if (lastFocus) {
     lastFocus = null;
     session.send({type: "form-focus", element: null});

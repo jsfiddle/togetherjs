@@ -8,7 +8,6 @@ import { provide } from "../core/registry.js";
 import TogetherJS from "../core/togetherjs.js";
 import $ from "../dom/dom.js";
 import { animateKeyboard, stopKeyboardAnimation } from "../dom/animate.js";
-import ui from "../ui/ui.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";
@@ -211,7 +210,7 @@ function mousemove(event) {
   lastPosX = pageX;
   lastPosY = pageY;
   var target = event.target;
-  var parent = $(target).closest(".togetherjs-window, .togetherjs-popup, #togetherjs-dock");
+  var parent = $(target).closest(".togetherjs-window, .togetherjs-menu, #togetherjs-dock");
   if (parent.length) {
     target = parent[0];
   } else if (elementFinder.ignoreElement(target)) {

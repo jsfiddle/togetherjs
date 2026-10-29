@@ -30,15 +30,11 @@ session.clientId = null;
 // Indicates if TogetherJS has just started (not continuing from a saved session):
 session.firstRun = false;
 
-// This is the key we use for localStorage:
-var localStoragePrefix = "togetherjs.";
 // This is the channel to the hub:
 var channel = null;
 
 // Setting, essentially global:
 session.AVATAR_SIZE = 90;
-
-var MAX_SESSION_AGE = 30*24*60*60*1000; // 30 days
 
 /****************************************
  * URLs
