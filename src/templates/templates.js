@@ -47,6 +47,9 @@ function clean(t) {
   t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
   t = util.trim(t);
   t = t.replace(/\{\{baseUrl\}\}/g, TogetherJS.baseUrl);
+  /* NOTE: these expand to HTML, so they belong in text content only. Putting
+     TOOL_NAME inside an attribute value splits the attribute at the markup's
+     own quotes and corrupts the element. */
   t = t.replace(/TOOL_NAME/g, '<span class="togetherjs-tool-name">TogetherJS</span>');
   t = t.replace(/SITE_NAME/g, '<strong class="togetherjs-site-name">[site name]</strong>');
   t = t.replace(

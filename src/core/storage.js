@@ -14,9 +14,10 @@ var DEFAULT_SETTINGS = {
   avatar: null,
   stickyShare: null,
   color: null,
-  seenIntroDialog: false,
-  seenWalkthrough: false,
-  dontShowRtcInfo: false
+  dontShowRtcInfo: false,
+  // Which edge the dock was last left on. The 2013 dock snapped to an edge
+  // but never remembered it, so it reset to the right on every page load.
+  dockPosition: null
 };
 
 var DEBUG_STORAGE = false;

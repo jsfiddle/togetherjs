@@ -22,7 +22,6 @@ import "./core/peers.js";
 import "./core/who.js";
 import "./core/startup.js";
 import "./ui/windowing.js";
-import "./ui/walkthrough.js";
 import "./ui/chat.js";
 import "./ui/visibility.js";
 import "./sync/cursor.js";

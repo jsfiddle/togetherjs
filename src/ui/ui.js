@@ -13,23 +13,19 @@ import templating from "../dom/templating.js";
 import linkify from "../dom/linkify.js";
 import peers from "../core/peers.js";
 import windowing from "./windowing.js";
-import tinycolor from "tinycolor2";
 import elementFinder from "../dom/elementFinder.js";
 import visibilityApi from "./visibility.js";
+import { icon, expandIcons } from "./icons.js";
+import { setDockPosition } from "./dock-position.js";
+import storage from "../core/storage.js";
+import { PALETTE, normalizeColor } from "./palette.js";
 
 var ui = util.Module('ui');
 var assert = util.assert;
-var AssertionError = util.AssertionError;
 var $window = $(window);
-// This is also in togetherjs.less, as @button-height:
-var BUTTON_HEIGHT = 60 + 1; // 60 is button height, 1 is border
 // chat TextArea
 var TEXTAREA_LINE_HEIGHT = 20; // in pixels
 var TEXTAREA_MAX_LINES = 5;
-// This is also in togetherjs.less, under .togetherjs-animated
-var ANIMATION_DURATION = 1000;
-// Time the new user window sticks around until it fades away:
-var NEW_USER_FADE_TIMEOUT = 5000;
 // This is set when an animation will keep the UI from being ready
 // (until this time):
 var finishedAt = null;
@@ -39,18 +35,15 @@ var DOCK_ANIMATION_TIME = 300;
 // (milliseconds) then they are collapsed into one message:
 var COLLAPSE_MESSAGE_LIMIT = 5000;
 
-var COLORS = [
-  "#8A2BE2", "#7FFF00", "#DC143C", "#00FFFF", "#8FBC8F", "#FF8C00", "#FF00FF",
-  "#FFD700", "#F08080", "#90EE90", "#FF6347"];
 
-// Lets the host page override the UI's font via
-// TogetherJSConfig_baseFont, e.g. "var(--font-base)" to reuse a CSS
-// custom property already defined on the host page's :root.
+// The UI inherits the host page's font by default. TogetherJSConfig_baseFont
+// overrides that with any CSS font-family value, including a reference to a
+// custom property the host page already defines (e.g. "var(--font-base)").
 TogetherJS.config.track("baseFont", function (font) {
   if (font) {
-    document.documentElement.style.setProperty("--togetherjs-font-family", font);
+    document.documentElement.style.setProperty("--tj-font", font);
   } else {
-    document.documentElement.style.removeProperty("--togetherjs-font-family");
+    document.documentElement.style.removeProperty("--tj-font");
   }
 });
 
@@ -71,17 +64,221 @@ ui.displayToggle = function (el) {
   el.show();
 };
 
-function panelPosition() {
-  var iface = $("#togetherjs-dock");
-  if (iface.hasClass("togetherjs-dock-right")) {
-    return "right";
-  } else if (iface.hasClass("togetherjs-dock-left")) {
-    return "left";
-  } else if (iface.hasClass("togetherjs-dock-bottom")) {
-    return "bottom";
-  } else {
-    throw new AssertionError("#togetherjs-dock doesn't have positioning class");
+/* ---------------------------------------------------------------------------
+   Dragging the dock.
+
+   The 2013 version shipped a drag handler that could never run: its first
+   statement reassigned the handle to `container.find("#togetherjs-dock-anchor
+   -disabled")`, an element that does not exist, under a comment saying this
+   was "in place to temporarily disable dock dragging". The assert on the line
+   above it passed only because it ran before that reassignment. The CSS
+   agreed, carrying its own FIXME and deliberately omitting `cursor: move`,
+   while the markup went on advertising a "Move the dock" tooltip.
+
+   What it disabled was also not really dragging: it swapped a CSS class to
+   snap the dock to an edge, never wrote coordinates, and hardcoded the
+   distance to the bottom edge at 10000px so the bottom could never win --
+   because `togetherjs-dock-bottom` had no CSS behind it. Nothing was saved,
+   so the dock reset to the right on every page load.
+
+   This version tracks the pointer, clamps to the viewport, snaps to the
+   nearest edge on release, and remembers where it was left.
+   --------------------------------------------------------------------------- */
+
+/* Light, dark, or follow the system. The stylesheet's dark rules are written
+   so that an explicit data-tj-theme wins over the prefers-color-scheme media
+   query in either direction. */
+function applyTheme(container) {
+  TogetherJS.config.track("theme", function (theme) {
+    if (theme === "light" || theme === "dark") {
+      container.attr("data-tj-theme", theme);
+    } else {
+      if (theme && theme !== "auto") {
+        console.warn("Unknown TogetherJSConfig_theme:", theme, "(expected light, dark or auto)");
+      }
+      container[0].removeAttribute("data-tj-theme");
+    }
+  });
+}
+
+var DOCK_MARGIN = 12;
+// How far the keyboard moves the dock per arrow press.
+var DOCK_NUDGE = 24;
+
+function dockEdgeFor(rect) {
+  /* The nearest edge, measured from the dock's centre so that a dock dropped
+     in a corner goes to whichever edge it is actually closest to. */
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var distances = {
+    left: cx,
+    right: window.innerWidth - cx,
+    top: cy,
+    bottom: window.innerHeight - cy
+  };
+  var best = "right";
+  Object.keys(distances).forEach(function (edge) {
+    if (distances[edge] < distances[best]) {
+      best = edge;
+    }
+  });
+  return best;
+}
+
+function placeDockAt(dock, left, top) {
+  /* Position the dock freely, clamped so it can never be dragged out of
+     reach. While free-floating it carries togetherjs-dock-free, which drops
+     the centring transform the edge classes rely on. */
+  var rect = dock.getBoundingClientRect();
+  var maxLeft = window.innerWidth - rect.width - DOCK_MARGIN;
+  var maxTop = window.innerHeight - rect.height - DOCK_MARGIN;
+  left = Math.max(DOCK_MARGIN, Math.min(maxLeft, left));
+  top = Math.max(DOCK_MARGIN, Math.min(maxTop, top));
+  dock.classList.add("togetherjs-dock-free");
+  dock.style.left = left + "px";
+  dock.style.top = top + "px";
+  dock.style.right = "auto";
+  dock.style.bottom = "auto";
+}
+
+function snapDockToEdge(dock, edge) {
+  /* Hand positioning back to CSS: the edge classes carry the layout for each
+     side, including the row direction for top and bottom. */
+  dock.classList.remove("togetherjs-dock-free");
+  dock.style.left = dock.style.top = dock.style.right = dock.style.bottom = "";
+  ["left", "right", "top", "bottom"].forEach(function (name) {
+    dock.classList.toggle("togetherjs-dock-" + name, name === edge);
+  });
+  setDockPosition(edge);
+  storage.settings.set("dockPosition", edge);
+  // The open panel is laid out relative to the dock, so it has to move too.
+  session.emit("resize");
+}
+
+function restoreDockPosition(container) {
+  storage.settings.get("dockPosition").then(function (edge) {
+    if (!edge) {
+      return;
+    }
+    var dock = container.find("#togetherjs-dock")[0];
+    if (dock) {
+      snapDockToEdge(dock, edge);
+    }
+  });
+}
+
+function setupDockDragging(container) {
+  var dock = container.find("#togetherjs-dock")[0];
+  var handle = container.find("#togetherjs-dock-anchor")[0];
+  assert(dock && handle, "Cannot find the dock or its drag handle");
+
+  var dragging = null;
+
+  /* Pointer events rather than mouse events: one code path covers mouse,
+     touch and pen, and setPointerCapture means the drag survives the pointer
+     leaving the handle -- which is how the old code lost mouseup and left the
+     dock stuck to the cursor. */
+  handle.addEventListener("pointerdown", function (event) {
+    if (event.button !== 0 && event.pointerType === "mouse") {
+      return;
+    }
+    var rect = dock.getBoundingClientRect();
+    dragging = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      moved: false
+    };
+    handle.setPointerCapture(event.pointerId);
+    dock.classList.add("togetherjs-dragging");
+    event.preventDefault();
+  });
+
+  handle.addEventListener("pointermove", function (event) {
+    if (!dragging || event.pointerId !== dragging.pointerId) {
+      return;
+    }
+    if (!dragging.moved) {
+      dragging.moved = true;
+      // An open panel is anchored to the dock's old spot; drop it rather than
+      // drag a disconnected pointer around with us.
+      windowing.hide();
+    }
+    placeDockAt(dock, event.clientX - dragging.offsetX, event.clientY - dragging.offsetY);
+  });
+
+  function endDrag(event) {
+    if (!dragging || event.pointerId !== dragging.pointerId) {
+      return;
+    }
+    var moved = dragging.moved;
+    dragging = null;
+    dock.classList.remove("togetherjs-dragging");
+    if (moved) {
+      snapDockToEdge(dock, dockEdgeFor(dock.getBoundingClientRect()));
+    }
   }
+
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
+
+  /* Keyboard equivalent. The handle is a real button, so it is already in the
+     tab order; arrow keys move the dock and release snaps it, which gives the
+     same outcome as a drag without needing a pointer. */
+  handle.addEventListener("keydown", function (event) {
+    var deltas = {
+      ArrowLeft: [-DOCK_NUDGE, 0],
+      ArrowRight: [DOCK_NUDGE, 0],
+      ArrowUp: [0, -DOCK_NUDGE],
+      ArrowDown: [0, DOCK_NUDGE]
+    };
+    var delta = deltas[event.key];
+    if (!delta) {
+      return;
+    }
+    var rect = dock.getBoundingClientRect();
+    placeDockAt(dock, rect.left + delta[0], rect.top + delta[1]);
+    event.preventDefault();
+  });
+
+  /* Snapping on keyup would undo each nudge the moment the key came back up,
+     so the dock could never travel further than one press. Wait for the
+     presses to stop instead. */
+  var nudgeTimer = null;
+  handle.addEventListener("keyup", function (event) {
+    if (event.key.indexOf("Arrow") !== 0 || !dock.classList.contains("togetherjs-dock-free")) {
+      return;
+    }
+    clearTimeout(nudgeTimer);
+    nudgeTimer = setTimeout(function () {
+      if (dock.classList.contains("togetherjs-dock-free")) {
+        snapDockToEdge(dock, dockEdgeFor(dock.getBoundingClientRect()));
+      }
+    }, 500);
+  });
+
+  // A dock pinned to an edge is re-pinned on resize; a viewport that shrank
+  // could otherwise leave it off-screen.
+  session.on("resize", function () {
+    if (dock.classList.contains("togetherjs-dock-free")) {
+      var rect = dock.getBoundingClientRect();
+      placeDockAt(dock, rect.left, rect.top);
+    }
+  });
+}
+
+/* Text for something the JS builds rather than the templates.
+   #togetherjs-strings carries these as data attributes so they go through the
+   same build-time translation as everything else; there is no gettext at
+   runtime. */
+function uiString(name) {
+  var el = ui.container && ui.container.find("#togetherjs-strings");
+  var value = el && el.length ? el.attr("data-" + name) : null;
+  if (!value) {
+    console.warn("No UI string named", name);
+    return "";
+  }
+  return value;
 }
 
 ui.container = null;
@@ -144,8 +341,11 @@ ui.prepareUI = function () {
   }
   var container = ui.container = $(templates("interface"));
   assert(container.length);
+  expandIcons(container[0]);
+  applyTheme(container);
   $("body").append(container);
   fixupAvatars(container);
+  restoreDockPosition(container);
   if (session.firstRun && TogetherJS.startTarget) {
     // Time at which the UI will be fully ready:
     // (We have to do this because the offset won't be quite right
@@ -202,21 +402,25 @@ ui.prepareUI = function () {
     }
     el.addClass("togetherjs-started");
   }
+  /* Every panel gets a close button. It is a real <button> with an
+     accessible name -- the injected one used to be an unlabelled <button>
+     whose only content was a background image. */
   ui.container.find(".togetherjs-window > header, .togetherjs-modal > header").each(function () {
-    $(this).append($('<button class="togetherjs-close"></button>'));
+    var button = $('<button type="button" class="togetherjs-close"></button>');
+    button.attr("aria-label", uiString("close"));
+    button.html(icon("close"));
+    $(this).append(button);
   });
 
   TogetherJS.config.track("disableWebRTC", function (hide, previous) {
     var buttons = "#togetherjs-audio-button, #togetherjs-video-button";
     if (hide && ! previous) {
       ui.container.find(buttons).hide();
-      adjustDockSize(-1);
     } else if ((! hide) && previous) {
       ui.container.find("#togetherjs-audio-button").show();
       if (TogetherJS.config.get("enableVideo")) {
         ui.container.find("#togetherjs-video-button").show();
       }
-      adjustDockSize(1);
     }
   });
 
@@ -302,164 +506,13 @@ ui.activateUI = function () {
 
   util.testExpose({submitChat: submitChat});
 
-  // Moving the window:
-  // FIXME: this should probably be stickier, and not just move the window around
-  // so abruptly
-  var anchor = container.find("#togetherjs-dock-anchor");
-  assert(anchor.length);
-  // FIXME: This is in place to temporarily disable dock dragging:
-  anchor = container.find("#togetherjs-dock-anchor-disabled");
-  anchor.mousedown(function (event) {
-    var iface = $("#togetherjs-dock");
-    // FIXME: switch to .offset() and pageX/Y
-    var startPos = panelPosition();
-    function selectoff() {
-      return false;
-    }
-    function mousemove(event2) {
-      var fromRight = $window.width() + window.pageXOffset - event2.pageX;
-      var fromLeft = event2.pageX - window.pageXOffset;
-      var fromBottom = $window.height() + window.pageYOffset - event2.pageY;
-      // FIXME: this is to temporarily disable the bottom view:
-      fromBottom = 10000;
+  setupDockDragging(container);
 
-      var pos;
-      if (fromLeft < fromRight && fromLeft < fromBottom) {
-        pos = "left";
-      } else if (fromRight < fromLeft && fromRight < fromBottom) {
-        pos = "right";
-      } else {
-        pos = "bottom";
-      }
-      iface.removeClass("togetherjs-dock-left");
-      iface.removeClass("togetherjs-dock-right");
-      iface.removeClass("togetherjs-dock-bottom");
-      iface.addClass("togetherjs-dock-" + pos);
-      if (startPos && pos != startPos) {
-        windowing.hide();
-        startPos = null;
-      }
-    }
-    $(document).on("mousemove", mousemove);
-    // If you don't turn selection off it will still select text, and show a
-    // text selection cursor:
-    $(document).on("selectstart", selectoff);
-    // FIXME: it seems like sometimes we lose the mouseup event, and it's as though
-    // the mouse is stuck down:
-    $(document).one("mouseup", function () {
-      $(document).off("mousemove", mousemove);
-      $(document).off("selectstart", selectoff);
-    });
-    return false;
-  });
-
-  function openDock() {
-    $('.togetherjs-window').animate({
-      opacity: 1
-    });
-    $('#togetherjs-dock-participants').animate({
-      opacity: 1
-    });
-    $('#togetherjs-dock #togetherjs-buttons').animate({
-      opacity: 1
-    });
-
-    //for iphone
-    if($(window).width() < 480) {
-      $('.togetherjs-dock-right').animate({
-        width: "204px"
-      }, {
-        duration:60, easing:"linear"
-      });
-    }
-
-    //for ipad
-    else {
-      $('.togetherjs-dock-right').animate({
-        width: "27%"
-      }, {
-        duration:60, easing:"linear"
-      });
-    }
-
-
-    // add bg overlay
-    // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px;'>\x3c/div>" );
-
-    //disable vertical scrolling
-    // $("body").css({
-    //   "position": "fixed",
-    //   top: 0,
-    //   left: 0
-    // });
-
-    //replace the anchor icon
-    var src = "/images/togetherjs-logo-close.png";
-    $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
-  }
-
-  function closeDock() {
-    //enable vertical scrolling
-    $("body").css({
-      "position": "",
-      top: "",
-      left: ""
-    });
-
-    //replace the anchor icon
-    var src = "/images/togetherjs-logo-open.png";
-    $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
-
-    $('.togetherjs-window').animate({
-      opacity: 0
-    });
-    $('#togetherjs-dock-participants').animate({
-      opacity: 0
-    });
-    $('#togetherjs-dock #togetherjs-buttons').animate({
-      opacity: 0
-    });
-    $('.togetherjs-dock-right').animate({
-      width: "40px"
-    }, {
-      duration:60, easing:"linear"
-    });
-
-    // remove bg overlay
-    //$(".overlay").remove();
-  }
-
-  // Setting the anchor button + dock mobile actions
-  if($.isMobile()) {
-
-    // toggle the profile button
+  // On a narrow viewport the dock is a compact bottom bar, so the profile
+  // button opens the menu as a full panel instead of a popup.
+  if ($.isMobile()) {
     $("#togetherjs-profile-button").click(function () {
       windowing.toggle("#togetherjs-menu-window");
-    });
-
-    // $("body").append( "\x3cdiv class='overlay' style='position: absolute; top: 0; left: -2px; background-color: rgba(0,0,0,0.5); width: 200%; height: 400%; z-index: 1000; margin: 0px'>\x3c/div>" );
-
-    //disable vertical scrolling
-    // $("body").css({
-    //   "position": "fixed",
-    //   top: 0,
-    //   left: 0
-    // });
-
-    //replace the anchor icon
-    var src = "/images/togetherjs-logo-close.png";
-    $("#togetherjs-dock-anchor #togetherjs-dock-anchor-horizontal img").attr("src", src);
-
-    // Was $(...).toggle(fn1, fn2), a signature jQuery removed in 1.9 — so
-    // this handler had silently done nothing for years.
-    var dockOpen = true;
-    $("#togetherjs-dock-anchor").click(function () {
-      dockOpen = ! dockOpen;
-      if (dockOpen) {
-        openDock();
-      } else {
-        closeDock();
-      }
     });
   }
 
@@ -477,17 +530,9 @@ ui.activateUI = function () {
     return false;
   });
 
-  $("#togetherjs-menu-feedback, #togetherjs-menu-feedback-button").click(function(){
-    windowing.hide();
-    hideMenu();
-    windowing.show("#togetherjs-feedback-form");
-  });
-
+  // Help is a plain link to the docs now; it just needs the menu to close.
   $("#togetherjs-menu-help, #togetherjs-menu-help-button").click(function () {
-    windowing.hide();
     hideMenu();
-    windowing.hide();
-    need("walkthrough").start(false);
   });
 
   $("#togetherjs-menu-update-name").click(function () {
@@ -504,18 +549,21 @@ ui.activateUI = function () {
     $("#togetherjs-edit-name-window input").focus();
   });
 
-  $("#togetherjs-menu .togetherjs-self-name").on("keyup change", function (event) {
-    console.log("alrighty", event);
-    if (event.which == 13) {
-      ui.displayToggle("#togetherjs-self-name-display");
-      return;
-    }
-    var val = $("#togetherjs-menu .togetherjs-self-name").val();
-    console.log("values!!", val);
-    if (val) {
-      peers.Self.update({name: val});
-    }
-  });
+  /* Both the popup menu's inline field and the narrow-screen window's field.
+     The second one had no handler at all, so editing your name on a phone
+     silently did nothing. */
+  $("#togetherjs-menu .togetherjs-self-name, #togetherjs-edit-name-window .togetherjs-self-name")
+    .on("keyup change", function (event) {
+      if (event.which == 13) {
+        ui.displayToggle("#togetherjs-self-name-display");
+        windowing.hide("#togetherjs-edit-name-window");
+        return;
+      }
+      var val = $(event.target).val();
+      if (val) {
+        peers.Self.update({name: val});
+      }
+    });
 
   $("#togetherjs-menu-update-avatar, #togetherjs-menu-update-avatar-button").click(function () {
     hideMenu();
@@ -533,45 +581,7 @@ ui.activateUI = function () {
 
   });
 
-  $("#togetherjs-menu-update-color").click(function () {
-    var picker = $("#togetherjs-pick-color");
-    if (picker.is(":visible")) {
-      picker.hide();
-      return;
-    }
-    picker.show();
-    bindPicker();
-    picker.find(".togetherjs-swatch-active").removeClass("togetherjs-swatch-active");
-    picker.find(".togetherjs-swatch[data-color=\"" + peers.Self.color + "\"]").addClass("togetherjs-swatch-active");
-  });
-
-  $("#togetherjs-pick-color").click(".togetherjs-swatch", function (event) {
-    var swatch = $(event.target);
-    var color = swatch.attr("data-color");
-    peers.Self.update({
-      color: color
-    });
-    event.stopPropagation();
-    return false;
-  });
-
-  $("#togetherjs-pick-color").click(function (event) {
-    $("#togetherjs-pick-color").hide();
-    event.stopPropagation();
-    return false;
-  });
-
-  COLORS.forEach(function (color) {
-    var el = templating.sub("swatch");
-    el.attr("data-color", color);
-    // tinycolor2 is instance-based; the vendored 0.9 build had static helpers.
-    var darkened = tinycolor(color).darken().toString();
-    el.css({
-      backgroundColor: color,
-      borderColor: darkened
-    });
-    $("#togetherjs-pick-color").append(el);
-  });
+  buildColorPicker(container);
 
   $("#togetherjs-chat-button").click(function () {
     windowing.toggle("#togetherjs-chat");
@@ -717,13 +727,18 @@ function sizeDownImage(imageUrl) {
 }
 
 function fixupAvatars(container) {
-  /* All <div class="togetherjs-person" /> elements need an element inside,
-     so we add that element here */
+  /* Every .togetherjs-person needs two children: the fallback person mark
+     that shows when the peer has no picture, and the strip of their colour
+     along the bottom. This runs over the whole container before anything is
+     cloned from it, so the chat, notification and participant templates get
+     them too -- they used to render as empty rings. */
   container.find(".togetherjs-person").each(function () {
     var $this = $(this);
-    var inner = $this.find(".togetherjs-person-avatar-swatch");
-    if (! inner.length) {
-      $this.append('<div class="togetherjs-person-avatar-swatch"></div>');
+    if (! $this.find("svg").length) {
+      $this.append(icon("person"));
+    }
+    if (! $this.find(".togetherjs-person-avatar-swatch").length) {
+      $this.append('<span class="togetherjs-person-avatar-swatch"></span>');
     }
   });
 }
@@ -762,28 +777,182 @@ function showMenu(event) {
   $(document).on("click", maybeHideMenu);
 }
 
+/* Keeps a popup inside the viewport. A popup anchored to a dock on the right
+   has its left edge computed from the anchor, which can land it off either
+   side once the dock can be dragged anywhere. */
+function clampToViewport(el, top, left) {
+  var margin = 8;
+  var width = el.outerWidth();
+  var height = el.outerHeight();
+  left = Math.max(margin, Math.min($window.width() - width - margin, left));
+  top = Math.max(margin, Math.min($window.height() - height - margin, top));
+  el.css({top: top + "px", left: left + "px"});
+}
+
 function bindMenu() {
   var el = $("#togetherjs-menu:visible");
   if (el.length) {
     var bound = $("#togetherjs-profile-button");
     var boundOffset = bound.offset();
-    el.css({
-      top: boundOffset.top + bound.height() - $window.scrollTop() + "px",
-      left: (boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft()) + "px"
-    });
+    clampToViewport(el,
+      boundOffset.top + bound.height() - $window.scrollTop(),
+      boundOffset.left + bound.width() - 10 - el.width() - $window.scrollLeft());
   }
+}
+
+/* ---------------------------------------------------------------------------
+   The colour picker.
+
+   The old one was a row of eleven hand-picked swatches built from <div>s:
+   not focusable, not announced, and unusable without a pointer. It was also
+   broken outright on this branch -- the click handler used jQuery's
+   delegation signature, `$(el).click(selector, fn)`, which the replacement
+   dom.js shorthand does not accept, so the callback was dropped and every
+   swatch click threw. The second handler still closed the popup, so it
+   looked like the picker simply ignored you.
+
+   This one is a radio group: arrow keys move between swatches, space or
+   enter chooses, and the platform's own colour input handles anything not in
+   the palette (and brings its eyedropper with it).
+   --------------------------------------------------------------------------- */
+function buildColorPicker(container) {
+  var picker = container.find("#togetherjs-pick-color");
+  var grid = container.find("#togetherjs-swatches");
+  var custom = container.find("#togetherjs-custom-color");
+  var swatches = [];
+
+  PALETTE.forEach(function (color) {
+    var el = templating.sub("swatch");
+    el.attr("data-color", color);
+    el.attr("aria-label", uiString("color-named") + " " + color);
+    el.css({backgroundColor: color});
+    // The tick inside the swatch is white under difference blending, so it
+    // stays readable whatever the swatch colour is.
+    grid.append(el);
+    swatches.push(el[0]);
+  });
+
+  function choose(color) {
+    color = normalizeColor(color);
+    if (!color) {
+      return;
+    }
+    peers.Self.update({color: color});
+    highlight(color);
+  }
+
+  function highlight(color) {
+    color = normalizeColor(color) || "";
+    swatches.forEach(function (el) {
+      // Compare normalized: the palette and a stored colour may differ only
+      // in case, which used to stop the active swatch ever being marked.
+      var active = normalizeColor(el.getAttribute("data-color")) === color;
+      el.classList.toggle("togetherjs-swatch-active", active);
+      el.setAttribute("aria-checked", active ? "true" : "false");
+      // Roving tabindex: one stop for the whole group, as a radio group.
+      el.tabIndex = active ? 0 : -1;
+    });
+    if (!swatches.some(function (el) { return el.tabIndex === 0; }) && swatches.length) {
+      swatches[0].tabIndex = 0;
+    }
+    if (color) {
+      custom.val(color);
+    }
+  }
+
+  grid.on("click", function (event) {
+    var el = event.target.closest(".togetherjs-swatch");
+    if (!el) {
+      return;
+    }
+    choose(el.getAttribute("data-color"));
+    event.stopPropagation();
+  });
+
+  grid.on("keydown", function (event) {
+    var step = {ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1}[event.key];
+    if (!step) {
+      return;
+    }
+    var index = swatches.indexOf(event.target.closest(".togetherjs-swatch"));
+    if (index == -1) {
+      return;
+    }
+    var next = swatches[(index + step + swatches.length) % swatches.length];
+    next.focus();
+    choose(next.getAttribute("data-color"));
+    event.preventDefault();
+  });
+
+  custom.on("input change", function () {
+    choose(custom.val());
+  });
+
+  // Clicking anywhere else in the popup closes it, but not the controls.
+  picker.on("click", function (event) {
+    if (event.target === picker[0]) {
+      hidePicker();
+    }
+  });
+
+  function showPicker() {
+    picker.show();
+    bindPicker();
+    highlight(peers.Self.color);
+    container.find("#togetherjs-menu-update-color").attr("aria-expanded", "true");
+    var active = swatches.filter(function (el) { return el.tabIndex === 0; })[0];
+    if (active) {
+      active.focus();
+    }
+  }
+
+  function hidePicker() {
+    picker.hide();
+    container.find("#togetherjs-menu-update-color").attr("aria-expanded", "false");
+  }
+
+  container.find("#togetherjs-menu-update-color, #togetherjs-menu-update-color-button")
+    .on("click", function (event) {
+      if (picker.is(":visible")) {
+        hidePicker();
+      } else {
+        showPicker();
+      }
+      event.stopPropagation();
+      return false;
+    });
+
+  picker.on("keydown", function (event) {
+    if (event.which == 27) {
+      hidePicker();
+      container.find("#togetherjs-menu-update-color").focus();
+    }
+  });
+
+  peers.on("self-updated", function () {
+    highlight(peers.Self.color);
+  });
+
+  highlight(peers.Self.color);
 }
 
 function bindPicker() {
   var picker = $("#togetherjs-pick-color:visible");
-  if (picker.length) {
-    var menu = $("#togetherjs-menu-update-color");
-    var menuOffset = menu.offset();
-    picker.css({
-      top: menuOffset.top + menu.height(),
-      left: menuOffset.left
-    });
+  if (! picker.length) {
+    return;
   }
+  // Anchored under whichever "Pick profile color" row is on screen.
+  var row = $("#togetherjs-menu-update-color:visible");
+  if (! row.length) {
+    row = $("#togetherjs-menu-update-color-button:visible");
+  }
+  if (! row.length) {
+    return;
+  }
+  var offset = row.offset();
+  clampToViewport(picker,
+    offset.top + row.height() - $window.scrollTop(),
+    offset.left - $window.scrollLeft());
 }
 
 session.on("resize", function () {
@@ -817,21 +986,6 @@ function maybeHideMenu(event) {
     t = t.parentNode;
   }
   hideMenu();
-}
-
-function adjustDockSize(buttons) {
-  /* Add or remove spots from the dock; positive number to
-     add button(s), negative number to remove button(s)
-     */
-  assert(typeof buttons == "number");
-  assert(buttons && Math.floor(buttons) == buttons);
-  var iface = $("#togetherjs-dock");
-  var newHeight = iface.height() + (BUTTON_HEIGHT * buttons);
-  assert(newHeight >= BUTTON_HEIGHT * 3, "Height went too low (", newHeight,
-         "), should never be less than 3 buttons high (", BUTTON_HEIGHT * 3, ")");
-  iface.css({
-    height: newHeight + "px"
-  });
 }
 
 // Misc
@@ -979,7 +1133,7 @@ ui.chat = {
     } else {
       title = attrs.url;
     }
-    var el = templating.sub("url-change", {
+    var el = templating.sub("chat-url-change", {
       peer: attrs.peer,
       date: date,
       href: attrs.url,
@@ -1022,7 +1176,7 @@ ui.chat = {
     if (attrs.forEveryone) {
       el.find("a").click(function () {
         // FIXME: hacky way to do this:
-        chat.submit("Followed link to " + attrs.url);
+        chat().submit("Followed link to " + attrs.url);
       });
     }
     ui.chat.add(el, messageId, true);
@@ -1094,7 +1248,8 @@ ui.PeerView = class PeerView {
   constructor(peer) {
     assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
     this.peer = peer;
-    this.dockClick = this.dockClick.bind(this);
+    // Bound once, so that destroy()'s off() can match what dock() registered.
+    this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
   }
 
   /* Takes an element and sets any person-related attributes on the element
@@ -1262,37 +1417,11 @@ ui.PeerView = class PeerView {
   // and shrink the size of the dock
   // and if you rollover the dock, it expands and reveals the rest of the participants in the dock
 
-  //if users hit X then show the participant button with the consol
-
   dock() {
     whenContainerReady(this, this._dock, []);
   }
 
   _dock() {
-
-    var numberOfUsers = peers.getAllPeers().length;
-
-    // collapse the Dock if too many users
-    function CollapsedDock() {
-      // decrease/reset dock height
-      $("#togetherjs-dock").css("height", 260);
-      //replace participant button
-      $("#togetherjs-dock-participants").replaceWith("<button id='togetherjs-participantlist-button' class='togetherjs-button'><div class='togetherjs-tooltip togetherjs-dock-person-tooltip'><span class='togetherjs-person-name'>Participants</span><span class='togetherjs-person-tooltip-arrow-r'></span></div><div class='togetherjs-person togetherjs-person-status-overlay' title='Participant List' style='background-image: url("+TogetherJS.baseUrl+"/images/robot-avatar.png); border-color: rgb(255, 0, 0);'></div></button>");
-      // new full participant window created on toggle
-      $("#togetherjs-participantlist-button").click(function () {
-        windowing.toggle("#togetherjs-participantlist");
-      });
-    }
-
-    // FIXME: turned off for now
-    if( numberOfUsers >= 5 && false) {
-      CollapsedDock();
-    } else {
-      // reset
-
-    }
-
-
     if (this.dockElement) {
       return;
     }
@@ -1302,28 +1431,31 @@ ui.PeerView = class PeerView {
     this.dockElement.attr("id", this.peer.className("togetherjs-dock-element-"));
     ui.container.find("#togetherjs-dock-participants").append(this.dockElement);
     animateDockEntry(this.dockElement.find(".togetherjs-person"));
-    adjustDockSize(1);
     this.detailElement = templating.sub("participant-window", {
       peer: this.peer
     });
-    var followId = this.peer.className("togetherjs-person-status-follow-");
-    this.detailElement.find('[for="togetherjs-person-status-follow"]').attr("for", followId);
-    this.detailElement.find('#togetherjs-person-status-follow').attr("id", followId);
     this.detailElement.find(".togetherjs-follow").click(function () {
       location.href = $(this).attr("href");
     });
     this.detailElement.find(".togetherjs-nudge").click((function () {
       this.peer.nudge();
     }).bind(this));
-    this.followCheckbox = this.detailElement.find("#" + followId);
-    this.followCheckbox.change(function () {
-      if (! this.checked) {
+    /* The follow checkbox is found by class and labelled by the <label> that
+       wraps it. The template used to give every peer's copy the same id, so
+       each clone had to be renamed here to keep the document's ids unique --
+       and the handler below ran with `this` bound to the checkbox element,
+       where `this.peer` is undefined, so unchecking the box threw. */
+    this.followCheckbox = this.detailElement.find(".togetherjs-person-status-follow");
+    this.followCheckbox.change((function () {
+      if (! this.followCheckbox[0].checked) {
         this.peer.unfollow();
       }
       // Following doesn't happen until the window is closed
-      // FIXME: should we tell the user this?
-    });
-    this.maybeHideDetailWindow = this.maybeHideDetailWindow.bind(this);
+    }).bind(this));
+    /* Bound and registered in the constructor instead: this runs on every
+       dock(), so an undock/dock cycle used to leave a dead listener behind
+       each time -- bound to a different function object each round, so the
+       off() in destroy() could never find them. */
     session.on("hide-window", this.maybeHideDetailWindow);
     ui.container.append(this.detailElement);
     this.dockElement.click((function () {
@@ -1355,7 +1487,6 @@ ui.PeerView = class PeerView {
       this.dockElement = null;
       this.detailElement.remove();
       this.detailElement = null;
-      adjustDockSize(-1);
     }).bind(this));
   }
 
@@ -1392,16 +1523,12 @@ ui.PeerView = class PeerView {
 
   maybeHideDetailWindow(windows) {
     if (this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
-      if (this.followCheckbox[0].checked) {
+      if (this.followCheckbox && this.followCheckbox[0] && this.followCheckbox[0].checked) {
         this.peer.follow();
       } else {
         this.peer.unfollow();
       }
     }
-  }
-
-  dockClick() {
-    // FIXME: scroll to person
   }
 
   cursor() {

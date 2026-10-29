@@ -44,9 +44,8 @@ function translate(source, translation, missing) {
 }
 
 export async function buildTemplates() {
-  const [interfaceHtml, walkthroughHtml, helpTxt] = await Promise.all([
+  const [interfaceHtml, helpTxt] = await Promise.all([
     fs.readFile(path.join(TEMPLATE_DIR, "interface.html"), "utf8"),
-    fs.readFile(path.join(TEMPLATE_DIR, "walkthrough.html"), "utf8"),
     fs.readFile(path.join(TEMPLATE_DIR, "help.txt"), "utf8"),
   ]);
 
@@ -61,7 +60,6 @@ export async function buildTemplates() {
 
     locales[lang] = {
       interface: stripComments(translate(interfaceHtml, translation, missing)),
-      walkthrough: stripComments(translate(walkthroughHtml, translation, missing)),
       help: translate(helpTxt, translation, missing),
       names: translation.names || "",
     };

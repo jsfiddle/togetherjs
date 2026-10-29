@@ -9,6 +9,7 @@ import session from "./session.js";
 import storage from "./storage.js";
 import templates from "../templates/templates.js";
 import { mixinEvents } from "./events.js";
+import { pickColor, normalizeColor, isValidColor } from "../ui/palette.js";
 
 var peers = util.Module("peers");
 var assert = util.assert;
@@ -40,7 +41,7 @@ class Peer {
     this.idle = attrs.status || "active";
     this.name = attrs.name || null;
     this.avatar = attrs.avatar || null;
-    this.color = attrs.color || "#00FF00";
+    this.color = normalizeColor(attrs.color) || "#00ff00";
     this.view = new (need("ui").PeerView)(this);
     this.lastMessageDate = 0;
     this.following = attrs.following || false;
@@ -128,8 +129,8 @@ class Peer {
       this.avatar = msg.avatar;
       identityUpdated = true;
     }
-    if (msg.color && msg.color != this.color) {
-      this.color = msg.color;
+    if (msg.color && normalizeColor(msg.color) && normalizeColor(msg.color) != this.color) {
+      this.color = normalizeColor(msg.color);
       identityUpdated = true;
     }
     if (msg.isClient !== undefined) {
@@ -284,8 +285,8 @@ session.on("start", function () {
           updatePeers = true;
         }
       }
-      if (attrs.color && attrs.color != this.color) {
-        this.color = attrs.color;
+      if (attrs.color && normalizeColor(attrs.color) && normalizeColor(attrs.color) != this.color) {
+        this.color = normalizeColor(attrs.color);
         updateMsg.color = this.color;
         if (! attrs.fromLoad) {
           storage.settings.set("color", this.color);
@@ -337,17 +338,21 @@ session.on("start", function () {
 
             storage.settings.set("defaultName", defaultName);
           }
+          color = normalizeColor(color);
           if (! color) {
-            color = Math.floor(Math.random() * 0xffffff).toString(16);
-            while (color.length < 6) {
-              color = "0" + color;
-            }
-            color = "#" + color;
+            /* This used to be Math.random() * 0xffffff, which could hand you
+               near-white (invisible against the UI) as readily as anything
+               else, and took no notice of what the other peers already had.
+               pickColor draws from an even palette and avoids collisions. */
+            color = pickColor(peers.getAllPeers().map(function (peer) {
+              return peer.color;
+            }));
             storage.settings.set("color", color);
           }
-          if (! avatar) {
-            avatar = TogetherJS.baseUrl + "/images/default-avatar.png";
-          }
+          /* No default avatar image any more: an unset avatar falls through
+             to the inline person icon in .togetherjs-person, which takes the
+             peer's own colour instead of showing the same grey PNG for
+             everyone. */
           this.update({
             name: name,
             avatar: avatar,
@@ -385,11 +390,11 @@ session.on("start", function () {
         } else {
           color = getUserColor();
         }
-        if (color && typeof color != "string") {
-          // FIXME: would be nice to test for color-ness here.
-          console.warn("Error in getUserColor(): should return a string (got", color, ")");
+        if (color && ! isValidColor(color)) {
+          console.warn("Error in getUserColor(): should return a hex color string (got", color, ")");
           color = null;
         }
+        color = normalizeColor(color);
       }
       if (getUserAvatar) {
         if (typeof getUserAvatar == "string") {

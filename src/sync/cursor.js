@@ -12,7 +12,7 @@ import ui from "../ui/ui.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";
-import tinycolor from "tinycolor2";
+import { foregroundFor } from "../ui/palette.js";
 import eventMaker from "../dom/eventMaker.js";
 import peers from "../core/peers.js";
 import templating from "../dom/templating.js";
@@ -20,10 +20,7 @@ import templating from "../dom/templating.js";
 var assert = util.assert;
 var cursor = util.Module("cursor");
 
-var FOREGROUND_COLORS = ["#111", "#eee"];
 var CURSOR_HEIGHT = 50;
-var CURSOR_ANGLE = (35 / 180) * Math.PI;
-var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
 // Number of milliseconds after page load in which a scroll-update
 // related hello-back message will be processed:
 var SCROLL_UPDATE_CUTOFF = 2000;
@@ -61,16 +58,13 @@ class Cursor {
   updatePeer(peer) {
     // FIXME: can I use peer.setElement()?
     this.element.css({color: peer.color});
-    var img = this.element.find("img.togetherjs-cursor-img");
-    img.attr("src", makeCursor(peer.color));
     var name = this.element.find(".togetherjs-cursor-name");
     var nameContainer = this.element.find(".togetherjs-cursor-container");
     assert(name.length);
     name.text(peer.name);
     nameContainer.css({
       backgroundColor: peer.color,
-      // tinycolor2 returns an instance rather than a colour string.
-      color: tinycolor.mostReadable(peer.color, FOREGROUND_COLORS).toHexString()
+      color: foregroundFor(peer.color)
     });
     var path = this.element.find("svg path");
     path.attr("fill", peer.color);
@@ -269,30 +263,6 @@ function mousemove(event) {
     offsetY: Math.floor(offsetY)
   };
   session.send(lastMessage);
-}
-
-function makeCursor(color) {
-  var canvas = $("<canvas></canvas>");
-  canvas.attr("height", CURSOR_HEIGHT);
-  canvas.attr("width", CURSOR_WIDTH);
-  var context = canvas[0].getContext('2d');
-  context.fillStyle = color;
-  context.moveTo(0, 0);
-  context.beginPath();
-  context.lineTo(0, CURSOR_HEIGHT/1.2);
-  context.lineTo(Math.sin(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5,
-                 Math.cos(CURSOR_ANGLE/2) * CURSOR_HEIGHT / 1.5);
-  context.lineTo(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2,
-                 Math.cos(CURSOR_ANGLE) * CURSOR_HEIGHT / 1.2);
-  context.lineTo(0, 0);
-  context.shadowColor = 'rgba(0,0,0,0.3)';
-  context.shadowBlur = 2;
-  context.shadowOffsetX = 1;
-  context.shadowOffsetY = 2;
-	context.strokeStyle = "#ffffff";
-	context.stroke();
-  context.fill();
-  return canvas[0].toDataURL("image/png");
 }
 
 var scrollTimeout = null;

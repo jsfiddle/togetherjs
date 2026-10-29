@@ -76,7 +76,6 @@ function sendHello(helloBack) {
     type: helloBack ? "hello-back" : "hello",
     name: "Recorder 'bot",
     // FIXME: replace with robot:
-    avatar: TogetherJS.baseUrl + "/images/robot-avatar.png",
     color: "#888888",
     rtcSupported: false,
     clientId: clientId,

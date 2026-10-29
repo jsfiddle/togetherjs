@@ -117,7 +117,7 @@ function installSyntheticMedia() {
 }
 
 /** Open a fresh browser context pointed at the example page. */
-export async function openClient(browser, hub, { url } = {}) {
+export async function openClient(browser, hub, { url, config } = {}) {
   const context = await browser.newContext();
   const page = await context.newPage();
   const errors = [];
@@ -144,13 +144,16 @@ export async function openClient(browser, hub, { url } = {}) {
     // Keep the modal flow out of the way of assertions.
     window.TogetherJSConfig_suppressJoinConfirmation = true;
     window.TogetherJSConfig_suppressInvite = true;
-    // The first-run walkthrough is a modal and its backdrop covers the dock,
-    // so present as a returning user unless a test says otherwise.
-    localStorage.setItem("togetherjs.settings.seenIntroDialog", "true");
     // util.testExpose() only publishes internals when this object already
     // exists, so it has to be created before the bundle evaluates.
     window.TogetherJSTestSpy = {};
   });
+  if (config) {
+    // Extra TogetherJSConfig_* globals, set before the bundle evaluates.
+    await page.addInitScript((entries) => {
+      for (const [name, value] of entries) window[name] = value;
+    }, Object.entries(config));
+  }
   await page.addInitScript(installSyntheticMedia);
   const target = url || `/examples/index.html?hub=${encodeURIComponent(hub.url)}`;
   await page.goto(target);

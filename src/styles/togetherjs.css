@@ -1,2239 +1,1323 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this file,
-* You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * ---------------------------------------------------------------------------
+ * TogetherJS interface styles.
+ *
+ * Three rules this file keeps to, which the 2013 original did not:
+ *
+ * 1. Every selector is scoped to a TogetherJS root -- `.togetherjs` or a
+ *    `#togetherjs-*` id -- so nothing here can restyle the page it is
+ *    embedded in. The original set `font-size: 16px !important` on every
+ *    input on the host page, faded every disabled button on it, and turned
+ *    them all TogetherJS blue on hover.
+ *
+ *    Deliberately NOT in a cascade layer. A layer would let a host page's
+ *    rules win by default, which sounds polite until the host's plain
+ *    `button { padding: .6rem 1.2rem }` reshapes our round colour swatches
+ *    into ovals -- and it would, because layer order beats specificity. The
+ *    scoping above is what keeps us out of the host's way; the tokens below
+ *    are the supported way in. A host that really does want to override a
+ *    rule can still outrank `.togetherjs .x` easily.
+ *
+ * 2. Colour, spacing, type and depth come from custom properties declared in
+ *    one place. Setting `--tj-accent` recolours the whole UI, because the
+ *    hover, border and muted variants are derived from it with color-mix()
+ *    rather than hardcoded. Nothing below writes a raw hex except the token
+ *    definitions themselves.
+ *
+ * 3. Typography is inherited from the host page by default, so the widget
+ *    reads as part of the site rather than as a visitor from another one.
+ *
+ * Dark mode follows prefers-color-scheme, and `TogetherJSConfig_theme` of
+ * "light" or "dark" overrides it through the data-tj-theme attribute.
+ * ---------------------------------------------------------------------------
+ */
 
-/* Design tokens. Prefixed so they cannot collide with custom properties
-   defined by the host page; override them to restyle the client. */
-:root {
-  --togetherjs-button-size: 40px;
-  --togetherjs-avatar-size: 32px;
-  --togetherjs-background-color: #0095DD;
-  --togetherjs-window-background-color: #ffffff;
-  --togetherjs-window-color: #000;
-  --togetherjs-text-color: #000;
-  --togetherjs-z-index: 10000;
-}
-/* Base font: override by setting window.TogetherJSConfig_baseFont, e.g.
-   TogetherJSConfig_baseFont = "var(--font-base)" to reuse a CSS custom
-   property already defined on the host page's :root. */
-/* .togetherjs reset */
-/* http://yuilibrary.com/yui/docs/cssreset/ */
+/* ======================================================================
+   Tokens
+   ====================================================================== */
+
 .togetherjs {
-  /*
-YUI 3.10.3 (build 2fb5187)
-Copyright 2013 Yahoo! Inc. All rights reserved.
-Licensed under the BSD License.
-http://yuilibrary.com/license/
-*/
-  /*
-	TODO think about hanlding inheritence differently, maybe letting IE6 fail a bit...
-*/
-  /* to preserve line-height and selector appearance */
-  /*to enable resizing for IE*/
-  /*because legend doesn't inherit in IE */
+  /* --- Colour: the three a host is most likely to set --- */
+  --tj-accent: #0a7cc1;
+  --tj-surface: #ffffff;
+  --tj-text: #16181d;
+
+  /* --- Derived from the above; override only for fine control --- */
+  --tj-accent-text: #ffffff;
+  --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, black);
+  --tj-accent-quiet: color-mix(in oklab, var(--tj-accent) 10%, var(--tj-surface));
+  --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, black);
+
+  --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 4%, var(--tj-surface));
+  --tj-surface-hover: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+  --tj-text-muted: color-mix(in oklab, var(--tj-text) 62%, var(--tj-surface));
+  --tj-border: color-mix(in oklab, var(--tj-text) 14%, var(--tj-surface));
+  --tj-border-strong: color-mix(in oklab, var(--tj-text) 26%, var(--tj-surface));
+  --tj-danger: #c0392b;
+
+  /* --- Geometry --- */
+  --tj-space: 8px;
+  --tj-radius: 6px;
+  --tj-radius-lg: 10px;
+  --tj-radius-pill: 999px;
+  --tj-button-size: 40px;
+  --tj-avatar-size: 30px;
+  --tj-dock-width: 52px;
+  --tj-panel-width: 290px;
+
+  /* --- Depth: 1px borders carry the structure, shadow only lifts --- */
+  --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.07);
+  --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.07), 0 12px 32px rgb(0 0 0 / 0.13);
+  --tj-backdrop: rgb(16 18 22 / 0.42);
+
+  /* --- Type: inherited from the host page by default --- */
+  --tj-font: inherit;
+  --tj-font-size: 14px;
+  --tj-font-size-sm: 12px;
+  --tj-line-height: 1.45;
+
+  /* --- Motion --- */
+  --tj-duration: 0.15s;
+  --tj-ease: cubic-bezier(0.2, 0, 0.1, 1);
+
+  /* --- Stacking. One base; everything below is `calc(var(--tj-z) + n)`,
+         so a host with its own high-z chrome moves TogetherJS in one go. */
+  --tj-z: 10000;
 }
-.togetherjs * {
-  box-sizing: content-box !important;
+
+/* Dark mode. The media query is wrapped so that an explicit
+   data-tj-theme="light" on the container still wins on a dark system. */
+@media (prefers-color-scheme: dark) {
+  .togetherjs:not([data-tj-theme="light"]) {
+    --tj-accent: #4aa3e0;
+    --tj-surface: #1c1f24;
+    --tj-text: #e9ebee;
+    --tj-accent-text: #0c1116;
+    --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
+    --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
+    --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+    --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
+    --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
+    --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
+    --tj-danger: #e06a5c;
+    --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
+    --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
+    --tj-backdrop: rgb(0 0 0 / 0.6);
+  }
 }
-.togetherjs header {
-  width: auto;
+
+.togetherjs[data-tj-theme="dark"] {
+  --tj-accent: #4aa3e0;
+  --tj-surface: #1c1f24;
+  --tj-text: #e9ebee;
+  --tj-accent-text: #0c1116;
+  --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
+  --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
+  --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+  --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
+  --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
+  --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
+  --tj-danger: #e06a5c;
+  --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
+  --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
+  --tj-backdrop: rgb(0 0 0 / 0.6);
 }
-.togetherjs div,
-.togetherjs dl,
-.togetherjs dt,
-.togetherjs dd,
-.togetherjs ul,
-.togetherjs ol,
-.togetherjs li,
-.togetherjs h1,
-.togetherjs h2,
-.togetherjs h3,
-.togetherjs h4,
-.togetherjs h5,
-.togetherjs h6,
-.togetherjs pre,
-.togetherjs code,
-.togetherjs form,
-.togetherjs fieldset,
-.togetherjs legend,
-.togetherjs input,
-.togetherjs textarea,
-.togetherjs p,
-.togetherjs blockquote,
-.togetherjs th,
-.togetherjs td {
+
+/* ======================================================================
+   Reset
+   Scoped to our own subtrees and written with :where() so it adds no
+   specificity: any rule below, and any rule a host writes, outranks it.
+   This replaces an inlined copy of the YUI 3.10.3 reset that still had
+   IE6/IE7 star-hacks in it.
+   ====================================================================== */
+
+.togetherjs,
+.togetherjs :where(*),
+.togetherjs :where(*)::before,
+.togetherjs :where(*)::after {
+  box-sizing: border-box;
+}
+
+.togetherjs :where(div, span, p, section, header, ul, ol, li, h1, h2, h3,
+                   h4, figure, form, fieldset, legend) {
   margin: 0;
   padding: 0;
-}
-.togetherjs table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-.togetherjs fieldset,
-.togetherjs img {
   border: 0;
-}
-.togetherjs address,
-.togetherjs caption,
-.togetherjs cite,
-.togetherjs code,
-.togetherjs dfn,
-.togetherjs em,
-.togetherjs strong,
-.togetherjs th,
-.togetherjs var {
-  font-style: normal;
-  font-weight: normal;
-}
-.togetherjs ol,
-.togetherjs ul {
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  background: none;
   list-style: none;
 }
-.togetherjs caption,
-.togetherjs th {
-  text-align: left;
+
+.togetherjs :where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+  margin: 0;
 }
-.togetherjs h1,
-.togetherjs h2,
-.togetherjs h3,
-.togetherjs h4,
-.togetherjs h5,
-.togetherjs h6 {
-  font-size: 100%;
-  font-weight: normal;
+
+.togetherjs :where(svg.togetherjs-icon) {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: none;
 }
-.togetherjs q:before,
-.togetherjs q:after {
-  content: '';
-}
-.togetherjs abbr,
-.togetherjs acronym {
-  border: 0;
-  font-variant: normal;
-}
-.togetherjs sup {
-  vertical-align: text-top;
-}
-.togetherjs sub {
-  vertical-align: text-bottom;
-}
-.togetherjs input,
-.togetherjs textarea,
-.togetherjs select {
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-}
-.togetherjs input,
-.togetherjs textarea,
-.togetherjs select {
-  *font-size: 100%;
-}
-.togetherjs legend {
-  color: #000;
-}
+
+/* ======================================================================
+   Root containers
+   ====================================================================== */
+
 .togetherjs {
-  /* General styles */
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-size: 14px;
-  line-height: 20px;
-  color: #333333;
-  font-weight: normal;
-}
-.togetherjs a {
-  color: var(--togetherjs-background-color);
-  text-decoration: none;
-}
-.togetherjs a:hover {
-  color: var(--togetherjs-background-color);
-  text-decoration: underline;
-}
-.togetherjs p {
-  margin: 7px 0 7px 0;
-}
-.togetherjs button,
-.togetherjs img {
-  vertical-align: middle;
-}
-.togetherjs input:focus {
-  outline: none;
-}
-.togetherjs button::-moz-focus-inner,
-.togetherjs input::-moz-focus-inner {
-  padding: 0;
-  border: 0;
-}
-.togetherjs .togetherjs-right {
-  float: right;
-}
-button:disabled {
-  opacity: 0.2;
-}
-button[disabled]:hover {
-  background: #0194DB;
-}
-.togetherjs-default {
-  display: inline-block;
-  border-radius: 4px;
-  text-align: center;
-  height: 40px;
-  /*line-height not consistent across browsers*/
-  line-height: 37px;
-  text-decoration: none;
-  min-width: 100px;
-  border: none;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  /*transition: all 0.25s linear 0s;*/
-  text-shadow: none;
-  margin: 3px;
-  font-size: 14px;
-  background: #9A9A9A;
-  color: #fff;
-}
-.togetherjs-default.togetherjs-follow {
-  cursor: pointer;
-}
-.togetherjs-default:hover {
-  background: #ADADAD;
-}
-.togetherjs-primary {
-  display: inline-block;
-  border-radius: 4px;
-  text-align: center;
-  height: 40px;
-  /*line-height not consistent across browsers*/
-  line-height: 37px;
-  text-decoration: none;
-  min-width: 100px;
-  border: none;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  /*transition: all 0.25s linear 0s;*/
-  text-shadow: none;
-  margin: 3px;
-  font-size: 14px;
-  background: #0194DB;
-  color: #fff;
-}
-.togetherjs-primary.togetherjs-follow {
-  cursor: pointer;
-}
-.togetherjs-primary:hover {
-  background: #00ACFF;
-}
-a.togetherjs-primary,
-a.togetherjs-default,
-a.togetherjs-secondary,
-a.togetherjs-primary:link,
-a.togetherjs-default:link,
-a.togetherjs-secondary:link,
-a.togetherjs-primary:active,
-a.togetherjs-default:active,
-a.togetherjs-secondary:active,
-a.togetherjs-primary:visited,
-a.togetherjs-default:visited,
-a.togetherjs-secondary:visited,
-a.togetherjs-primary:hover,
-a.togetherjs-default:hover,
-a.togetherjs-secondary:hover {
-  color: #fff;
-  text-decoration: none;
-  vertical-align: middle;
-}
-#togetherjs-avatar-edit .togetherjs-person-avatar-swatch {
-  margin-left: 22px;
-}
-#togetherjs-avatar-edit .togetherjs-person {
-  float: left;
-  height: 36px;
-  width: 36px;
-  margin: 35px;
-  background-repeat: no-repeat;
-  background-size: 40px 40px;
-  background-position: -2px -1px;
-  border: 2px solid;
-  border-radius: 2px;
-  background-clip: border-box;
-}
-#togetherjs-avatar-edit #togetherjs-avatar-buttons {
-  float: right;
-  width: 172px;
-  padding: 45px 0px;
-}
-input.togetherjs-upload-avatar {
-  line-height: 0px;
-  width: 174px;
-  margin-left: -20px;
-}
-#togetherjs-upload-avatar {
-  float: left;
-}
-#togetherjs-camera-avatar {
-  clear: both;
-}
-#togetherjs-avatar-edit .togetherjs-buttons {
-  clear: both;
-}
-.togetherjs-destructive {
-  display: inline-block;
-  border-radius: 4px;
-  text-align: center;
-  height: 40px;
-  /*line-height not consistent across browsers*/
-  line-height: 37px;
-  text-decoration: none;
-  min-width: 100px;
-  border: none;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  /*transition: all 0.25s linear 0s;*/
-  text-shadow: none;
-  margin: 3px;
-  font-size: 14px;
-  background: #AC2924;
-  color: #ffffff;
-}
-.togetherjs-destructive:hover {
-  background: #d40606;
-}
-.togetherjs-secondary {
-  display: inline-block;
-  border-radius: 4px;
-  text-align: center;
-  height: 40px;
-  /*line-height not consistent across browsers*/
-  line-height: 37px;
-  text-decoration: none;
-  min-width: 100px;
-  border: none;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  /*transition: all 0.25s linear 0s;*/
-  text-shadow: none;
-  margin: 3px;
-  font-size: 14px;
-  background: #999999;
-  /* Old browsers */
-  background: -moz-linear-gradient(top, #999999 0%, #888888 100%);
-  /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #999999), color-stop(100%, #888888));
-  /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, #999999 0%, #888888 100%);
-  /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, #999999 0%, #888888 100%);
-  /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, #999999 0%, #888888 100%);
-  /* IE10+ */
-  background: linear-gradient(to bottom, #999999 0%, #888888 100%);
-  /* W3C */
-  color: #fff;
-}
-.togetherjs-cancel {
-  display: inline-block;
-  background-color: var(--togetherjs-background-color);
-  border: none;
-  padding: 3px 0px;
-  margin: 0px 0px 0px;
-  min-width: 0;
-  font-size: 14px;
-  color: #333333;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-weight: 300;
-  vertical-align: -2px !important;
-}
-.togetherjs-cancel:hover {
-  cursor: pointer;
-  border-bottom: 1px solid #BCBCBC;
-  margin: 0px 0px -1px;
-}
-.togetherjs-alt-text {
-  vertical-align: -2px;
-}
-/*FIX ME something weird is going on here. the avatar has no paddingTop only on Safari*/
-/*button#togetherjs-profile-button.togetherjs-button {
-  padding:10px 0px !important;
-}*/
-/* General dock rules: */
-.togetherjs #togetherjs-buttons .togetherjs-button {
-  background-color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  position: relative;
-  width: 60px;
-  height: 60px;
-  background-color: var(--togetherjs-background-color);
-  background-size: 40px 40px;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-top: 1px solid rgba(0, 0, 0, 0.2);
-}
-.togetherjs #togetherjs-buttons .togetherjs-button:hover {
-  background-color: #0F81BF;
-}
-.togetherjs #togetherjs-buttons hr {
-  padding: 0;
-  margin: 0;
-}
-.togetherjs #togetherjs-dock-participants button.togetherjs-active {
-  background-color: #0F81BF !important;
-}
-.togetherjs #togetherjs-buttons #togetherjs-share-button {
-  background-image: url('./images/button-share.png');
-}
-.togetherjs #togetherjs-buttons #togetherjs-share-button:hover {
-  background-image: url('./images/button-share-active.png');
-}
-.togetherjs #togetherjs-buttons #togetherjs-share-button.togetherjs-active {
-  background-image: url('./images/button-share-active.png') !important;
-  background-color: #0F81BF;
-}
-.togetherjs #togetherjs-buttons #togetherjs-audio-button {
-  background-image: url('./images/button-mic.png');
-}
-.togetherjs #togetherjs-buttons #togetherjs-audio-button:hover {
-  background-image: url('./images/button-mic-active.png');
-  /*background-color:var(--togetherjs-background-color);*/
-  /*cursor: default;*/
-}
-.togetherjs #togetherjs-buttons #togetherjs-audio-button.togetherjs-active {
-  background-image: url('./images/button-mic-active.png') !important;
-  background-color: #0F81BF;
-}
-.togetherjs #togetherjs-buttons #togetherjs-chat-button {
-  background-image: url('./images/button-chat.png');
-}
-.togetherjs #togetherjs-buttons #togetherjs-chat-button:hover {
-  background-image: url('./images/button-chat-active.png');
-}
-.togetherjs #togetherjs-buttons #togetherjs-chat-button.togetherjs-active {
-  background-image: url('./images/button-chat-active.png') !important;
-  background-color: #0F81BF;
-}
-.togetherjs #togetherjs-dock-anchor {
-  height: 20px;
-  text-align: center;
-  /* FIXME: disabling dock movement for now, cursor would be misleading: */
-  user-select: none;
-  width: 100%;
-  position: relative;
-  left: 0px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
-.togetherjs .togetherjs-subtitle {
-  background: #0195DD;
-  width: 280px;
-  height: 17px;
-  border-bottom: 1px solid #0071A7;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 12px;
-  padding: 7px 10px;
-  left: -14px;
-  top: -15px;
-  position: relative;
-}
-.togetherjs .togetherjs-subtitle #togetherjs-chat-participants {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-.togetherjs .togetherjs-subtitle #togetherjs-chat-no-participants {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-.togetherjs .togetherjs-subtitle #togetherjs-chat-participant-list {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-.togetherjs #togetherjs-chat-input {
-  width: 264px;
-  height: 20px;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  resize: none;
-  font-size: 14px;
-  padding: 4px 6px 5px;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  /*box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);*/
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-weight: 300;
-}
-.togetherjs #togetherjs-chat-input:focus {
-  border: 1px solid var(--togetherjs-background-color);
-}
-.togetherjs #togetherjs-chat-input-box {
-  margin: 0;
-  padding: 10px 10px 11px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  background: #F2F2F2;
-  position: relative;
-  /*box-shadow: 0 -1px 2px rgba(0,0,0,0.1);*/
-  height: 31px;
-  width: 280px;
-  margin-left: -7px;
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-}
-.togetherjs .togetherjs-window #togetherjs-chat-messages {
-  width: 300px;
-  position: relative;
-  left: -14px;
-  background: #fff;
-  top: -30px;
-  margin-bottom: -30px !important;
-}
-.togetherjs .togetherjs-chat-item {
-  padding: 0 0 20px 0;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-size: 14px;
-  padding: 10px 0px;
-  margin: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  color: #333333;
-  min-height: 60px;
-}
-.togetherjs #togetherjs-chat-messages .togetherjs-chat-item a.togetherjs-person-url {
-  width: 105px;
-  white-space: nowrap;
-  vertical-align: top;
-  display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.togetherjs #togetherjs-chat-messages .togetherjs-person-self {
-  float: left;
-  margin-bottom: 20px;
-  margin-top: 7px;
-}
-.togetherjs #togetherjs-chat-messages .togetherjs-person {
-  float: left;
-  margin-bottom: 20px;
-}
-.togetherjs .togetherjs-person-name-abbrev {
-  color: #333333;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  padding-top: 2px;
-}
-.togetherjs .togetherjs-timestamp {
-  float: right;
-  color: rgba(51, 51, 51, 0.5);
-  font-size: 9px !important;
-  padding: 0 15px;
-}
-.togetherjs .togetherjs-chat-content {
-  white-space: pre-wrap;
-  line-height: 20px;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  margin: 3px 15px 3px 60px;
-}
-.togetherjs #togetherjs-window-pointer-right,
-.togetherjs #togetherjs-window-pointer-left {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  margin-right: -5px;
-  margin-top: -5px;
-  background: #fff;
-  border-right: 1px solid rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  z-index: 10002;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-}
-.togetherjs #togetherjs-window-pointer-right {
-}
-.togetherjs #togetherjs-window-pointer-left {
-}
-.togetherjs .togetherjs-window {
-  position: fixed;
-  background-color: #ffffff;
-  color: #000;
-  padding: 0 7px 0 7px;
-  z-index: 10001;
-  width: 286px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-.togetherjs .togetherjs-window section {
-  margin: 15px 7px;
-}
-.togetherjs .togetherjs-window > header {
-  font-weight: bold;
-  font-variant: normal;
-  text-align: center;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  color: #fff;
-  margin: 0 -7px 0 -7px;
-  padding: 10px 4px 5px 30px;
-  height: 24px;
-  background: var(--togetherjs-background-color);
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  border-bottom: 1px solid #0071A7;
-}
-.togetherjs .togetherjs-window .togetherjs-share-link {
-  width: 256px;
-  font-size: 12px;
-  padding: 6px 6px 4px;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-  font-family: Monaco, sans-serif;
-  margin: 7px 0px;
-}
-.togetherjs .togetherjs-window .togetherjs-share-link:focus {
-  border: 1px solid var(--togetherjs-background-color);
-}
-.togetherjs .togetherjs-window header button.togetherjs-close {
-  background-color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  border-left: 1px solid #0071A7;
-  float: right;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: var(--togetherjs-background-color);
-  background-image: url('./images/icon-close@2x.png');
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: 13px 13px;
-  width: 39px;
-  height: 39px;
-  margin-top: -10px;
-  margin-right: -4px;
-  border-top-right-radius: 4px;
-}
-.togetherjs .togetherjs-window header button.togetherjs-close:hover {
-  background-image: url('./images/icon-close-active.png');
-  background-color: rgba(0, 0, 0, 0.1);
-}
-.togetherjs .togetherjs-window #togetherjs-chat-messages {
-  overflow-y: auto;
-  /*FIXME: I'm just pulling numbers out of thin air here:*/
-  height: 260px;
-}
-.togetherjs #togetherjs-feedback-form > header {
-  font-weight: bold;
-  font-variant: normal;
-  text-align: center;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  color: #fff;
-  margin: 0 -1px 0 -1px;
-  padding: 10px 4px 5px 30px;
-  height: 24px;
-  background: var(--togetherjs-background-color);
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  border-bottom: 1px solid #0071A7;
-}
-.togetherjs #togetherjs-feedback-form.togetherjs-modal {
-  background-color: #fff;
-  color: #000000;
-  padding: 0 0 5px 0;
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  border-left: 1px solid #c9c9c9;
-  border-right: 1px solid #c9c9c9;
-  border-bottom: 1px solid #c9c9c9;
-  position: fixed;
-  top: 46%;
-  left: 47%;
-  margin-left: -150px;
-  margin-top: -10em;
-  height: 24em;
-  width: 399px;
-}
-.togetherjs #togetherjs-alpha-intro .togetherjs-small-feedback-txt {
-  font-size: 10px;
-}
-.togetherjs #togetherjs-alpha-intro .togetherjs-modal-close:hover {
-  background: #61921b;
-}
-.togetherjs #togetherjs-alpha-intro {
-  height: 24em;
-}
-.togetherjs #togetherjs-intro .togetherjs-modal-dont-join {
-  /*    background-repeat: repeat-x;
-    border: 0;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-block;
-    text-transform: none;
-    vertical-align: middle;
-    padding: 10px 0 10px 0;*/
-}
-.togetherjs .togetherjs-notification {
-  position: fixed;
-  background-color: #ffffff;
-  color: #000;
-  padding: 0 7px 0 7px;
-  z-index: 10001;
-  width: 300px;
-  border-radius: 4px;
-  background: rgba(242, 242, 242, 0.9);
-  border: 1px solid #BCBCBC;
-  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.4), inset 0px 3px 1px 0px #FFFFFF;
-}
-.togetherjs .togetherjs-notification section {
-  margin: 15px 7px;
-}
-.togetherjs .togetherjs-notification > header {
-  font-weight: bold;
-  font-variant: normal;
-  text-align: center;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  color: #fff;
-  margin: 0 -7px 0 -7px;
-  padding: 10px 4px 5px 30px;
-  height: 24px;
-  background: var(--togetherjs-background-color);
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  border-bottom: 1px solid #0071A7;
-}
-.togetherjs .togetherjs-notification .togetherjs-share-link {
-  width: 256px;
-  font-size: 12px;
-  padding: 6px 6px 4px;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-  font-family: Monaco, sans-serif;
-  margin: 7px 0px;
-}
-.togetherjs .togetherjs-notification .togetherjs-share-link:focus {
-  border: 1px solid var(--togetherjs-background-color);
-}
-.togetherjs .togetherjs-notification header button.togetherjs-close {
-  background-color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  border-left: 1px solid #0071A7;
-  float: right;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: var(--togetherjs-background-color);
-  background-image: url('./images/icon-close@2x.png');
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: 13px 13px;
-  width: 39px;
-  height: 39px;
-  margin-top: -10px;
-  margin-right: -4px;
-  border-top-right-radius: 4px;
-}
-.togetherjs .togetherjs-notification header button.togetherjs-close:hover {
-  background-image: url('./images/icon-close-active.png');
-  background-color: rgba(0, 0, 0, 0.1);
-}
-.togetherjs .togetherjs-notification #togetherjs-chat-messages {
-  overflow-y: auto;
-  /*FIXME: I'm just pulling numbers out of thin air here:*/
-  height: 260px;
-}
-.togetherjs .togetherjs-notification:hover {
-  background: #f2f2f2;
-  cursor: pointer;
-}
-.togetherjs .togetherjs-notification .togetherjs-chat-item {
-  border-bottom: 0px;
-  word-wrap: break-word;
-}
-.togetherjs .togetherjs-notification section#togetherjs-chat-notifier-message {
-  margin: 0px !important;
-}
-.togetherjs .togetherjs-notification .togetherjs-chat-content {
-  font-size: 12px;
-}
-.togetherjs .togetherjs-notification section {
-  font-size: 12px;
-}
-.togetherjs .togetherjs-notification .togetherjs-person-name {
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-weight: bold;
-  font-size: 14px;
-}
-.togetherjs .togetherjs-notification button {
-  min-width: 47% !important;
-}
-.togetherjs .togetherjs-notification .togetherjs-person {
-  display: none;
-}
-.togetherjs .togetherjs-notification .togetherjs-timestamp {
-  display: none;
-}
-.togetherjs .togetherjs-notification {
-  border-bottom: 0px;
-}
-.togetherjs .togetherjs-notification img.togetherjs-notification-logo {
-  float: left;
-  margin: 22px 14px 14px 10px;
-  width: 34px;
-  height: 25px;
-}
-.togetherjs .togetherjs-notification img.togetherjs-notification-closebtn {
-  float: right;
-  padding: 14px 7px;
-}
-.togetherjs .togetherjs-notification img.togetherjs-notification-closebtn:hover {
-  opacity: 0.5;
-}
-.togetherjs .togetherjs-notification section.togetherjs-buttons {
-  border-top: 1px solid #E1E1E1;
-}
-.togetherjs .togetherjs-person {
-  height: 36px;
-  width: 36px;
-  margin: 10px;
-  background-repeat: no-repeat;
-  background-size: 40px 40px;
-  background-position: -2px -2px;
-  border: 2px solid;
-  border-radius: 2px;
-  background-clip: border-box;
-}
-.togetherjs .togetherjs-person.togetherjs-person-small {
-  display: inline-block;
-  height: 20px;
-  width: 20px;
-  margin: -1px -18px;
-  background-size: 22px 22px;
-  background-position: -1px -1px;
-}
-.togetherjs .togetherjs-person-small .togetherjs-person-avatar-swatch {
-  border-width: 3px;
-  margin-left: 14px;
-  margin-top: 0px;
-}
-.togetherjs .togetherjs-person-avatar-swatch {
-  /* This is the element that lives inside all .togetherjs-person elements
-       and is used for the triangle. */
-  width: 0;
-  height: 0;
-  margin-left: 23px;
-  padding: 0;
-  border-top: 7px solid transparent;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 7px solid transparent;
-  margin-top: 0px;
-}
-.togetherjs .togetherjs-person-inactive {
-  opacity: 0.5;
-}
-.togetherjs .togetherjs-button .togetherjs-person {
-  margin: 0 0 0 10px;
-}
-@-moz-document url-prefix() {
-  .togetherjs {
-    /* firefox only styles */
-  }
-  .togetherjs .togetherjs-button .togetherjs-person {
-    margin: 10px 0 0 10px;
-  }
-}
-.togetherjs header .togetherjs-person {
-  float: left;
-}
-.togetherjs .togetherjs-dock-person > .togetherjs-dock-person-tooltip {
-  display: none;
-}
-.togetherjs .togetherjs-dock-person:hover > .togetherjs-dock-person-tooltip {
-  display: block;
-}
-.togetherjs .togetherjs-dock-person.togetherjs-active:hover > .togetherjs-dock-person-tooltip {
-  display: none;
-}
-.togetherjs .togetherjs-dock-person-tooltip {
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-weight: 300;
-  position: absolute;
-  right: 70px;
-  top: 0px;
-  padding: 8px;
-  font-size: 12px;
-  text-align: left;
-  min-width: 30px;
-}
-.togetherjs .togetherjs-tooltip {
-  background-color: rgba(42, 42, 42, 0.9);
-  color: #fff;
-  border-radius: 4px;
-  line-height: 20px !important;
-}
-.togetherjs .togetherjs-dock-person-tooltip .togetherjs-person-name {
-  font-size: 12px;
-}
-.togetherjs .togetherjs-person-tooltip-arrow-r {
-  position: absolute;
-  left: 46px;
-  width: 0;
-  height: 0;
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
-  border-left: 4px solid rgba(0, 0, 0, 0.9);
-  line-height: 20px;
-  opacity: 0.9;
-  top: 20px;
-}
-.togetherjs-triangle-up {
-  position: absolute;
-  top: -15px;
-  width: 13px;
-  left: 50px;
-}
-.togetherjs-triangle-up img {
-  width: 12px;
-  height: 13px;
-}
-.togetherjs-rtc-dialog-btn {
-  text-align: right;
-}
-#togetherjs-rtc-info section.togetherjs-buttons {
-  text-align: right !important;
-}
-#togetherjs-rtc-info label {
-  font-size: 12px !important;
-  float: left !important;
-  padding-top: 13px;
-  padding-left: 30px;
-}
-#togetherjs-rtc-info input {
-  margin-top: 0px !important;
-}
-.togetherjs-chat-url-change {
-  background: #f2f2f2;
-  margin-top: 0px !important;
-}
-.togetherjs-chat-join-item {
-  background: #f2f2f2;
-  margin-top: 0px !important;
-}
-.togetherjs-chat-left-item {
-  background: #f2f2f2;
-  margin-top: 0px !important;
-}
-.togetherjs-inline-text {
-  margin-top: 10px !important;
-}
-.togetherjs-chat-join-item .togetherjs-person {
-  float: left;
-  margin-bottom: 0px !important;
-  margin-top: 0px;
-}
-.togetherjs-chat-left-item .togetherjs-person {
-  float: left;
-  margin-bottom: 0px !important;
-  margin-top: 0px;
-}
-.togetherjs-chat-url-change .togetherjs-person {
-  float: left;
-  margin-bottom: 0px !important;
-  margin-top: 0px;
-}
-.togetherjs-chat-join-item span.togetherjs-person-name {
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-}
-.togetherjs-chat-left-item span.togetherjs-person-name {
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-}
-.togetherjs-chat-url-change span.togetherjs-person-name {
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-}
-.togetherjs-clear {
-  clear: both;
-}
-/* Menu */
-#togetherjs-menu {
-  width: 216px;
-  position: fixed;
-  font-size: 14px;
-  background-color: #fff;
-  z-index: 10003;
-  border: 1px solid #979797;
-  border-radius: 4px;
-}
-#togetherjs-menu hr {
-  margin: 0px;
-  border-top: 0px solid #E1E1E1;
-}
-#togetherjs-menu .togetherjs-menu-hr-avatar {
-  margin-top: 20px;
-  height: 0px;
-  border-bottom: 1px solid #E1E1E1;
-  font-size: 1px;
-}
-#togetherjs-menu .togetherjs-hr {
-  height: 0px;
-  margin: 0px;
-  border-bottom: 1px solid #E1E1E1;
-  font-size: 1px;
-}
-#togetherjs-menu .togetherjs-menu-item {
-  margin: -1px 0px -1px;
-  padding: 12px;
-  line-height: 9px;
-  height: 10px;
-  clear: both;
-  cursor: pointer;
-}
-#togetherjs-menu .togetherjs-menu-item.togetherjs-menu-disabled {
-  cursor: default;
-}
-#togetherjs-menu .togetherjs-menu-item.togetherjs-menu-disabled:hover {
-  background-color: inherit;
-  border-radius: 4px;
-  border-top: 1px solid #979797;
-  padding-top: 11px !important;
-}
-#togetherjs-menu .togetherjs-menu-item img {
-  float: left;
-  height: 20px;
-  width: 20px;
-  margin-right: 10px;
-  margin-top: -5px;
-}
-#togetherjs-menu .togetherjs-menu-item:hover {
-  background-color: rgba(216, 216, 216, 0.5);
-}
-#togetherjs-menu .togetherjs-menu-item .togetherjs-avatar {
-  height: 20px;
-  width: 20px;
-  padding: 0;
-  margin: 0 10px 0 0;
-}
-#togetherjs-menu .togetherjs-menu-item .togetherjs-person-bgcolor-self {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 1px solid #999;
-  border-radius: 2px;
-  margin-right: 12px;
-  float: left;
-  margin-top: -2px;
-  margin-left: 4px;
-}
-#togetherjs-menu #togetherjs-menu-help {
-  padding-left: 15px;
-}
-#togetherjs-menu #togetherjs-menu-feedback {
-  padding-left: 15px;
-}
-#togetherjs-menu img#togetherjs-menu-avatar {
-  float: left;
-  padding-top: 8px;
-}
-#togetherjs-menu .togetherjs-person-name-self {
-  padding-top: 8px;
-  line-height: 32px;
-  font-weight: bold;
-}
-#togetherjs-menu .togetherjs-self-name {
-  width: 146px !important;
-  float: right;
-  margin-top: -23px;
-  font-size: 12px;
-  padding: 7px 7px;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-  margin: -2px 0px;
-}
-#togetherjs-menu .togetherjs-self-name:focus {
-  border: 1px solid var(--togetherjs-background-color);
-}
-#togetherjs-menu .togetherjs-self-name:focus {
-  border-bottom: 1px solid var(--togetherjs-background-color);
-}
-/*Participant windows*/
-#togetherjs-participantlist.togetherjs-window {
-  padding: -1px;
-}
-#togetherjs-participantlist.togetherjs-window section {
-  overflow: scroll;
-  height: 200px;
-  margin: 0px -7px;
-}
-#togetherjs-participantlist section.togetherjs-buttons {
-  height: auto;
-  background: none;
-  text-align: left;
-  margin: auto;
-  padding-top: 0px;
-}
-#togetherjs-participantlist .togetherjs-person.togetherjs-person-small {
-  margin: 0px;
-  width: 30px;
-  height: 30px;
-}
-#togetherjs-participantlist.togetherjs-window section ul li {
-  padding: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-}
-#togetherjs-participantlist.togetherjs-window .tj-name {
-  padding-left: 5px;
-}
-#togetherjs-participantlist.togetherjs-window .tj-status {
-  float: right;
-  margin-top: 6px;
-  margin-right: 10px;
-  font-size: 24px;
-  color: green;
-}
-#togetherjs-participantlist.togetherjs-window .tj-urllocation {
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-#togetherjs-participantlist .togetherjs-follow-question {
-  margin-left: 0px;
-}
-#togetherjs-participantlist.togetherjs-window .tj-follow {
-  font-size: 12px;
-}
-#togetherjs-participantlist.togetherjs-window .tj-btn-sm {
-  height: 30px;
-  line-height: 30px;
-  font-size: 12px;
-  margin: 0px 3px 0px 0px;
-}
-section.togetherjs-participant-window-main {
-  margin: 0px -7px -7px !important;
-}
-.togetherjs-participant-window-row a.togetherjs-person-url {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 179px;
-  display: inline-block;
-}
-.togetherjs p.togetherjs-participant-window-row {
-  border-bottom: 1px solid #E1E1E1 !important;
-  padding: 7px 14px 14px !important;
-}
-.togetherjs-participant-window-row strong {
-  font-weight: 800;
-}
-.togetherjs-follow-question {
-  margin-left: 10px;
-}
-.togetherjs-float-left {
-  float: left;
-}
-.togetherjs-window input[type="radio"],
-.togetherjs-window input[type="checkbox"] {
-  margin: 0 0 0 !important;
-}
-.togetherjs-clear {
-  clear: both;
-  margin: 10px;
-}
-section.togetherjs-buttons {
-  background: #F3F2F2;
-  margin: 0px -7px !important;
-  padding: 7px;
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  text-align: right;
-}
-section.togetherjs-buttons.togetherjs-buttons-notification-diff-url {
-  margin: 7px -7px 0px !important;
-  padding: 7px 3px 0px;
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  width: 300px;
-  text-align: right;
-}
-.togetherjs-notification-diff-url {
-  width: 288px !important;
-  margin: 0px 7px !important;
-}
-.togetherjs-different-url button {
-  min-width: 47% !important;
-}
-/*.togetherjs-different-url {
-  text-align:right;
-}*/
-.togetherjs-same-url {
-  padding-left: 7px !important;
-  opacity: 0.5 !important;
-  padding-top: 7px !important;
-  padding-bottom: 7px !important;
-}
-section.togetherjs-buttons .togetherjs-same-url {
-  text-align: left;
-}
-/* Button set */
-#togetherjs-dock {
-  position: fixed;
-  z-index: 10000;
-  background-color: var(--togetherjs-background-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  /*border:1px solid #000;*/
-}
-#togetherjs-dock.togetherjs-dock-right {
-  padding: 0;
-  bottom: 150px;
-  right: 5px;
-  border-radius: 4px;
-  height: 260px;
-  width: 60px;
-}
-#togetherjs-dock.togetherjs-dock-right #togetherjs-dock-anchor-vertical {
-  display: none;
-}
-#togetherjs-dock.togetherjs-dock-right #togetherjs-dock-anchor-horizontal {
-  display: inline;
-}
-#togetherjs-dock.togetherjs-dock-right #togetherjs-dock-anchor-horizontal img {
-  width: 31px;
-  height: 7px;
-  padding: 0px 2px 2px 2px;
-  pointer-events: none;
-}
-#togetherjs-dock.togetherjs-dock-left {
-  padding: 0;
-  bottom: 60px;
-  left: 5px;
-  border-radius: 0 4px 4px 0;
-  height: 214px;
-  width: 60px;
-}
-#togetherjs-dock.togetherjs-dock-left #togetherjs-dock-anchor-vertical {
-  display: none;
-}
-#togetherjs-dock.togetherjs-dock-left #togetherjs-dock-anchor-horizontal {
-  display: inline;
-}
-#togetherjs-dock.togetherjs-dock-left #togetherjs-dock-anchor-horizontal img {
-  width: 6px;
-  height: 6px;
-  padding: 7px 2px 2px 2px;
-}
-#togetherjs-dock.togetherjs-dock-top {
-  padding: 0;
-  top: 40px;
-  left: 50%;
-  margin-left: -130px;
-  border-radius: 4px 4px 0 0;
-  height: 60px;
-  width: 260px;
-}
-#togetherjs-dock.togetherjs-dock-top #togetherjs-buttons,
-#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-anchor {
-  display: inline;
-}
-#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-anchor-vertical {
-  display: inline;
-}
-#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-anchor-horizontal {
-  display: none;
-}
-#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-anchor-vertical img {
-  width: 6px;
-  height: 6px;
-  padding: 2px;
-}
-/* Arrows for pointing */
-.togetherjs-arrow {
-  position: absolute;
-  border: 2px solid #f00;
-  z-index: 10010;
-  padding: 0;
-  margin: 0;
-  transform-origin: top left;
-}
-.togetherjs-chat-message.togetherjs-arrow-message {
-  border: 2px solid #f00;
-}
-/* Shared cursors */
-.togetherjs-cursor svg {
-}
-.togetherjs-cursor-img {
-  position: relative;
-  top: 0;
-}
-.togetherjs-cursor img {
-  width: 20px;
-  /*FIX ME, moz filter not working...*/
-  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.2));
-}
-.togetherjs-cursor {
-  position: absolute;
-  z-index: 9999;
-  font-size: 28px;
-  font-weight: bolder;
-  /* This magic CSS rule makes this element basically invisible to clicks/etc:
-  (good on all but IE: http://caniuse.com/pointer-events */
-  pointer-events: none;
-  /*FIXME: maybe these should use position: fixed so the cursor
-  stays stuck to the top of the screen until the appropriate time
-  (when .togetherjs-scrolled-above/below is removed)?*/
-}
-.togetherjs-cursor:hover {
-  cursor: pointer;
-}
-.togetherjs-cursor.togetherjs-scrolled-above {
-  position: fixed;
-}
-.togetherjs-cursor.togetherjs-scrolled-above svg {
-  transition-duration: 0.8s;
-  transition-property: transform;
-  transform: rotate(20deg);
-}
-.togetherjs-cursor.togetherjs-scrolled-above .togetherjs-cursor-down {
-  display: none;
-}
-.togetherjs-cursor.togetherjs-scrolled-below {
-  position: fixed;
-}
-.togetherjs-cursor.togetherjs-scrolled-below svg {
-  transition-duration: 0.8s;
-  transition-property: transform;
-  transform: rotate(-150deg);
-}
-.togetherjs-cursor.togetherjs-scrolled-below .togetherjs-cursor-up {
-  display: none;
-}
-.togetherjs-cursor.togetherjs-scrolled-normal svg {
-  transition-duration: 0.8s;
-  transition-property: transform;
-  transform: rotate(-10deg);
-}
-.togetherjs-cursor.togetherjs-scrolled-normal .togetherjs-cursor-up,
-.togetherjs-cursor.togetherjs-scrolled-normal .togetherjs-cursor-down {
-  display: none;
-}
-.togetherjs-cursor .togetherjs-cursor-container {
-  opacity: 0.9;
-  white-space: nowrap;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  font-size: 40%;
-  position: relative;
-  top: 5px;
-  left: 15px;
-  padding: 8px;
-  border-radius: 4px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
-}
-.togetherjs-click {
-  position: absolute;
-  z-index: 9998;
-  pointer-events: none;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 5px;
-  border: 3px solid #ff3a29;
-  /*    Note, you must call this like:
-  .transition(~"value, value, value")*/
-  transition: width 2s, height 2s, margin 2s, border 2s;
-}
-.togetherjs-click.togetherjs-clicking {
-  width: 40px;
-  height: 40px;
-  margin: -20px 0 0 -20px;
-  border-radius: 20px;
-  border: 3px solid rgba(0, 0, 0, 0);
-}
-#togetherjs-starter .togetherjs-running {
-  background-color: #f00;
-  color: #fff;
-  border-radius: 4px;
-  border: 3px outset #d00;
-  /*FIXME: add gradient*/
-}
-/* Modals */
-#togetherjs-modal-background {
-  position: fixed;
-  background-color: #000;
-  opacity: 0.5;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 10002;
-}
-.togetherjs .togetherjs-modal {
-  background-color: #ffffff;
-  color: #000;
-  padding: 0 7px 0 7px;
-  z-index: 10001;
-  width: 286px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  border-radius: 5px !important;
-  position: fixed;
-  z-index: 10003;
-  top: 50%;
-  left: 50%;
-  margin-left: -150px;
-  width: 300px;
-  margin-top: -10em;
-}
-.togetherjs .togetherjs-modal section {
-  margin: 15px 7px;
-}
-.togetherjs .togetherjs-modal > header {
-  font-weight: bold;
-  font-variant: normal;
-  text-align: center;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  color: #fff;
-  margin: 0 -7px 0 -7px;
-  padding: 10px 4px 5px 30px;
-  height: 24px;
-  background: var(--togetherjs-background-color);
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  border-bottom: 1px solid #0071A7;
-}
-.togetherjs .togetherjs-modal .togetherjs-share-link {
-  width: 256px;
-  font-size: 12px;
-  padding: 6px 6px 4px;
-  border-radius: 4px;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-  font-family: Monaco, sans-serif;
-  margin: 7px 0px;
-}
-.togetherjs .togetherjs-modal .togetherjs-share-link:focus {
-  border: 1px solid var(--togetherjs-background-color);
-}
-.togetherjs .togetherjs-modal header button.togetherjs-close {
-  background-color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  border-left: 1px solid #0071A7;
-  float: right;
-  font-weight: bold;
-  cursor: pointer;
-  background-color: var(--togetherjs-background-color);
-  background-image: url('./images/icon-close@2x.png');
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: 13px 13px;
-  width: 39px;
-  height: 39px;
-  margin-top: -10px;
-  margin-right: -4px;
-  border-top-right-radius: 4px;
-}
-.togetherjs .togetherjs-modal header button.togetherjs-close:hover {
-  background-image: url('./images/icon-close-active.png');
-  background-color: rgba(0, 0, 0, 0.1);
-}
-.togetherjs .togetherjs-modal #togetherjs-chat-messages {
-  overflow-y: auto;
-  /*FIXME: I'm just pulling numbers out of thin air here:*/
-  height: 260px;
-}
-.togetherjs .togetherjs-modal.togetherjs-modal-wide {
-  width: 550px;
-  margin-left: -284px;
-  height: 530px;
-  margin-top: -275px;
-}
-.togetherjs .togetherjs-modal section.togetherjs-buttons {
-  /*position: absolute;*/
-  bottom: 0;
-  background: #F2F2F2;
-  width: 294px;
-  padding: 10px;
-  text-align: right;
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  margin-left: -7px;
-  margin-bottom: 0px;
-  border-top: 1px solid #E1E1E1;
-}
-.togetherjs .togetherjs-modal-wide section.togetherjs-buttons {
-  width: 544px;
-  text-align: center !important;
-  position: absolute;
-}
-.togetherjs .togetherjs-walkthrough-slide {
-  padding: 0 30px 0 30px;
-  text-align: center;
-}
-.togetherjs .togetherjs-walkthrough-slide p {
-  margin: 18px auto;
-  width: 400px;
-}
-.togetherjs .togetherjs-walkthrough-slide iframe {
-  border-radius: 4px;
-}
-.togetherjs section.togetherjs-walkthrough-slide .togetherjs-walkthrough-main-image .togetherjs-walkthrough-avatar-section {
-  margin-top: 115px;
-}
-.togetherjs .togetherjs-avatar-preview {
-  float: left;
-  margin-left: 82px;
-}
-.togetherjs .togetherjs-avatar-upload-input {
-  float: right;
-  margin-right: 82px;
-  margin-top: 19px;
-}
-.togetherjs .togetherjs-save-settings {
-  margin-top: 239px;
-}
-.togetherjs section.togetherjs-walkthrough-slide .togetherjs-walkthrough-avatar {
-  width: 80px;
-  height: 80px;
-  position: absolute;
-  left: 44%;
-  top: 30%;
-  border-radius: 4px 4px 4px 4px;
-  border: 2px solid #cccccc;
-  background: none repeat scroll 0% 0% #000000;
-}
-.togetherjs section.togetherjs-walkthrough-slide .togetherjs-walkthrough-avatar:hover {
-  cursor: pointer;
-  border: 2px solid #cccccc;
-}
-.togetherjs section.togetherjs-walkthrough-slide input.togetherjs-self-name {
-  position: absolute;
-  top: 50%;
-  left: 29%;
-  font-size: 14px;
-  padding: 6px 6px 6px;
-  border-radius: 4px 4px 4px 4px;
-  border: 1px solid #cccccc;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
-  font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-  margin: -20px 0px;
-}
-.togetherjs section.togetherjs-walkthrough-slide .togetherjs-swatch {
-  width: 32px;
-  height: 32px;
-  background: none repeat scroll 0% 0% #000000;
-  position: absolute;
-  top: 46.2%;
-  right: 29%;
-  border-radius: 4px 4px 4px 4px;
-  border: 1px solid #cccccc;
-}
-.togetherjs section.togetherjs-walkthrough-slide .togetherjs-swatch:hover {
-  cursor: pointer;
-  border: 1px solid rgba(204, 204, 204, 0.2);
-}
-.togetherjs section.togetherjs-walkthrough-slide span.togetherjs-walkthrough-sendlink {
-  top: 44%;
-  position: relative;
-}
-.togetherjs section.togetherjs-walkthrough-slide input.togetherjs-share-link {
-  top: 44%;
-  position: relative;
-}
-.togetherjs .togetherjs-walkthrough-main-image {
-  width: 400px;
-  height: 300px;
-  background: rgba(216, 216, 216, 0.1);
-  border-radius: 4px;
-  border: 1px solid rgba(151, 151, 151, 0.1);
-  margin: 0 auto;
-}
-.togetherjs .togetherjs-walkthrough-main-image img {
-  width: 400px;
-  height: 300px;
-}
-.togetherjs #togetherjs-walkthrough input,
-.togetherjs textarea,
-.togetherjs .uneditable-input {
-  width: 177px;
-}
-.togetherjs #togetherjs-walkthrough select,
-.togetherjs input[type="file"] {
-  height: 30px;
-  line-height: 0px;
-}
-.togetherjs #togetherjs-walkthrough-previous {
-  cursor: pointer;
-  width: 19px;
-  height: 36px;
-  background-repeat: no-repeat;
-  background-size: 60% 60%;
-  margin-left: 36px;
-  margin-top: 28%;
-  background-image: url('./images/icn-walkthrough-arrow-l.png');
-  float: left;
-}
-.togetherjs #togetherjs-walkthrough-previous.togetherjs-disabled {
-  cursor: default;
-  opacity: 0.2;
-}
-.togetherjs #togetherjs-walkthrough-previous:hover {
-  background-image: url('./images/icn-walkthrough-arrow-l-hover.png');
-}
-.togetherjs #togetherjs-walkthrough-next {
-  cursor: pointer;
-  width: 19px;
-  height: 36px;
-  background-repeat: no-repeat;
-  background-size: 60% 60%;
-  margin-right: 28px;
-  margin-top: 28%;
-  background-image: url('./images/icn-walkthrough-arrow-r.png');
-  float: right;
-}
-.togetherjs #togetherjs-walkthrough-next.togetherjs-disabled {
-  cursor: default;
-  opacity: 0.2;
-}
-.togetherjs #togetherjs-walkthrough-next:hover {
-  background-image: url('./images/icn-walkthrough-arrow-r-hover.png');
-}
-.togetherjs #togetherjs-walkthrough-progress {
-  width: 537px;
-  position: absolute;
-  bottom: 66px;
-  text-align: center;
-}
-.togetherjs .togetherjs-walkthrough-slide-progress {
-  cursor: pointer;
-  padding: 0 5px 0 5px;
-  color: #D8D8D8;
-  font-size: 20px;
-}
-.togetherjs .togetherjs-walkthrough-slide-progress.togetherjs-active {
-  color: #9C9C9C;
-}
-.togetherjs .togetherjs-walkthrough-slide-progress:hover {
-  color: #9C9C9C;
-}
-/* Animations */
-/* Inspired by https://github.com/daneden/animate.css */
-@keyframes togetherjs-pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-.togetherjs-pulse {
-  animation-name: togetherjs-pulse;
-}
-.togetherjs-animated {
-  animation-duration: 1s;
-  animation-fill-mode: both;
-}
-@keyframes togetherjs-color-pulse {
-  0% {
-    box-shadow: none;
-  }
-  50% {
-    box-shadow: inset 0 0 2px var(--togetherjs-background-color);
-  }
-  100% {
-    box-shadow: none;
-  }
-}
-.togetherjs-color-pulse {
-  animation-name: togetherjs-color-pulse;
-}
-@keyframes togetherjs-color-alert {
-  0% {
-    box-shadow: none;
-  }
-  50% {
-    box-shadow: 0 0 5px var(--togetherjs-background-color);
-  }
-  100% {
-    box-shadow: none;
-  }
-}
-.togetherjs-color-alert {
-  animation-name: togetherjs-color-alert;
-  animation-iteration-count: infinite;
-}
-#togetherjs-profile-arrow {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  left: 42px;
-  top: 46px;
-  background: url('./images/icn-gear.png');
-  background-size: 12px 12px;
-  background-repeat: no-repeat;
-}
-#togetherjs-pick-color {
-  width: 100px;
-  height: 76px;
-  margin-left: -35px;
-  position: absolute;
-  margin-top: 25px;
-  background-color: #fff;
-  z-index: 10004;
-  border: 1px solid #979797;
-  border-radius: 4px;
-  padding: 5px;
-}
-#togetherjs-pick-color .togetherjs-swatch {
-  cursor: pointer;
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  border: 1px solid;
-  border-radius: 1px;
-  margin: 4px;
-}
-#togetherjs-pick-color .togetherjs-swatch.togetherjs-swatch-active {
-  border: 3px solid;
-  border-radius: 3px;
-}
-#togetherjs-pick-color .togetherjs-swatch:hover {
-  border: 2px solid rgba(0, 0, 0, 0.5);
-  height: 10px;
-  width: 10px;
-  border-radius: 3px;
-}
-.togetherjs-focus {
-  position: absolute;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-  border: 3px solid;
-  margin: -3px;
-}
-.togetherjs-only-mobile {
-  display: none;
-}
-@media screen and (max-device-width: 480px) {
-  /*TogetherJS dock*/
-  #togetherjs-dock.togetherjs-dock-right {
-    top: 0px;
-    width: auto;
-    height: 40px !important;
-    right: 0px;
-    margin: 10px;
-    bottom: 0px;
-  }
-  #togetherjs-dock #togetherjs-dock-anchor {
-    width: 40px;
-    height: 40px;
-    float: right;
-    user-select: all;
-    cursor: default;
-    display: inline;
-  }
-  #togetherjs-dock #togetherjs-buttons {
-    display: inline;
-  }
-  #togetherjs-dock .togetherjs-button {
-    float: right;
-    border-right: 1px solid rgba(0, 0, 0, 0.2);
-    border-top: none;
-    width: 40px;
-    height: 40px;
-    background-size: 30px 30px;
-  }
-  #togetherjs-dock #togetherjs-profile-arrow {
-    display: none;
-  }
-  #togetherjs-dock #togetherjs-dock-anchor-horizontal img {
-    width: 24px;
-    height: 24px;
-    padding: 8px;
-  }
-  .togetherjs-only-mobile {
-    display: block;
-    text-align: center;
-    /*  a.togetherjs-share-link {
-    padding: 6px 111px 6px;
-  }*/
-  }
-  .togetherjs-not-mobile {
-    display: none;
-  }
-  .togetherjs .togetherjs-menu-item {
-    cursor: pointer;
-    margin: 0px -14px 0px;
-    padding: 9px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  }
-  .togetherjs #togetherjs-menu-feedback-button,
-  .togetherjs #togetherjs-menu-update-color-button,
-  .togetherjs #togetherjs-menu-help-button {
-    display: none;
-  }
-  .togetherjs .togetherjs-menu-item img {
-    display: none;
-  }
-  .togetherjs .togetherjs-menu-item:first-child {
-    display: none;
-  }
-  .togetherjs .togetherjs-button .togetherjs-person {
-    margin: 0 0 0 5px;
-  }
-  .togetherjs .togetherjs-person {
-    background-size: 30px 30px;
-    height: 26px;
-    width: 26px;
-  }
-  .togetherjs .togetherjs-person-avatar-swatch {
-    margin-left: 12px;
-  }
-  .togetherjs .togetherjs-window {
-    width: 100%;
-    margin-left: 0;
-    height: 82%;
-    margin-top: 0%;
-    z-index: 10003 !important;
-    top: 20%;
-    left: -2px;
-  }
-  .togetherjs .togetherjs-window #togetherjs-chat-messages {
-    width: 105%;
-  }
-  .togetherjs .togetherjs-window .togetherjs-close {
-    display: none;
-  }
-  .togetherjs .togetherjs-window #togetherjs-chat-messages {
-    height: 62%;
-    top: -37px;
-  }
-  .togetherjs .togetherjs-subtitle {
-    width: 98%;
-    margin: 22px 7px;
-  }
-  .togetherjs #togetherjs-chat-input-box {
-    width: 100%;
-    bottom: 0px;
-    position: fixed;
-  }
-  .togetherjs #togetherjs-chat-input {
-    width: 95%;
-  }
-  .togetherjs .togetherjs-timestamp {
-    padding: 8px 45px 0px 10px;
-  }
-  .togetherjs #togetherjs-rtc-not-supported section.togetherjs-buttons {
-    display: none;
-  }
-  .togetherjs #togetherjs-menu-window section.togetherjs-buttons {
-    display: none;
-  }
-  .togetherjs .togetherjs-modal {
-    width: 94%;
-    margin-left: 1%;
-    height: 94%;
-    margin-top: 1%;
-    top: 0;
-    left: 0;
-  }
-  .togetherjs .togetherjs-window > header {
-    margin: -7px;
-    padding: 10px;
-  }
-  #togetherjs-dock-participants {
-    display: none;
-  }
-  #togetherjs-confirm-end section.togetherjs-buttons {
-    position: fixed;
-    bottom: 0;
-    width: 92%;
-  }
-  #togetherjs-edit-name-window section.togetherjs-buttons {
-    position: fixed;
-    bottom: 0;
-    width: 96%;
-  }
-  input.togetherjs-self-name {
-    padding: 10px;
-    width: 92%;
-    margin-top: 10px;
-  }
-  #togetherjs-avatar-edit section.togetherjs-buttons {
-    position: fixed;
-    bottom: 0;
-    width: 92%;
-  }
-  #togetherjs-avatar-edit .togetherjs-person {
-    margin: 30px auto;
-    float: none;
-  }
-  #togetherjs-avatar-edit #togetherjs-avatar-buttons {
-    float: none;
-    margin: 0 auto;
-  }
-  #togetherjs-window-pointer-right,
-  #togetherjs-window-pointer-left {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    margin-right: -5px;
-    margin-top: -5px;
-    background: #fff;
-    border-right: 1px solid rgba(0, 0, 0, 0.2);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    z-index: 10002;
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-  }
-  #togetherjs-window-pointer-right {
-  }
-  #togetherjs-window-pointer-left {
-  }
-  /*TogetherJS walkthrough*/
-  .togetherjs .togetherjs-modal section {
-    margin: 0px 7px;
-  }
-  #togetherjs-walkthrough-progress {
-    width: 93%;
-    text-align: center;
-    position: static;
-  }
-  .togetherjs-modal-wide section.togetherjs-buttons {
-    width: 93.9%;
-    text-align: center !important;
-    position: absolute;
-    bottom: -17px;
-  }
-  .togetherjs-walkthrough-slide p {
-    margin: 13px auto;
-    width: 100%;
-    font-size: 11px;
-  }
-  .togetherjs .togetherjs-walkthrough-main-image {
-    width: auto;
-    height: auto;
-    background: rgba(216, 216, 216, 0.1);
-    border-radius: 4px;
-    border: 1px solid rgba(151, 151, 151, 0.1);
-    padding: 10px;
-  }
-  .togetherjs .togetherjs-walkthrough-main-image img {
-    width: 50%;
-    height: auto;
-  }
-  .togetherjs #togetherjs-walkthrough-next {
-    cursor: pointer;
-    width: 19px;
-    height: 36px;
-    background-repeat: no-repeat;
-    background-size: 60% 60%;
-    margin-right: 0px;
-    margin-top: 28%;
-    background-image: url('./images/icn-walkthrough-arrow-r.png');
-    float: right;
-  }
-  .togetherjs #togetherjs-walkthrough-previous {
-    cursor: pointer;
-    width: 19px;
-    height: 36px;
-    background-repeat: no-repeat;
-    background-size: 60% 60%;
-    margin-top: 28%;
-    background-image: url('./images/icn-walkthrough-arrow-l.png');
-    float: left;
-    margin-left: 0px;
-  }
-  .togetherjs .togetherjs-modal .togetherjs-share-link {
-    width: 80%;
-    font-size: 14px;
-    padding: 14px;
-    border-radius: 4px;
-    border: 1px solid #cccccc;
-    box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-    font-family: Monaco;
-    margin: 7px 0px;
-  }
-  .togetherjs-walkthrough-sendlink {
-    top: 44%;
-    position: relative;
-    padding: 15px;
-  }
-  .togetherjs section.togetherjs-walkthrough-slide input.togetherjs-self-name {
-    position: absolute;
-    top: 50%;
-    left: 29%;
-    font-size: 14px;
-    padding: 6px 6px 6px;
-    border-radius: 4px 4px 4px 4px;
-    border: 1px solid #cccccc;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
-    font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-    margin: -20px 11px;
-    width: 60%;
-  }
-  .togetherjs section.togetherjs-walkthrough-slide .togetherjs-walkthrough-main-image .togetherjs-walkthrough-avatar-section {
-    margin-top: 15px;
-  }
-  .togetherjs .togetherjs-avatar-preview {
-    margin: 0 auto;
-    float: none;
-  }
-  .togetherjs .togetherjs-avatar-upload-input {
-    margin: 10px auto;
-    float: none;
-  }
-  .togetherjs .togetherjs-avatar-upload-input input {
-    width: 60%;
-  }
-  input.togetherjs-upload-avatar {
-    line-height: 0px;
-    width: 174px;
-    margin-left: 0px;
-  }
-  .togetherjs section.togetherjs-walkthrough-slide input.togetherjs-self-name {
-    float: left;
-    font-size: 14px;
-    padding: 6px 6px 6px;
-    border-radius: 4px 4px 4px 4px;
-    border: 1px solid #cccccc;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1) inset;
-    font-family: var(--togetherjs-font-family, Helvetica, 'Helvetica Neue', Arial, sans-serif);
-    width: 66%;
-    position: static;
-    margin: 10px 10px;
-  }
-  .togetherjs section.togetherjs-walkthrough-slide .togetherjs-swatch {
-    width: 32px;
-    height: 32px;
-    background: none repeat scroll 0% 0% #000000;
-    position: relative;
-    float: right;
-    right: 10px;
-    border-radius: 4px 4px 4px 4px;
-    border: 1px solid #cccccc;
-    top: 10px;
-  }
-  .togetherjs .togetherjs-save-settings {
-    margin-top: 20px;
-    margin-bottom: 0px;
-  }
-}
-@media screen and (max-device-width: 480px) and (min-width: 480px) {
-  .togetherjs-mobile-browser input.togetherjs-self-name {
-    width: 95%;
-    margin-top: 10px;
-  }
-  .togetherjs .togetherjs-window {
-    width: 100%;
-    left: -2px !important;
-    top: 50%;
-  }
-  .togetherjs-mobile-browser #togetherjs-edit-name-window section.togetherjs-buttons {
-    width: 99%;
-  }
-  #togetherjs-confirm-end section.togetherjs-buttons {
-    width: 96.6%;
-    position: absolute;
-    bottom: 0;
-  }
-  #togetherjs-edit-name-window section.togetherjs-buttons {
-    width: 99%;
-  }
-  input.togetherjs-self-name {
-    width: 94%;
-    margin-top: 10px;
-  }
-  #togetherjs-avatar-edit section.togetherjs-buttons {
-    width: 95.3%;
-    bottom: 0;
-    background: #F2F2F2;
-    padding: 10px;
-    text-align: right;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-    border-top: 1px solid #E1E1E1;
-    position: absolute;
-  }
-  .togetherjs-modal {
-    width: 74% !important;
-    height: 50% !important;
-    margin: 20% 12% !important;
-  }
-  .togetherjs-mobile-browser .togetherjs .togetherjs-modal {
-    width: 76% !important;
-    margin-left: 1%;
-    height: 94%;
-    margin-top: 1%;
-    top: 0;
-    left: 0;
-    height: 41%;
-    margin: 20% 11%;
-  }
-  .togetherjs-modal-wide section.togetherjs-buttons {
-    width: 97.4% !important;
-  }
-}
-@media screen and (max-device-width: 480px) and (max-width: 480px) {
-  .togetherjs .togetherjs-window {
-    width: 96%;
-    margin-left: 0;
-    height: 82%;
-    margin-top: 0%;
-    z-index: 10003 !important;
-    top: 20%;
-    left: -2px;
-  }
-  .togetherjs .togetherjs-window #togetherjs-chat-messages {
-    width: 105%;
-  }
-  .togetherjs .togetherjs-window .togetherjs-close {
-    display: none;
-  }
-  .togetherjs .togetherjs-window #togetherjs-chat-messages {
-    height: 62%;
-    top: -37px;
-  }
-  #togetherjs-chat-input-box {
-    width: 94% !important;
-    bottom: 0px;
-    position: fixed;
-  }
-  .togetherjs-timestamp {
-    padding: 8px 15px 0px 10px !important;
-  }
-  input[type='text'],
-  input[type='number'],
-  textarea {
-    font-size: 16px !important;
-  }
-}
-/* We set this class on the <body> element when that last media query won't work
-   but we detect in Javascript that the client should be treated as mobile */
-
-/* Typing indicator.
-   The three dots used to be driven from JS by a setInterval writing opacity
-   on each one (jqueryPlugins.js's animateKeyboard); it is a CSS animation
-   now, toggled by the togetherjs-typing-animating class. */
-.togetherjs .togetherjs-cursor-typing span[class^="togetherjs-typing-ellipse-"] {
-  opacity: 0.5;
+  font-family: var(--tj-font);
+  font-size: var(--tj-font-size);
+  line-height: var(--tj-line-height);
+  color: var(--tj-text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-.togetherjs .togetherjs-typing-animating span[class^="togetherjs-typing-ellipse-"] {
-  animation: togetherjs-typing-dot 1.2s infinite steps(1, end);
-}
-
-.togetherjs .togetherjs-typing-animating .togetherjs-typing-ellipse-two {
-  animation-delay: 0.3s;
-}
-
-.togetherjs .togetherjs-typing-animating .togetherjs-typing-ellipse-three {
-  animation-delay: 0.6s;
-}
-
-@keyframes togetherjs-typing-dot {
-  0% { opacity: 1; }
-  75% { opacity: 1; }
-  100% { opacity: 0.5; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .togetherjs .togetherjs-typing-animating span[class^="togetherjs-typing-ellipse-"] {
-    animation: none;
-    opacity: 1;
-  }
-}
-
-/* ---- Audio and video calling ---- */
-
-/* The camera button reuses the mic button's sprite slots; a distinct "on"
-   state is enough to tell them apart. */
-#togetherjs-video-button {
-  background-image: url("images/button-mic.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  filter: grayscale(1);
-}
-
-#togetherjs-video-button.togetherjs-rtc-on {
-  filter: none;
-  background-color: var(--togetherjs-background-color);
-}
-
-#togetherjs-video {
-  width: 340px;
-}
-
-#togetherjs-video-tiles {
-  display: grid;
-  /* auto-fit keeps one tile full width and packs more in as peers join. */
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 8px;
-}
-
-.togetherjs-video-tile {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  background: #222;
-}
-
-.togetherjs-video-tile video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* The self-preview reads as a mirror, which is what people expect. */
-#togetherjs-video-self video {
-  transform: scaleX(-1);
-}
-
-/* Until a remote track arrives there is nothing to show but the peer's
-   avatar; a black rectangle just looks broken. */
-.togetherjs-video-tile .togetherjs-video-avatar {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-color: #333;
-}
-
-.togetherjs-video-tile.togetherjs-video-live .togetherjs-video-avatar {
-  display: none;
-}
-
-.togetherjs-video-label {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px 6px;
-  font-size: 11px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* The container is only a coordinate space; its children are positioned. */
+#togetherjs-container {
+  position: static;
 }
 
 .togetherjs-hidden {
   display: none !important;
 }
 
-#togetherjs-video-empty {
-  margin-top: 8px;
-  font-size: 12px;
-  opacity: 0.7;
+/* Visible only to assistive technology. */
+.togetherjs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
-.togetherjs-rtc-device-row {
-  margin-top: 8px;
-  font-size: 12px;
+/* One focus treatment for everything, and only for keyboard focus. The
+   original removed outlines outright and put nothing in their place. */
+.togetherjs :focus-visible {
+  outline: 2px solid var(--tj-accent);
+  outline-offset: 2px;
+  border-radius: var(--tj-radius);
 }
 
-.togetherjs-rtc-device-row label {
-  display: block;
-  margin-bottom: 2px;
+/* ======================================================================
+   Buttons
+   ====================================================================== */
+
+.togetherjs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--tj-space) * 0.75);
+  min-height: 32px;
+  padding: 6px 14px;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--tj-duration) var(--tj-ease),
+              border-color var(--tj-duration) var(--tj-ease);
 }
 
-.togetherjs-rtc-device-row select {
+.togetherjs button:hover {
+  background: var(--tj-surface-hover);
+}
+
+.togetherjs button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.togetherjs button:disabled:hover {
+  background: var(--tj-surface);
+}
+
+.togetherjs button.togetherjs-primary {
+  background: var(--tj-accent);
+  border-color: var(--tj-accent);
+  color: var(--tj-accent-text);
+}
+
+.togetherjs button.togetherjs-primary:hover {
+  background: var(--tj-accent-hover);
+  border-color: var(--tj-accent-hover);
+}
+
+.togetherjs button.togetherjs-destructive {
+  background: var(--tj-danger);
+  border-color: var(--tj-danger);
+  color: #fff;
+}
+
+.togetherjs button.togetherjs-destructive:hover {
+  background: color-mix(in oklab, var(--tj-danger) 86%, black);
+}
+
+.togetherjs button.togetherjs-secondary,
+.togetherjs button.togetherjs-default,
+.togetherjs button.togetherjs-cancel {
+  background: var(--tj-surface);
+}
+
+.togetherjs section.togetherjs-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--tj-space);
+  padding: var(--tj-space) calc(var(--tj-space) * 1.5);
+  border-top: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+  border-radius: 0 0 var(--tj-radius-lg) var(--tj-radius-lg);
+}
+
+.togetherjs .togetherjs-alt-text {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+/* ======================================================================
+   The dock
+   ====================================================================== */
+
+#togetherjs-dock {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 1);
+  width: var(--tj-dock-width);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow);
+  overflow: hidden;
+  /* The drag writes inline top/left; these are the fallback anchors for
+     each edge class, and are overridden the moment the dock is moved. */
+  touch-action: none;
+}
+
+#togetherjs-dock.togetherjs-dock-right {
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+}
+
+#togetherjs-dock.togetherjs-dock-left {
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+}
+
+/* Horizontal layouts for the top and bottom edges. The 2013 version had a
+   -bottom class in the JS with no CSS at all behind it, which is part of
+   why the bottom edge was hardcoded unreachable. */
+#togetherjs-dock.togetherjs-dock-top,
+#togetherjs-dock.togetherjs-dock-bottom {
+  width: auto;
+  flex-direction: row;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#togetherjs-dock.togetherjs-dock-top {
+  top: 12px;
+}
+
+#togetherjs-dock.togetherjs-dock-bottom {
+  bottom: 12px;
+}
+
+/* While dragging, the JS sets explicit coordinates; drop the centring
+   translate so the dock follows the pointer exactly. */
+#togetherjs-dock.togetherjs-dock-free {
+  transform: none;
+}
+
+/* The drag handle. It is a real button, so it is reachable by keyboard
+   (arrow keys nudge the dock) and announces itself. */
+#togetherjs-dock-anchor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 2px;
+  border: 0;
+  border-radius: 0;
+  background: var(--tj-surface-sunken);
+  color: var(--tj-text-muted);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+#togetherjs-dock-anchor:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+#togetherjs-dock-anchor:active,
+#togetherjs-dock.togetherjs-dragging #togetherjs-dock-anchor {
+  cursor: grabbing;
+}
+
+#togetherjs-dock-anchor .togetherjs-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* On a vertical dock the grip reads better lying down. */
+#togetherjs-dock.togetherjs-dock-right #togetherjs-dock-anchor .togetherjs-icon,
+#togetherjs-dock.togetherjs-dock-left #togetherjs-dock-anchor .togetherjs-icon,
+#togetherjs-dock.togetherjs-dock-free #togetherjs-dock-anchor .togetherjs-icon {
+  transform: rotate(90deg);
+}
+
+#togetherjs-dock.togetherjs-dragging {
+  box-shadow: var(--tj-shadow-lg);
+  user-select: none;
+}
+
+#togetherjs-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px;
+  gap: 2px;
+}
+
+#togetherjs-dock.togetherjs-dock-top #togetherjs-buttons,
+#togetherjs-dock.togetherjs-dock-bottom #togetherjs-buttons {
+  flex-direction: row;
+}
+
+#togetherjs-buttons .togetherjs-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tj-button-size);
+  height: var(--tj-button-size);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text-muted);
+  cursor: pointer;
+}
+
+#togetherjs-buttons .togetherjs-button:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+/* Active state is the accent fill. Because the icons paint with
+   currentColor, this is all it takes to recolour them -- the old PNGs were
+   baked white, so the only way to change them was to ship another file. */
+#togetherjs-buttons .togetherjs-button.togetherjs-active {
+  background: var(--tj-accent);
+  color: var(--tj-accent-text);
+}
+
+#togetherjs-buttons .togetherjs-button.togetherjs-active:hover {
+  background: var(--tj-accent-hover);
+}
+
+#togetherjs-buttons hr,
+#togetherjs-dock .togetherjs-hr {
+  width: 60%;
+  height: 1px;
+  margin: 4px auto;
+  border: 0;
+  background: var(--tj-border);
+}
+
+#togetherjs-dock-participants {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-participants,
+#togetherjs-dock.togetherjs-dock-bottom #togetherjs-dock-participants {
+  flex-direction: row;
+}
+
+/* An unread-message or incoming-call pulse on a dock button. */
+#togetherjs-buttons .togetherjs-button.togetherjs-color-alert::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-accent);
+  box-shadow: 0 0 0 2px var(--tj-surface);
+  animation: togetherjs-pulse 1.6s var(--tj-ease) infinite;
+}
+
+#togetherjs-profile-button {
+  position: relative;
+}
+
+#togetherjs-profile-arrow {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 3px solid var(--tj-text-muted);
+}
+
+/* ======================================================================
+   People: avatars, names, status
+   ====================================================================== */
+
+.togetherjs .togetherjs-person {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tj-avatar-size);
+  height: var(--tj-avatar-size);
+  border-radius: var(--tj-radius-pill);
+  border: 2px solid var(--tj-border-strong);
+  background-color: var(--tj-surface-sunken);
+  background-size: cover;
+  background-position: center;
+  color: var(--tj-text-muted);
+  overflow: hidden;
+  flex: none;
+}
+
+/* The fallback mark inside an avatar with no picture. Peer identity is also
+   carried by the border colour, but colour alone is not enough, so the
+   abbreviated name sits on top of this where there is room. */
+.togetherjs .togetherjs-person .togetherjs-icon {
+  width: 65%;
+  height: 65%;
+}
+
+.togetherjs .togetherjs-person-small {
+  --tj-avatar-size: 22px;
+}
+
+.togetherjs .togetherjs-person-inactive {
+  opacity: 0.45;
+}
+
+.togetherjs .togetherjs-person-name,
+.togetherjs .togetherjs-person-name-self {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.togetherjs .togetherjs-person-name-abbrev {
+  font-size: var(--tj-font-size-sm);
+  font-weight: 600;
+}
+
+/* A small wedge of the peer's colour on the avatar, so that identity does
+   not rest on the border alone. */
+.togetherjs .togetherjs-person-avatar-swatch {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 5px;
+}
+
+.togetherjs .togetherjs-person-status-overlay {
+  position: relative;
+}
+
+.togetherjs .togetherjs-person-bgcolor-self {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--tj-radius-pill);
+  border: 1px solid var(--tj-border-strong);
+  vertical-align: -2px;
+}
+
+/* ======================================================================
+   Windows (panels anchored to a dock button) and modals
+   ====================================================================== */
+
+.togetherjs .togetherjs-window,
+.togetherjs .togetherjs-modal {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 2);
+  width: var(--tj-panel-width);
+  max-width: calc(100vw - 2 * var(--tj-space));
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow-lg);
+  overflow: hidden;
+}
+
+.togetherjs .togetherjs-modal {
+  z-index: calc(var(--tj-z) + 5);
+  width: 340px;
+}
+
+.togetherjs .togetherjs-modal-wide {
+  width: 420px;
+}
+
+.togetherjs .togetherjs-window > header,
+.togetherjs .togetherjs-modal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tj-space);
+  padding: calc(var(--tj-space) * 1.25) calc(var(--tj-space) * 1.5);
+  border-bottom: 1px solid var(--tj-border);
+  font-size: var(--tj-font-size);
+  font-weight: 600;
+}
+
+.togetherjs .togetherjs-window > section,
+.togetherjs .togetherjs-modal > section {
+  padding: calc(var(--tj-space) * 1.5);
+}
+
+.togetherjs .togetherjs-window > section + section,
+.togetherjs .togetherjs-modal > section + section {
+  padding-top: 0;
+}
+
+.togetherjs .togetherjs-window > section.togetherjs-buttons,
+.togetherjs .togetherjs-modal > section.togetherjs-buttons {
+  padding-top: var(--tj-space);
+}
+
+.togetherjs .togetherjs-window p,
+.togetherjs .togetherjs-modal p {
+  margin: 0 0 var(--tj-space);
+}
+
+.togetherjs .togetherjs-window p:last-child,
+.togetherjs .togetherjs-modal p:last-child {
+  margin-bottom: 0;
+}
+
+.togetherjs .togetherjs-window a,
+.togetherjs .togetherjs-modal a {
+  color: var(--tj-accent);
+}
+
+/* The close button injected into every window header. */
+.togetherjs .togetherjs-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text-muted);
+  cursor: pointer;
+  flex: none;
+}
+
+.togetherjs .togetherjs-close:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+.togetherjs .togetherjs-close .togetherjs-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.togetherjs .togetherjs-subtitle {
+  padding: calc(var(--tj-space) * 0.75) calc(var(--tj-space) * 1.5);
+  border-bottom: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-modal-background {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--tj-z) + 4);
+  background: var(--tj-backdrop);
+}
+
+/* The little wedge that points from a panel back at its dock button. */
+#togetherjs-window-pointer-right,
+#togetherjs-window-pointer-left,
+#togetherjs-window-pointer-top,
+#togetherjs-window-pointer-bottom {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  transform: rotate(45deg);
+}
+
+#togetherjs-window-pointer-right {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+#togetherjs-window-pointer-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+#togetherjs-window-pointer-top {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+#togetherjs-window-pointer-bottom {
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+
+/* ======================================================================
+   Form controls
+   ====================================================================== */
+
+.togetherjs input[type="text"],
+.togetherjs input[type="url"],
+.togetherjs input[type="number"],
+.togetherjs textarea,
+.togetherjs select {
   width: 100%;
-  max-width: 260px;
+  padding: 6px 10px;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+}
+
+.togetherjs input[type="text"]:focus,
+.togetherjs input[type="url"]:focus,
+.togetherjs textarea:focus,
+.togetherjs select:focus {
+  border-color: var(--tj-accent);
+}
+
+.togetherjs label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+.togetherjs .togetherjs-hr,
+.togetherjs .togetherjs-menu-hr-avatar {
+  height: 1px;
+  margin: var(--tj-space) 0;
+  background: var(--tj-border);
+}
+
+.togetherjs .togetherjs-share-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--tj-font-size-sm);
+}
+
+/* ======================================================================
+   The profile menu (and its mobile window twin)
+   ====================================================================== */
+
+.togetherjs .togetherjs-menu {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  min-width: 220px;
+  padding: 4px;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow-lg);
+}
+
+.togetherjs .togetherjs-menu-item {
+  display: flex;
+  align-items: center;
+  /* The shared button rule centres its contents; menu rows are left-aligned
+     lists, so their icons line up down the column. */
+  justify-content: flex-start;
+  gap: calc(var(--tj-space) * 1.25);
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+  text-align: start;
+  cursor: pointer;
+}
+
+.togetherjs button.togetherjs-menu-item:hover {
+  background: var(--tj-surface-hover);
+}
+
+.togetherjs .togetherjs-menu-item .togetherjs-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--tj-text-muted);
+}
+
+.togetherjs .togetherjs-menu-disabled,
+.togetherjs div.togetherjs-menu-item {
+  cursor: default;
+}
+
+#togetherjs-menu-profile {
+  gap: calc(var(--tj-space) * 1.25);
+  font-weight: 600;
+}
+
+#togetherjs-menu-end,
+#togetherjs-menu-end-button {
+  color: var(--tj-danger);
+}
+
+#togetherjs-menu-end .togetherjs-icon,
+#togetherjs-menu-end-button .togetherjs-icon {
+  color: inherit;
+}
+
+#togetherjs-invite-users:empty {
+  display: none;
+}
+
+/* ======================================================================
+   The colour picker
+   ====================================================================== */
+
+#togetherjs-pick-color {
+  min-width: 0;
+  padding: calc(var(--tj-space) * 1.25);
+}
+
+#togetherjs-swatches {
+  display: grid;
+  /* Fixed tracks, not 1fr: the swatches are round, so they must not stretch
+     with the popup. */
+  grid-template-columns: repeat(6, 26px);
+  gap: 6px;
+}
+
+.togetherjs .togetherjs-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+  min-height: 0;
+  border: 2px solid transparent;
+  border-radius: var(--tj-radius-pill);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+  cursor: pointer;
+}
+
+.togetherjs .togetherjs-swatch:hover {
+  transform: scale(1.1);
+}
+
+/* The selected swatch gets a ring *and* a tick, so the choice is not
+   carried by colour alone. */
+.togetherjs .togetherjs-swatch-active {
+  border-color: var(--tj-text);
+}
+
+/* The tick lives in the markup; it is simply revealed when selected, and
+   blend mode keeps it legible on a swatch of any lightness. */
+.togetherjs .togetherjs-swatch .togetherjs-icon {
+  width: 14px;
+  height: 14px;
+  margin: auto;
+  color: #fff;
+  mix-blend-mode: difference;
+  visibility: hidden;
+}
+
+.togetherjs .togetherjs-swatch-active .togetherjs-icon {
+  visibility: visible;
+}
+
+#togetherjs-custom-color-row {
+  display: flex;
+  align-items: center;
+  gap: var(--tj-space);
+  margin-top: calc(var(--tj-space) * 1.25);
+  padding-top: calc(var(--tj-space) * 1.25);
+  border-top: 1px solid var(--tj-border);
+}
+
+#togetherjs-custom-color-row label {
+  flex: 1;
+  margin: 0;
+  color: var(--tj-text);
+  font-size: var(--tj-font-size-sm);
+}
+
+/* The native picker, trimmed to look like one more swatch. It brings the
+   platform's own eyedropper and works on touch, which a hand-rolled wheel
+   would not. */
+.togetherjs input[type="color"] {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius-pill);
+  background: none;
+  cursor: pointer;
+  flex: none;
+}
+
+.togetherjs input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.togetherjs input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--tj-radius-pill);
+}
+
+.togetherjs input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: var(--tj-radius-pill);
+}
+
+/* ======================================================================
+   Chat
+   ====================================================================== */
+
+#togetherjs-chat {
+  display: flex;
+  flex-direction: column;
+  max-height: min(70vh, 460px);
+}
+
+#togetherjs-chat-messages {
+  flex: 1;
+  min-height: 120px;
+  padding: var(--tj-space) 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.togetherjs .togetherjs-chat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tj-space);
+  padding: 5px calc(var(--tj-space) * 1.5);
+}
+
+.togetherjs .togetherjs-chat-item .togetherjs-person {
+  --tj-avatar-size: 24px;
+  margin-top: 1px;
+}
+
+.togetherjs .togetherjs-chat-content {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.togetherjs .togetherjs-chat-item .togetherjs-person-name {
+  margin-right: 4px;
+}
+
+.togetherjs .togetherjs-timestamp {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+.togetherjs .togetherjs-chat-join-item,
+.togetherjs .togetherjs-chat-left-item,
+.togetherjs .togetherjs-chat-url-change {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-chat-input-box {
+  padding: var(--tj-space) calc(var(--tj-space) * 1.5);
+  border-top: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+}
+
+#togetherjs-chat-input {
+  min-height: 34px;
+  max-height: 120px;
+  resize: none;
+  overflow-y: auto;
+}
+
+/* Hints that there is more above or below the visible chat. */
+.togetherjs .togetherjs-scrolled-above::before,
+.togetherjs .togetherjs-scrolled-below::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--tj-border);
+}
+
+/* ======================================================================
+   Notifications
+   ====================================================================== */
+
+.togetherjs .togetherjs-notification {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  width: 300px;
+  padding: calc(var(--tj-space) * 1.25);
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-left: 3px solid var(--tj-accent);
+  border-radius: var(--tj-radius);
+  box-shadow: var(--tj-shadow-lg);
+  cursor: pointer;
+}
+
+.togetherjs .togetherjs-notification-closebtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.togetherjs .togetherjs-notification-logo {
+  display: none;
+}
+
+/* ======================================================================
+   Video
+   ====================================================================== */
+
+#togetherjs-video-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: var(--tj-space);
+}
+
+.togetherjs .togetherjs-video-tile {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface-sunken);
+  border: 1px solid var(--tj-border);
+  overflow: hidden;
+}
+
+.togetherjs .togetherjs-video-tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Self-view is mirrored, which is what people expect of their own image. */
+}
+
+#togetherjs-video-self video {
+  transform: scaleX(-1);
+}
+
+/* Until a track arrives the tile shows the peer's avatar instead of black. */
+.togetherjs .togetherjs-video-tile:not(.togetherjs-video-live) video {
+  display: none;
+}
+
+.togetherjs .togetherjs-video-avatar {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.togetherjs .togetherjs-video-live .togetherjs-video-avatar {
+  display: none;
+}
+
+.togetherjs .togetherjs-video-label {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+  color: #fff;
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-video-empty {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+  text-align: center;
+}
+
+.togetherjs .togetherjs-rtc-device-row {
+  margin-bottom: var(--tj-space);
+}
+
+/* ======================================================================
+   Cursors, clicks and focus rings drawn on the host page
+   ====================================================================== */
+
+.togetherjs-cursor {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  pointer-events: none;
+  transition: top var(--tj-duration) linear, left var(--tj-duration) linear;
+}
+
+.togetherjs-cursor svg {
+  width: 15px;
+  height: 23px;
+  display: block;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.35));
+}
+
+.togetherjs-cursor .togetherjs-cursor-container {
+  position: absolute;
+  top: 14px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.togetherjs-cursor .togetherjs-cursor-name {
+  padding: 1px 6px;
+  border-radius: var(--tj-radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.togetherjs-cursor .togetherjs-cursor-typing {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px 6px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-surface);
+  box-shadow: var(--tj-shadow);
+}
+
+.togetherjs-cursor .togetherjs-cursor-typing span {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-text-muted);
+}
+
+.togetherjs-cursor .togetherjs-typing-animating span {
+  animation: togetherjs-typing 1.2s var(--tj-ease) infinite;
+}
+
+.togetherjs-cursor .togetherjs-typing-ellipse-two {
+  animation-delay: 0.15s;
+}
+
+.togetherjs-cursor .togetherjs-typing-ellipse-three {
+  animation-delay: 0.3s;
+}
+
+.togetherjs-click {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 2px solid var(--tj-accent);
+  border-radius: var(--tj-radius-pill);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.togetherjs-clicking {
+  animation: togetherjs-click 0.6s var(--tj-ease) 1;
+}
+
+.togetherjs-focus {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  border: 2px solid;
+  border-radius: var(--tj-radius);
+  pointer-events: none;
+}
+
+/* ======================================================================
+   Tooltips
+   ====================================================================== */
+
+.togetherjs .togetherjs-tooltip {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border-radius: var(--tj-radius);
+  background: var(--tj-text);
+  color: var(--tj-surface);
+  font-size: var(--tj-font-size-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--tj-duration) var(--tj-ease);
+}
+
+.togetherjs .togetherjs-dock-person:hover > .togetherjs-tooltip,
+.togetherjs .togetherjs-dock-person:focus-visible > .togetherjs-tooltip {
+  opacity: 1;
+}
+
+.togetherjs .togetherjs-person-tooltip-arrow-r {
+  display: none;
+}
+
+/* ======================================================================
+   Animation
+   ====================================================================== */
+
+@keyframes togetherjs-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes togetherjs-typing {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%           { opacity: 1; }
+}
+
+@keyframes togetherjs-click {
+  from { opacity: 1; transform: scale(0.4); }
+  to   { opacity: 0; transform: scale(1.3); }
+}
+
+@keyframes togetherjs-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.togetherjs .togetherjs-animated {
+  animation: togetherjs-fade-in var(--tj-duration) var(--tj-ease);
+}
+
+/* Every animation in this file is decorative. The original guarded exactly
+   one of four, and left an infinite pulse running on an incoming call. */
+@media (prefers-reduced-motion: reduce) {
+  .togetherjs,
+  .togetherjs *,
+  .togetherjs-cursor,
+  .togetherjs-cursor *,
+  .togetherjs-click {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ======================================================================
+   Narrow viewports
+   The original keyed off `max-device-width`, which measures the physical
+   screen rather than the viewport, so a narrow window on a desktop never
+   matched and a large phone in landscape matched when it should not.
+   ====================================================================== */
+
+.togetherjs .togetherjs-only-mobile { display: none; }
+.togetherjs .togetherjs-not-mobile { display: initial; }
+
+@media (max-width: 560px) {
+  .togetherjs .togetherjs-only-mobile { display: initial; }
+  .togetherjs .togetherjs-not-mobile { display: none; }
+
+  #togetherjs-dock,
+  #togetherjs-dock.togetherjs-dock-right,
+  #togetherjs-dock.togetherjs-dock-left,
+  #togetherjs-dock.togetherjs-dock-top,
+  #togetherjs-dock.togetherjs-dock-bottom,
+  #togetherjs-dock.togetherjs-dock-free {
+    /* One predictable place on a small screen, whatever was dragged. */
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    flex-direction: row;
+    border-radius: 0;
+    border-width: 1px 0 0 0;
+    transform: none;
+  }
+
+  #togetherjs-dock #togetherjs-buttons {
+    flex-direction: row;
+    justify-content: center;
+    flex: 1;
+  }
+
+  /* There is nowhere to drag to, so hide the handle rather than offer it. */
+  #togetherjs-dock-anchor {
+    display: none;
+  }
+
+  .togetherjs .togetherjs-window,
+  .togetherjs .togetherjs-menu {
+    left: var(--tj-space) !important;
+    right: var(--tj-space);
+    bottom: calc(var(--tj-button-size) + 3 * var(--tj-space)) !important;
+    top: auto !important;
+    width: auto;
+  }
+
+  .togetherjs .togetherjs-modal {
+    left: var(--tj-space) !important;
+    right: var(--tj-space);
+    width: auto;
+  }
+
+  #togetherjs-window-pointer-right,
+  #togetherjs-window-pointer-left,
+  #togetherjs-window-pointer-top,
+  #togetherjs-window-pointer-bottom {
+    display: none !important;
+  }
+}
+
+/* ======================================================================
+   Right-to-left
+   ====================================================================== */
+
+.togetherjs:dir(rtl) .togetherjs-tooltip {
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.togetherjs:dir(rtl) .togetherjs-menu-item {
+  text-align: start;
 }

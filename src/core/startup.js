@@ -7,7 +7,6 @@
 
  - Introduce the session when you've been invited
  - Show any browser compatibility indicators
- - Show the walkthrough the first time
  - Show the share link window
 
  When everything is done it fires session.emit("startup-ready")
@@ -29,7 +28,6 @@ var STEPS = [
   "browserBroken",
   "browserUnsupported",
   "sessionIntro",
-  "walkthrough",
   // Look in the share() below if you add anything after here:
   "share"
   ];
@@ -93,20 +91,6 @@ var handlers = {
       cancelled = true;
       windowing.hide();
       session.close("declined-join");
-    });
-  },
-
-  walkthrough: function (next) {
-    storage.settings.get("seenIntroDialog").then(function (seenIntroDialog) {
-      if (seenIntroDialog) {
-        next();
-        return;
-      }
-      var walkthrough = need("walkthrough");
-      walkthrough.start(true, function () {
-        storage.settings.set("seenIntroDialog", true);
-        next();
-      });
     });
   },
 

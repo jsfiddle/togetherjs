@@ -92,8 +92,11 @@ var defaultConfiguration = {
   fallbackLang: "en-US",
   // Overrides the UI's font-family; accepts any CSS font-family value,
   // including a reference to a CSS custom property already defined on
-  // the host page (e.g. "var(--font-base)")
+  // the host page (e.g. "var(--font-base)"). The UI inherits the host
+  // page's font when this is unset.
   baseFont: null,
+  // "light", "dark", or "auto" to follow the operating system's setting.
+  theme: "auto",
 };
 
 // Substituted by build/build.mjs.
