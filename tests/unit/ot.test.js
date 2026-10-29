@@ -46,29 +46,29 @@ class SerializingHub {
 }
 
 function makeClient(id, hub, text) {
-  const client = { id, history: ot.SimpleHistory(id, text, 1) };
+  const client = { id, history: new ot.SimpleHistory(id, text, 1) };
   hub.add(client);
   return client;
 }
 
 describe("ot.SimpleHistory", () => {
   it("tracks local edits in its current state", () => {
-    const history = ot.SimpleHistory("client1", "hello", 1);
-    history.add(ot.TextReplace(5, 0, " world"));
+    const history = new ot.SimpleHistory("client1", "hello", 1);
+    history.add(new ot.TextReplace(5, 0, " world"));
     expect(history.current).toBe("hello world");
   });
 
   it("reports a selection round-trip", () => {
-    const history = ot.SimpleHistory("client1", "hello world", 1);
+    const history = new ot.SimpleHistory("client1", "hello world", 1);
     history.setSelection([2, 5]);
     expect(history.getSelection()).toEqual([2, 5]);
   });
 
   it("ignores a change whose basis does not match", () => {
-    const history = ot.SimpleHistory("client1", "hello", 1);
+    const history = new ot.SimpleHistory("client1", "hello", 1);
     const changed = history.commit({
       id: "other.1",
-      delta: ot.TextReplace(0, 0, "X"),
+      delta: new ot.TextReplace(0, 0, "X"),
       basis: 99,
     });
     expect(changed).toBe(false);

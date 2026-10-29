@@ -68,14 +68,20 @@ elementFinder.elementLocation = function elementLocation(el) {
   return parentLocation + ":nth-child(" + (index+1) + ")";
 };
 
-elementFinder.CannotFind = util.Class({
-  constructor: function CannotFind(location, reason, context) {
+/* Thrown by findElement() and friends when a location cannot be resolved.
+   An Error subclass so that it carries a stack: these are caught by
+   `instanceof` in several places and the stack is what says which caller
+   asked for an element that is not there. */
+elementFinder.CannotFind = class CannotFind extends Error {
+  constructor(location, reason, context) {
+    super("[CannotFind (" + location + "): " + reason + "]");
+    this.name = "CannotFind";
     this.prefix = "";
     this.location = location;
     this.reason = reason;
     this.context = context;
-  },
-  toString: function () {
+  }
+  toString() {
     var loc;
     try {
       loc = elementFinder.elementLocation(this.context);
@@ -88,7 +94,7 @@ elementFinder.CannotFind = util.Class({
         this.reason + " in " +
         loc + "]");
   }
-});
+};
 
 elementFinder.findElement = function findElement(loc, container) {
   // FIXME: should this all just be done with document.querySelector()?
@@ -134,7 +140,7 @@ elementFinder.findElement = function findElement(loc, container) {
     }
     el = document.getElementById(id);
     if (! el) {
-      throw elementFinder.CannotFind("#" + id, "No element by that id", container);
+      throw new elementFinder.CannotFind("#" + id, "No element by that id", container);
     }
     if (rest) {
       try {
@@ -174,7 +180,7 @@ elementFinder.findElement = function findElement(loc, container) {
       }
     }
     if (! el) {
-      throw elementFinder.CannotFind(":nth-child(" + num + ")", "container only has " + (num - count) + " elements", container);
+      throw new elementFinder.CannotFind(":nth-child(" + num + ")", "container only has " + (num - count) + " elements", container);
     }
     if (loc) {
       try {
@@ -189,7 +195,7 @@ elementFinder.findElement = function findElement(loc, container) {
       return el;
     }
   } else {
-    throw elementFinder.CannotFind(loc, "Malformed location", container);
+    throw new elementFinder.CannotFind(loc, "Malformed location", container);
   }
 };
 

@@ -26,12 +26,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9.17.0",
     "globals": "^15.14.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.4.2",
-    "vitest": "^3.2.4",
+    "vitest": "^5.0.5",
     "ws": "^8.21.3"
   },
   "engines": {

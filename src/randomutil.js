@@ -1,32 +1,46 @@
-import util from "./core/util.js";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* Seeded random value generation, used by the OT tests to replay a fixed
+   sequence of edits. */
+
 import RandomStream from "./vendor/whrandom/random.js";
 
+var LOWER = "abcdefghijklmnopqrstuvwxyz";
+var UPPER = LOWER.toUpperCase();
+var NUMBERS = "0123456789";
+var WHITESPACE = " \t\n";
+var PUNCTUATION = "~`!@#$%^&*()_-+={}[]|\;:'\"<>,./?";
 
-var Randomizer = util.Class({
-  constructor: function (seed) {
+class Randomizer {
+  constructor(seed) {
     this.stream = RandomStream(seed);
-  },
-  number: function (max) {
+  }
+
+  number(max) {
     return Math.floor(this.stream() * max);
-  },
-  pick: function (seq) {
+  }
+
+  pick(seq) {
     return seq[this.number(seq.length)];
-  },
-  pickDist: function (items) {
+  }
+
+  pickDist(items) {
     var total = 0;
     for (var a in items) {
-      if (! items.hasOwnProperty(a)) {
+      if (!Object.prototype.hasOwnProperty.call(items, a)) {
         continue;
       }
       if (typeof items[a] != "number") {
-        throw "Bad property: " + a + " not a number";
+        throw new Error("Bad property: " + a + " not a number");
       }
       total += items[a];
     }
     var num = this.number(total);
     var last;
     for (a in items) {
-      if (! items.hasOwnProperty(a)) {
+      if (!Object.prototype.hasOwnProperty.call(items, a)) {
         continue;
       }
       last = a;
@@ -35,30 +49,31 @@ var Randomizer = util.Class({
       }
       num -= items[a];
     }
-    // FIXME: not sure if this should ever h
     return last;
-  },
-  string: function (len, chars) {
+  }
+
+  string(len, chars) {
     var s = "";
-    for (var i=0; i<len; i++) {
+    for (var i = 0; i < len; i++) {
       s += this.character(chars);
     }
     return s;
-  },
-  character: function (chars) {
+  }
+
+  character(chars) {
     chars = chars || this.defaultChars;
     return chars.charAt(this.number(chars.length));
   }
-});
+}
 
-Randomizer.prototype.lower = "abcdefghijklmnopqrstuvwxyz";
-Randomizer.prototype.upper = Randomizer.prototype.lower.toUpperCase();
-Randomizer.prototype.numberCharacters = "0123456789";
-Randomizer.prototype.whitespace = " \t\n";
-Randomizer.prototype.punctuation = "~`!@#$%^&*()_-+={}[]|\\;:'\"<>,./?";
-Randomizer.prototype.defaultChars =
-    Randomizer.prototype.lower + Randomizer.prototype.upper +
-    Randomizer.prototype.numberCharacters + Randomizer.prototype.whitespace +
-    Randomizer.prototype.punctuation;
+/* These stay on the prototype rather than becoming class fields: callers
+   override one on an instance (the OT tests narrow defaultChars) and read the
+   rest back off the class, which per-instance fields would not allow. */
+Randomizer.prototype.lower = LOWER;
+Randomizer.prototype.upper = UPPER;
+Randomizer.prototype.numberCharacters = NUMBERS;
+Randomizer.prototype.whitespace = WHITESPACE;
+Randomizer.prototype.punctuation = PUNCTUATION;
+Randomizer.prototype.defaultChars = LOWER + UPPER + NUMBERS + WHITESPACE + PUNCTUATION;
 
 export default Randomizer;

@@ -8,6 +8,7 @@ import util from "./util.js";
 import channels from "./channels.js";
 import $ from "../dom/dom.js";
 import storage from "./storage.js";
+import { mixinEvents } from "./events.js";
 
 
 var DEBUG = true;
@@ -16,7 +17,7 @@ var DEBUG = true;
 // for us to respect a URL change:
 var HELLO_BACK_CUTOFF = 1500;
 
-var session = util.mixinEvents(util.Module("session"));
+var session = mixinEvents(util.Module("session"));
 var assert = util.assert;
 
 // We will load this module later (there's a circular import):
@@ -26,7 +27,6 @@ var peers;
 session.shareId = null;
 // This is the ID that identifies this client:
 session.clientId = null;
-session.router = channels.Router();
 // Indicates if TogetherJS has just started (not continuing from a saved session):
 session.firstRun = false;
 
@@ -91,7 +91,7 @@ session.currentUrl = function () {
  * Message handling/dispatching
  */
 
-session.hub = util.mixinEvents({});
+session.hub = mixinEvents({});
 
 var _ignoreMessages = null;
 function ignoreMessage(type) {
@@ -115,7 +115,7 @@ var readyForMessages = false;
 function openChannel() {
   assert(! channel, "Attempt to re-open channel");
   console.info("Connecting to", session.hubUrl(), location.href);
-  var c = channels.WebSocketChannel(session.hubUrl());
+  var c = new channels.WebSocketChannel(session.hubUrl());
   c.onmessage = function (msg) {
     if (! readyForMessages) {
       if (DEBUG) {
@@ -161,7 +161,6 @@ function openChannel() {
     TogetherJS._onmessage(msg);
   };
   channel = c;
-  session.router.bindChannel(channel);
 }
 
 session.send = function (msg) {

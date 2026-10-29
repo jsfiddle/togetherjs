@@ -7,7 +7,7 @@ import ot from "../../src/sync/ot.js";
 import Randomizer from "../../src/randomutil.js";
 
 function r(start, length, text) {
-  return ot.TextReplace(start, length, text);
+  return new ot.TextReplace(start, length, text);
 }
 
 describe("TextReplace.apply", () => {

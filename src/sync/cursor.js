@@ -27,6 +27,9 @@ var CURSOR_WIDTH = Math.ceil(Math.sin(CURSOR_ANGLE) * CURSOR_HEIGHT);
 // Number of milliseconds after page load in which a scroll-update
 // related hello-back message will be processed:
 var SCROLL_UPDATE_CUTOFF = 2000;
+// How long after receiving a setKeydown call we should keep showing the user
+// as typing. Must be more than MIN_KEYDOWN_TIME, below.
+var KEYDOWN_WAIT_TIME = 2000;
 
 session.hub.on("cursor-update", function (msg) {
   if (msg.sameUrl) {
@@ -39,9 +42,9 @@ session.hub.on("cursor-update", function (msg) {
 });
 
 // FIXME: should check for a peer leaving and remove the cursor object
-var Cursor = util.Class({
+class Cursor {
 
-  constructor: function (clientId) {
+  constructor(clientId) {
     this.clientId = clientId;
     this.element = templating.clone("cursor");
     this.elementClass = "togetherjs-scrolled-normal";
@@ -53,13 +56,9 @@ var Cursor = util.Class({
     this.keydownTimeout = null;
     this.clearKeydown = this.clearKeydown.bind(this);
     this.atOtherUrl = false;
-  },
+  }
 
-  // How long after receiving a setKeydown call that we should show the
-  // user typing.  This should be more than MIN_KEYDOWN_TIME:
-  KEYDOWN_WAIT_TIME: 2000,
-
-  updatePeer: function (peer) {
+  updatePeer(peer) {
     // FIXME: can I use peer.setElement()?
     this.element.css({color: peer.color});
     var img = this.element.find("img.togetherjs-cursor-img");
@@ -100,16 +99,16 @@ var Cursor = util.Class({
         opacity:1
       });
     }
-  },
+  }
 
-  setClass: function (name) {
+  setClass(name) {
     if (name != this.elementClass) {
       this.element.removeClass(this.elementClass).addClass(name);
       this.elementClass = name;
     }
-  },
+  }
 
-  updatePosition: function (pos) {
+  updatePosition(pos) {
     var top, left;
     if (this.atOtherUrl) {
       this.element.show();
@@ -129,19 +128,19 @@ var Cursor = util.Class({
     this.lastTop = top;
     this.lastLeft = left;
     this.setPosition(top, left);
-  },
+  }
 
-  hideOtherUrl: function () {
+  hideOtherUrl() {
     if (this.atOtherUrl) {
       return;
     }
     this.atOtherUrl = true;
     // FIXME: should show away status better:
     this.element.hide();
-  },
+  }
 
 
-  setPosition: function (top, left) {
+  setPosition(top, left) {
     var wTop = $(window).scrollTop();
     var height = $(window).height();
 
@@ -160,40 +159,41 @@ var Cursor = util.Class({
       top: top,
       left: left
     });
-  },
+  }
 
-  refresh: function () {
+  refresh() {
     if (this.lastTop !== null) {
       this.setPosition(this.lastTop, this.lastLeft);
     }
-  },
+  }
 
-  setKeydown: function () {
+  setKeydown() {
     if (this.keydownTimeout) {
       clearTimeout(this.keydownTimeout);
     } else {
       animateKeyboard(this.element.find(".togetherjs-cursor-typing").show());
     }
-    this.keydownTimeout = setTimeout(this.clearKeydown, this.KEYDOWN_WAIT_TIME);
-  },
+    this.keydownTimeout = setTimeout(this.clearKeydown, KEYDOWN_WAIT_TIME);
+  }
 
-  clearKeydown: function () {
+  clearKeydown() {
     this.keydownTimeout = null;
     stopKeyboardAnimation(this.element.find(".togetherjs-cursor-typing").hide());
-  },
+  }
 
-  _destroy: function () {
+  _destroy() {
     this.element.remove();
     this.element = null;
   }
-});
+};
+
 
 Cursor._cursors = {};
 
 cursor.getClient = Cursor.getClient = function (clientId) {
   var c = Cursor._cursors[clientId];
   if (! c) {
-    c = Cursor._cursors[clientId] = Cursor(clientId);
+    c = Cursor._cursors[clientId] = new Cursor(clientId);
   }
   return c;
 };

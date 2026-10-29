@@ -7,43 +7,13 @@ import util from "./util.js";
 
 var console = window.console || {log: function () {}};
 
-var Console = util.Class({
-  constructor: function () {
+class Console {
+  constructor() {
     this.messages = [];
     this.level = this.levels.log;
-  },
+  }
 
-  messageLimit: 100,
-
-  levels: {
-    debug: 1,
-    // FIXME: I'm considering *not* wrapping console.log, and strictly keeping
-    // it as a debugging tool; also line numbers would be preserved
-    log: 2,
-    info: 3,
-    notify: 4,
-    warn: 5,
-    error: 6,
-    fatal: 7
-  },
-
-  // Gets set below:
-  maxLevel: 0,
-
-  consoleLevels: [
-    [],
-    console.debug || [],
-    console.log || [],
-    console.info || [],
-    console.notify || [],
-    console.warn || [],
-    console.error || [],
-    console.fatal || []
-  ],
-
-  levelNames: {},
-
-  setLevel: function (l) {
+  setLevel(l) {
     var number;
     if (typeof l == "string") {
       number = this.levels[l];
@@ -67,9 +37,9 @@ var Console = util.Class({
       }
     }
     this.level = l;
-  },
+  }
 
-  write: function (level) {
+  write(level) {
     try {
       this.messages.push([
         Date.now(),
@@ -86,13 +56,13 @@ var Console = util.Class({
       }
       method.apply(console, Array.prototype.slice.call(arguments, 1));
     }
-  },
+  }
 
-  suppressedWrite: function () {
+  suppressedWrite() {
     this.write.apply(this, ["suppress"].concat(Array.prototype.slice.call(arguments)));
-  },
+  }
 
-  trace: function (level) {
+  trace(level) {
     level = level || 'log';
     if (console.trace) {
       level = "suppressedWrite";
@@ -108,9 +78,9 @@ var Console = util.Class({
     if (console.trace) {
       console.trace();
     }
-  },
+  }
 
-  _browserInfo: function () {
+  _browserInfo() {
     // FIXME: add TogetherJS version and
     return [
       "TogetherJS base URL: " + TogetherJS.baseUrl,
@@ -122,9 +92,9 @@ var Console = util.Class({
       "URL: " + location.href,
       "------+------+----------------------------------------------"
     ];
-  },
+  }
 
-  _stringify: function (args) {
+  _stringify(args) {
     var s = "";
     for (var i=0; i<args.length; i++) {
       if (s) {
@@ -133,9 +103,9 @@ var Console = util.Class({
       s += this._stringifyItem(args[i]);
     }
     return s;
-  },
+  }
 
-  _stringifyItem: function (item) {
+  _stringifyItem(item) {
     if (typeof item == "string") {
       if (item === "") {
         return '""';
@@ -154,17 +124,17 @@ var Console = util.Class({
       item = JSON.stringify(item);
     }
     return item.toString();
-  },
+  }
 
-  _formatDate: function (timestamp) {
+  _formatDate(timestamp) {
     return (new Date(timestamp)).toISOString();
-  },
+  }
 
-  _formatTime: function (timestamp) {
+  _formatTime(timestamp) {
     return ((timestamp - TogetherJS.pageLoaded) / 1000).toFixed(2);
-  },
+  }
 
-  _formatMinutes: function (milliseconds) {
+  _formatMinutes(milliseconds) {
     var m = Math.floor(milliseconds / 1000 / 60);
     var remaining = milliseconds - (m * 1000 * 60);
     if (m > 10) {
@@ -179,16 +149,16 @@ var Console = util.Class({
       m += ((remaining / 1000).toFixed(3) + "").substr(1);
     }
     return m;
-  },
+  }
 
-  _formatLevel: function (l) {
+  _formatLevel(l) {
     if (l === "suppress") {
       return "";
     }
     return this.levelNames[l];
-  },
+  }
 
-  toString: function () {
+  toString() {
     try {
       var lines = this._browserInfo();
       this.messages.forEach(function (m) {
@@ -200,31 +170,9 @@ var Console = util.Class({
       console.warn("Error running console.toString():", e);
       throw e;
     }
-  },
-
-  submit: function (options) {
-    // FIXME: friendpaste is broken for this
-    // (and other pastebin sites aren't really Browser-accessible)
-    return util.Deferred(function (def) {
-      options = options || {};
-      var site = options.site || TogetherJS.config.get("pasteSite") || "https://www.friendpaste.com/";
-      var req = new XMLHttpRequest();
-      req.open("POST", site);
-      req.setRequestHeader("Content-Type", "application/json");
-      req.send(JSON.stringify({
-        "title": options.title || "TogetherJS log file",
-        "snippet": this.toString(),
-        "language": "text"
-      }));
-      req.onreadystatechange = function () {
-        if (req.readyState === 4) {
-          var data = JSON.parse(req.responseText);
-        }
-      };
-    });
   }
+};
 
-});
 
 function rpad(s, len, pad) {
   s = s + "";
@@ -264,6 +212,39 @@ function lpadLines(s, len, pad) {
 
 
 
+/* These live on the prototype rather than as class fields: they are shared
+   constants, and the loop below both reads `levels` back off the class and
+   fills in `levelNames` and `maxLevel` in place. Per-instance fields would
+   give every Console its own copy and leave the prototype's empty. */
+Console.prototype.messageLimit = 100;
+
+Console.prototype.levels = {
+  debug: 1,
+  // FIXME: I'm considering *not* wrapping console.log, and strictly keeping
+  // it as a debugging tool; also line numbers would be preserved
+  log: 2,
+  info: 3,
+  notify: 4,
+  warn: 5,
+  error: 6,
+  fatal: 7
+};
+
+Console.prototype.consoleLevels = [
+  [],
+  console.debug || [],
+  console.log || [],
+  console.info || [],
+  console.notify || [],
+  console.warn || [],
+  console.error || [],
+  console.fatal || []
+];
+
+// Both filled in by the loops below:
+Console.prototype.maxLevel = 0;
+Console.prototype.levelNames = {};
+
 // This is a factory that creates `Console.prototype.debug`, `.error` etc:
 function logFunction(name, level) {
   return function () {
@@ -280,7 +261,7 @@ util.forEachAttr(Console.prototype.levels, function (value, name) {
   Console.prototype.levelNames[value] = name;
 });
 
-var appConsole = Console();
+var appConsole = new Console();
 
 appConsole.ConsoleClass = Console;
 

@@ -74,59 +74,6 @@ util.Deferred = function Deferred(initializer) {
 
 TogetherJS.$ = $;
 
-/* A simple class pattern, use like:
-
-  var Foo = util.Class({
-    constructor: function (a, b) {
-      init the class
-    },
-    otherMethod: ...
-  });
-
-You can also give a superclass as the optional first argument.
-
-Instantiation does not require "new"
-
-*/
-util.Class = function (superClass, prototype) {
-  var a;
-  if (prototype === undefined) {
-    prototype = superClass;
-  } else {
-    if (superClass.prototype) {
-      superClass = superClass.prototype;
-    }
-    var newPrototype = Object.create(superClass);
-    for (a in prototype) {
-      if (prototype.hasOwnProperty(a)) {
-        newPrototype[a] = prototype[a];
-      }
-    }
-    prototype = newPrototype;
-  }
-  var ClassObject = function () {
-    var obj = Object.create(prototype);
-    obj.constructor.apply(obj, arguments);
-    obj.constructor = ClassObject;
-    return obj;
-  };
-  ClassObject.prototype = prototype;
-  if (prototype.constructor.name) {
-    ClassObject.className = prototype.constructor.name;
-    ClassObject.toString = function () {
-      return '[Class ' + this.className + ']';
-    };
-  }
-  if (prototype.classMethods) {
-    for (a in prototype.classMethods) {
-      if (prototype.classMethods.hasOwnProperty(a)) {
-        ClassObject[a] = prototype.classMethods[a];
-      }
-    }
-  }
-  return ClassObject;
-};
-
 /* Extends obj with other, or copies obj if no other is given. */
 util.extend = TogetherJS._extend;
 
@@ -149,14 +96,12 @@ util.safeClassName = function safeClassName(name) {
   return name.replace(/[^a-zA-Z0-9_\-]/g, "_") || "class";
 };
 
-util.AssertionError = function (message) {
-  if (! this instanceof util.AssertionError) {
-    return new util.AssertionError(message);
+util.AssertionError = class AssertionError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AssertionError";
   }
-  this.message = message;
-  this.name = "AssertionError";
 };
-util.AssertionError.prototype = Error.prototype;
 
 util.assert = function (cond) {
   if (! cond) {
@@ -184,16 +129,16 @@ util.pickRandom = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
 
-util.mixinEvents = TogetherJS._mixinEvents;
-
-util.Module = util.Class({
-  constructor: function (name) {
-    this._name = name;
-  },
-  toString: function () {
-    return '[Module ' + this._name + ']';
-  }
-});
+/* A named namespace object for a module's exports. The name is only used in
+   logging and assertion messages. */
+util.Module = function Module(name) {
+  return {
+    _name: name,
+    toString: function () {
+      return "[Module " + name + "]";
+    }
+  };
+};
 
 util.blobToBase64 = function (blob) {
   // Oh this is just terrible

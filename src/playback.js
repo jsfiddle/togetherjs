@@ -66,17 +66,17 @@ function parseLogs(logs) {
     line = JSON.parse(line);
     result.push(line);
   }
-  return Logs(result);
+  return new Logs(result);
 }
 
-var Logs = util.Class({
-  constructor: function (logs, fromStorage) {
+class Logs {
+  constructor(logs, fromStorage) {
     this.logs = logs;
     this.fromStorage = fromStorage;
     this.pos = 0;
-  },
+  }
 
-  play: function () {
+  play() {
     this.start = Date.now();
     if (this.pos >= this.logs.length) {
       this.unload();
@@ -106,9 +106,9 @@ var Logs = util.Class({
       }
     }
     this.playOne();
-  },
+  }
 
-  cancel: function () {
+  cancel() {
     if (this.playTimer) {
       clearTimeout(this.playTimer);
       this.playTimer = null;
@@ -116,16 +116,16 @@ var Logs = util.Class({
     this.start = null;
     this.pos = 0;
     this.unload();
-  },
+  }
 
-  pause: function () {
+  pause() {
     if (this.playTimer) {
       clearTimeout(this.playTimer);
       this.playTimer = null;
     }
-  },
+  }
 
-  playOne: function () {
+  playOne() {
     this.playTimer = null;
     if (this.pos >= this.logs.length) {
       this.unload();
@@ -144,9 +144,9 @@ var Logs = util.Class({
     if (this.fromStorage) {
       this.savePos();
     }
-  },
+  }
 
-  playItem: function (item) {
+  playItem(item) {
     if (item.type == "hello") {
       // We may need to pause here
       if (item.url != (location.href+"").replace(/\#.*/, "")) {
@@ -158,34 +158,34 @@ var Logs = util.Class({
     } catch (e) {
       console.warn("Could not play back message:", item, "error:", e);
     }
-  },
+  }
 
-  save: function () {
+  save() {
     this.fromStorage = true;
     storage.set("playback.logs", this.logs);
     this.savePos();
-  },
+  }
 
-  savePos: function () {
+  savePos() {
     storage.set("playback.pos", this.pos);
-  },
+  }
 
-  unload: function () {
+  unload() {
     if (this.fromStorage) {
       storage.set("playback.logs", undefined);
       storage.set("playback.pos", undefined);
     }
     // FIXME: should do a bye message here
   }
+};
 
-});
 
 playback.getRunningLogs = function () {
   return storage.get("playback.logs").then(function (value) {
     if (! value) {
       return null;
     }
-    var logs = Logs(value, true);
+    var logs = new Logs(value, true);
     return storage.get("playback.pos").then(function (pos) {
       pos = pos || 0;
       logs.pos = pos;

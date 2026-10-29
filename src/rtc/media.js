@@ -10,8 +10,9 @@
  */
 
 import util from "../core/util.js";
+import { mixinEvents } from "../core/events.js";
 
-var media = util.mixinEvents(util.Module("rtcMedia"));
+var media = mixinEvents(util.Module("rtcMedia"));
 media._knownEvents = ["change", "error"];
 
 var audioTrack = null;

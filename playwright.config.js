@@ -1,12 +1,13 @@
 import { defineConfig } from "@playwright/test";
 import fs from "node:fs";
 
-/* This dev container ships a Chromium that Playwright does not manage, so
-   point at it when it is there and let Playwright resolve its own browser
-   otherwise (CI, or a normal checkout after `playwright install`). */
-const PINNED_CHROMIUM =
-  process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
-const executablePath = fs.existsSync(PINNED_CHROMIUM) ? PINNED_CHROMIUM : undefined;
+/* This dev container ships a Chromium that Playwright does not manage, at a
+   stable symlink that tracks whichever build the image holds. Use it when it
+   is there and let Playwright resolve its own browser otherwise (CI, or a
+   normal checkout after `playwright install`). Do not name a build number
+   here: it goes stale whenever the image is rebuilt. */
+const candidates = [process.env.CHROMIUM_PATH, "/opt/pw-browsers/chromium"];
+const executablePath = candidates.find((p) => p && fs.existsSync(p));
 
 export default defineConfig({
   testDir: "./tests/e2e",

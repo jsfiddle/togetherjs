@@ -90,22 +90,33 @@ ui.container = null;
 // ui.activateUI is called before the DOM is fully loaded:
 var deferringPrepareUI = null;
 
-function deferForContainer(func) {
-  /* Defers any calls to func() until after ui.container is set
-     Function cannot have a return value (as sometimes the call will
-     become async).  Use like:
+/* Calls func once ui.container exists: right now if it already does, and
+   otherwise on the next "ui-ready". No return value, since the call may
+   become asynchronous.
+
+   This used to fall through after calling func, so a call made with the UI
+   already up *also* registered a "ui-ready" listener that was never removed.
+   Each of those replayed on every later ui.activateUI() with its original
+   arguments, which is why reopening a session resurrected old chat
+   messages. */
+function whenContainerReady(self, func, args) {
+  if (ui.container) {
+    func.apply(self, args);
+    return;
+  }
+  session.once("ui-ready", function () {
+    func.apply(self, args);
+  });
+}
+
+/* Wraps a function so that calls made before the UI exists are deferred.
+   Use like:
 
      method: deferForContainer(function (args) {...})
-     */
+   */
+function deferForContainer(func) {
   return function () {
-    if (ui.container) {
-      func.apply(this, arguments);
-    }
-    var self = this;
-    var args = Array.prototype.slice.call(arguments);
-    session.once("ui-ready", function () {
-      func.apply(self, args);
-    });
+    whenContainerReady(this, func, Array.prototype.slice.call(arguments));
   };
 }
 
@@ -1078,17 +1089,17 @@ session.on("display-window", function (id, win) {
 
 /* This class is bound to peers.Peer instances as peer.view.
    The .update() method is regularly called by peer objects when info changes. */
-ui.PeerView = util.Class({
+ui.PeerView = class PeerView {
 
-  constructor: function (peer) {
+  constructor(peer) {
     assert(peer.isSelf !== undefined, "PeerView instantiated with non-Peer object");
     this.peer = peer;
     this.dockClick = this.dockClick.bind(this);
-  },
+  }
 
   /* Takes an element and sets any person-related attributes on the element
      Different from updates, which use the class names we set here: */
-  setElement: function (el) {
+  setElement(el) {
     var count = 0;
     var classes = ["togetherjs-person", "togetherjs-person-status",
                    "togetherjs-person-name", "togetherjs-person-name-abbrev",
@@ -1105,9 +1116,13 @@ ui.PeerView = util.Class({
       console.warn("setElement(", el, ") doesn't contain any person items");
     }
     this.updateDisplay(el);
-  },
+  }
 
-  updateDisplay: deferForContainer(function (container) {
+  updateDisplay(container) {
+    whenContainerReady(this, this._updateDisplay, [container]);
+  }
+
+  _updateDisplay(container) {
     container = container || ui.container;
     var abbrev = this.peer.name;
     if (this.peer.isSelf) {
@@ -1201,9 +1216,9 @@ ui.PeerView = util.Class({
     // FIXME: add some style based on following?
     updateChatParticipantList();
     this.updateFollow();
-  }),
+  }
 
-  update: function () {
+  update() {
     if (! this.peer.isSelf) {
       if (this.peer.status == "live") {
         this.dock();
@@ -1213,9 +1228,9 @@ ui.PeerView = util.Class({
     }
     this.updateDisplay();
     this.updateUrlDisplay();
-  },
+  }
 
-  updateUrlDisplay: function (force) {
+  updateUrlDisplay(force) {
     var url = this.peer.url;
     if ((! url) || (url == this._lastUpdateUrlDisplay && ! force)) {
       return;
@@ -1228,18 +1243,18 @@ ui.PeerView = util.Class({
       title: this.peer.title,
       sameUrl: sameUrl
     });
-  },
+  }
 
-  urlNudge: function () {
+  urlNudge() {
     // FIXME: do something more distinct here
     this.updateUrlDisplay(true);
-  },
+  }
 
-  notifyJoined: function () {
+  notifyJoined() {
     ui.chat.joinedSession({
       peer: this.peer
     });
-  },
+  }
 
   // when there are too many participants in the dock, consolidate the participants to one avatar, and on mouseOver, the dock expands down to reveal the rest of the participants
   // if there are X users in the session
@@ -1249,7 +1264,11 @@ ui.PeerView = util.Class({
 
   //if users hit X then show the participant button with the consol
 
-  dock: deferForContainer(function () {
+  dock() {
+    whenContainerReady(this, this._dock, []);
+  }
+
+  _dock() {
 
     var numberOfUsers = peers.getAllPeers().length;
 
@@ -1325,9 +1344,9 @@ ui.PeerView = util.Class({
       }
     }).bind(this));
     this.updateFollow();
-  }),
+  }
 
-  undock: function () {
+  undock() {
     if (! this.dockElement) {
       return;
     }
@@ -1338,9 +1357,9 @@ ui.PeerView = util.Class({
       this.detailElement = null;
       adjustDockSize(-1);
     }).bind(this));
-  },
+  }
 
-  scrollTo: function () {
+  scrollTo() {
     if (this.peer.url != session.currentUrl()) {
       return;
     }
@@ -1351,9 +1370,9 @@ ui.PeerView = util.Class({
     }
     pos = elementFinder.pixelForPosition(pos);
     easeTo(pos);
-  },
+  }
 
-  updateFollow: function () {
+  updateFollow() {
     if (! this.peer.url) {
       return;
     }
@@ -1369,9 +1388,9 @@ ui.PeerView = util.Class({
       same.hide();
       different.show();
     }
-  },
+  }
 
-  maybeHideDetailWindow: function (windows) {
+  maybeHideDetailWindow(windows) {
     if (this.detailElement && windows[0] && windows[0][0] === this.detailElement[0]) {
       if (this.followCheckbox[0].checked) {
         this.peer.follow();
@@ -1379,21 +1398,22 @@ ui.PeerView = util.Class({
         this.peer.unfollow();
       }
     }
-  },
+  }
 
-  dockClick: function () {
+  dockClick() {
     // FIXME: scroll to person
-  },
+  }
 
-  cursor: function () {
+  cursor() {
     return need("cursor").getClient(this.peer.id);
-  },
+  }
 
-  destroy: function () {
+  destroy() {
     // FIXME: should I get rid of the dockElement?
     session.off("hide-window", this.maybeHideDetailWindow);
   }
-});
+};
+
 
 function updateChatParticipantList() {
   var live = peers.getAllPeers(true);
@@ -1478,7 +1498,7 @@ session.hub.on("invite", function (msg) {
   if (msg.forClientId && msg.clientId != peers.Self.id) {
     return;
   }
-  var peer = need("who").ExternalPeer(msg.userInfo.clientId, msg.userInfo);
+  var peer = new (need("who").ExternalPeer)(msg.userInfo.clientId, msg.userInfo);
   ui.chat.invite({peer: peer, url: msg.url, forEveryone: ! msg.forClientId});
 });
 

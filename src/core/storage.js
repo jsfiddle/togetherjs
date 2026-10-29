@@ -4,6 +4,7 @@
 
 import TogetherJS from "./togetherjs.js";
 import util from "./util.js";
+import { mixinEvents } from "./events.js";
 
 var assert = util.assert;
 var Deferred = util.Deferred;
@@ -20,25 +21,25 @@ var DEFAULT_SETTINGS = {
 
 var DEBUG_STORAGE = false;
 
-var Storage = util.Class({
+class Storage {
   // `suffix` is appended to the configured storagePrefix. The prefix is
   // resolved lazily (see .prefix below) because this module is evaluated as
   // soon as the bundle loads, which is before the host page's configuration
   // has been applied.
-  constructor: function (name, storage, suffix) {
+  constructor(name, storage, suffix) {
     this.name = name;
     this.storage = storage;
     this.suffix = suffix;
-  },
+  }
 
   get prefix() {
     if (this._prefix === undefined) {
       this._prefix = TogetherJS.config.close("storagePrefix") + this.suffix;
     }
     return this._prefix;
-  },
+  }
 
-  get: function (key, defaultValue) {
+  get(key, defaultValue) {
     var self = this;
     return Deferred(function (def) {
       // Strictly this isn't necessary, but eventually I want to move to something more
@@ -60,9 +61,9 @@ var Storage = util.Class({
         return value;
       }));
     });
-  },
+  }
 
-  set: function (key, value) {
+  set(key, value) {
     var self = this;
     if (value !== undefined) {
       value = JSON.stringify(value);
@@ -82,9 +83,9 @@ var Storage = util.Class({
       }
       setTimeout(def.resolve);
     });
-  },
+  }
 
-  clear: function () {
+  clear() {
     var self = this;
     var promises = [];
     return Deferred((function (def) {
@@ -99,9 +100,9 @@ var Storage = util.Class({
         });
       });
     }).bind(this));
-  },
+  }
 
-  keys: function (prefix, excludePrefix) {
+  keys(prefix, excludePrefix) {
     // Returns a list of keys, potentially with the given prefix
     var self = this;
     return Deferred(function (def) {
@@ -121,17 +122,17 @@ var Storage = util.Class({
         return result;
       }));
     });
-  },
-
-  toString: function () {
-    return '[storage for ' + this.name + ']';
   }
 
-});
+  toString() {
+    return '[storage for ' + this.name + ']';
+  }
+};
 
-var storage = Storage('localStorage', localStorage, ".");
 
-storage.settings = util.mixinEvents({
+var storage = new Storage('localStorage', localStorage, ".");
+
+storage.settings = mixinEvents({
   defaults: DEFAULT_SETTINGS,
 
   get: function (name) {
@@ -146,6 +147,6 @@ storage.settings = util.mixinEvents({
 
 });
 
-storage.tab = Storage('sessionStorage', sessionStorage, "-session.");
+storage.tab = new Storage('sessionStorage', sessionStorage, "-session.");
 
 export default storage;

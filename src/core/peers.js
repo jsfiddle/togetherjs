@@ -8,6 +8,7 @@ import util from "./util.js";
 import session from "./session.js";
 import storage from "./storage.js";
 import templates from "../templates/templates.js";
+import { mixinEvents } from "./events.js";
 
 var peers = util.Module("peers");
 var assert = util.assert;
@@ -25,11 +26,11 @@ function defaultNicknames() {
   }
   return _defaultNicknames;
 }
-var Peer = util.Class({
+class Peer {
 
-  isSelf: false,
+  isSelf = false;
 
-  constructor: function (id, attrs) {
+  constructor(id, attrs) {
     attrs = attrs || {};
     assert(id);
     assert(! Peer.peers[id]);
@@ -40,7 +41,7 @@ var Peer = util.Class({
     this.name = attrs.name || null;
     this.avatar = attrs.avatar || null;
     this.color = attrs.color || "#00FF00";
-    this.view = need("ui").PeerView(this);
+    this.view = new (need("ui").PeerView)(this);
     this.lastMessageDate = 0;
     this.following = attrs.following || false;
     Peer.peers[id] = this;
@@ -56,13 +57,13 @@ var Peer = util.Class({
       this.view.notifyJoined();
     }
     this.view.update();
-  },
+  }
 
-  repr: function () {
+  repr() {
     return "Peer(" + JSON.stringify(this.id) + ")";
-  },
+  }
 
-  serialize: function () {
+  serialize() {
     return {
       id: this.id,
       status: this.status,
@@ -77,14 +78,14 @@ var Peer = util.Class({
       color: this.color,
       following: this.following
     };
-  },
+  }
 
-  destroy: function () {
+  destroy() {
     this.view.destroy();
     delete Peer.peers[this.id];
-  },
+  }
 
-  updateMessageDate: function (msg) {
+  updateMessageDate(msg) {
     if (this.idle == "inactive") {
       this.update({idle: "active"});
     }
@@ -92,9 +93,9 @@ var Peer = util.Class({
       this.unbye();
     }
     this.lastMessageDate = Date.now();
-  },
+  }
 
-  updateFromHello: function (msg) {
+  updateFromHello(msg) {
     var urlUpdated = false;
     var activeRTC = false;
     var identityUpdated = false;
@@ -156,9 +157,9 @@ var Peer = util.Class({
     if (this.following) {
       session.emit("follow-peer", this);
     }
-  },
+  }
 
-  update: function (attrs) {
+  update(attrs) {
     // FIXME: should probably test that only a couple attributes are settable
     // particularly status and idle
     if (attrs.idle) {
@@ -168,38 +169,38 @@ var Peer = util.Class({
       this.status = attrs.status;
     }
     this.view.update();
-  },
+  }
 
-  className: function (prefix) {
+  className(prefix) {
     prefix = prefix || "";
     return prefix + util.safeClassName(this.id);
-  },
+  }
 
-  bye: function () {
+  bye() {
     if (this.status != "bye") {
       this.status = "bye";
       peers.emit("status-updated", this);
     }
     this.view.update();
-  },
+  }
 
-  unbye: function () {
+  unbye() {
     if (this.status == "bye") {
       this.status = "live";
       peers.emit("status-updated", this);
     }
     this.view.update();
-  },
+  }
 
-  nudge: function () {
+  nudge() {
     session.send({
       type: "url-change-nudge",
       url: location.href,
       to: this.id
     });
-  },
+  }
 
-  follow: function () {
+  follow() {
     if (this.following) {
       return;
     }
@@ -213,15 +214,15 @@ var Peer = util.Class({
     storeSerialization();
     this.view.update();
     session.emit("follow-peer", this);
-  },
+  }
 
-  unfollow: function () {
+  unfollow() {
     this.following = false;
     storeSerialization();
     this.view.update();
   }
+};
 
-});
 
 // FIXME: I can't decide where this should actually go, seems weird
 // that it is emitted and handled in the same module
@@ -239,7 +240,7 @@ Peer.peers = {};
 
 Peer.deserialize = function (obj) {
   obj.fromStorage = true;
-  var peer = Peer(obj.id, obj);
+  var peer = new Peer(obj.id, obj);
 };
 
 peers.Self = undefined;
@@ -249,7 +250,7 @@ session.on("start", function () {
     return;
   }
   /* Same interface as Peer, represents oneself (local user): */
-  peers.Self = util.mixinEvents({
+  peers.Self = mixinEvents({
     isSelf: true,
     id: session.clientId,
     identityId: session.identityId,
@@ -411,7 +412,7 @@ session.on("start", function () {
     }
   });
 
-  peers.Self.view = need("ui").PeerView(peers.Self);
+  peers.Self.view = new (need("ui").PeerView)(peers.Self);
   storage.tab.get("peerCache").then(deserialize);
   peers.Self._loadFromSettings().then(function() {
     peers.Self._loadFromApp();
@@ -469,7 +470,7 @@ peers.getPeer = function getPeer(id, message, ignoreMissing) {
     return peers.Self;
   }
   if (message && ! peer) {
-    peer = Peer(id, {fromHelloMessage: message});
+    peer = new Peer(id, {fromHelloMessage: message});
     return peer;
   }
   if (ignoreMissing && !peer) {
@@ -571,7 +572,7 @@ function storeSerialization() {
   storage.tab.set("peerCache", serialize());
 }
 
-util.mixinEvents(peers);
+mixinEvents(peers);
 
 util.testExpose({
   setIdleTime: function (time) {

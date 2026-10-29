@@ -15,7 +15,7 @@ var MAX_LATE_RESPONSE = 2000;
 who.getList = function (hubUrl) {
   return util.Deferred(function (def) {
     var expected;
-    var channel = channels.WebSocketChannel(hubUrl);
+    var channel = new channels.WebSocketChannel(hubUrl);
     var users = {};
     var responded = 0;
     var firstResponse = 0;
@@ -32,7 +32,7 @@ who.getList = function (hubUrl) {
       }
       if (msg.type == "hello-back") {
         if (! users[msg.clientId]) {
-          users[msg.clientId] = who.ExternalPeer(msg.clientId, msg);
+          users[msg.clientId] = new who.ExternalPeer(msg.clientId, msg);
           responded++;
           if (expected && responded >= expected) {
             close();
@@ -66,7 +66,7 @@ who.getList = function (hubUrl) {
 
 who.invite = function (hubUrl, clientId) {
   return util.Deferred(function (def) {
-    var channel = channels.WebSocketChannel(hubUrl);
+    var channel = new channels.WebSocketChannel(hubUrl);
     var id = util.generateId();
     channel.onmessage = function (msg) {
       if (msg.type == "invite" && msg.inviteId == id) {
@@ -89,10 +89,11 @@ who.invite = function (hubUrl, clientId) {
   });
 };
 
-who.ExternalPeer = util.Class({
-  isSelf: false,
-  isExternal: true,
-  constructor: function (id, attrs) {
+who.ExternalPeer = class ExternalPeer {
+  isSelf = false;
+  isExternal = true;
+
+  constructor(id, attrs) {
     attrs = attrs || {};
     assert(id);
     this.id = id;
@@ -103,15 +104,15 @@ who.ExternalPeer = util.Class({
     this.avatar = attrs.avatar || null;
     this.color = attrs.color || "#00FF00";
     this.lastMessageDate = 0;
-    this.view = ui.PeerView(this);
-  },
+    this.view = new ui.PeerView(this);
+  }
 
-  className: function (prefix) {
+  className(prefix) {
     prefix = prefix || "";
     return prefix + util.safeClassName(this.id);
   }
+};
 
-});
 
 provide("who", who);
 

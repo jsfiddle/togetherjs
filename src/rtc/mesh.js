@@ -20,8 +20,9 @@ import session from "../core/session.js";
 import peers from "../core/peers.js";
 import media from "./media.js";
 import { PeerConnection } from "./connection.js";
+import { mixinEvents } from "../core/events.js";
 
-var mesh = util.mixinEvents(util.Module("rtcMesh"));
+var mesh = mixinEvents(util.Module("rtcMesh"));
 mesh._knownEvents = ["track", "peer-state", "connection-state", "capacity", "error"];
 
 var connections = new Map();

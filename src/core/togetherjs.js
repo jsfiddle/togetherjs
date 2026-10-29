@@ -14,6 +14,8 @@
  * The boot logic that actually starts a session lives in ../index.js.
  */
 
+import { mixinEvents } from "./events.js";
+
 var defaultConfiguration = {
   // Disables clicks for a certain element.
   // (e.g., 'canvas' would not show clicks on canvas elements.)
@@ -205,95 +207,6 @@ TogetherJS._startupInit = {
 TogetherJS.startup = TogetherJS._extend(TogetherJS._startupInit);
 TogetherJS.running = false;
 
-TogetherJS._mixinEvents = function (proto) {
-  proto.on = function on(name, callback) {
-    if (typeof callback != "function") {
-      console.warn("Bad callback for", this, ".on(", name, ", ", callback, ")");
-      throw new Error(".on() called with non-callback");
-    }
-    if (name.search(" ") != -1) {
-      name.split(/ +/g).forEach(function (n) {
-        this.on(n, callback);
-      }, this);
-      return;
-    }
-    if (this._knownEvents && this._knownEvents.indexOf(name) == -1) {
-      var thisString = "" + this;
-      if (thisString.length > 20) {
-        thisString = thisString.substr(0, 20) + "...";
-      }
-      console.warn(thisString + ".on('" + name + "', ...): unknown event");
-      if (console.trace) {
-        console.trace();
-      }
-    }
-    if (!this._listeners) {
-      this._listeners = {};
-    }
-    if (!this._listeners[name]) {
-      this._listeners[name] = [];
-    }
-    if (this._listeners[name].indexOf(callback) == -1) {
-      this._listeners[name].push(callback);
-    }
-  };
-  proto.once = function once(name, callback) {
-    if (typeof callback != "function") {
-      console.warn("Bad callback for", this, ".once(", name, ", ", callback, ")");
-      throw new Error(".once() called with non-callback");
-    }
-    var attr = "onceCallback_" + name;
-    if (!callback[attr]) {
-      callback[attr] = function onceCallback() {
-        callback.apply(this, arguments);
-        this.off(name, onceCallback);
-        delete callback[attr];
-      };
-    }
-    this.on(name, callback[attr]);
-  };
-  proto.off = proto.removeListener = function off(name, callback) {
-    if (this._listenerOffs) {
-      // Defer the .off() call until the .emit() is done.
-      this._listenerOffs.push([name, callback]);
-      return;
-    }
-    if (name.search(" ") != -1) {
-      name.split(/ +/g).forEach(function (n) {
-        this.off(n, callback);
-      }, this);
-      return;
-    }
-    if (!this._listeners || !this._listeners[name]) {
-      return;
-    }
-    var l = this._listeners[name];
-    for (var i = 0; i < l.length; i++) {
-      if (l[i] == callback) {
-        l.splice(i, 1);
-        break;
-      }
-    }
-  };
-  proto.emit = function emit(name) {
-    var offs = (this._listenerOffs = []);
-    if (!this._listeners || !this._listeners[name]) {
-      delete this._listenerOffs;
-      return;
-    }
-    var args = Array.prototype.slice.call(arguments, 1);
-    // Copy: a listener may add or remove listeners while we iterate.
-    this._listeners[name].slice().forEach(function (callback) {
-      callback.apply(this, args);
-    }, this);
-    delete this._listenerOffs;
-    offs.forEach(function (item) {
-      this.off(item[0], item[1]);
-    }, this);
-  };
-  return proto;
-};
-
 /* Finalizes the unloading of TogetherJS. Modules are singletons inside the
    bundle now, so unlike the RequireJS version this cannot discard their state;
    modules that hold session state reset themselves on session "close". */
@@ -303,7 +216,7 @@ TogetherJS._teardown = function () {
   TogetherJS.running = false;
 };
 
-TogetherJS._mixinEvents(TogetherJS);
+mixinEvents(TogetherJS);
 TogetherJS._knownEvents = ["ready", "close"];
 TogetherJS.toString = function () {
   return "TogetherJS";
@@ -431,7 +344,7 @@ TogetherJS.config.close = function (name) {
 TogetherJS.version = BUILD_GIT_COMMIT || "unknown";
 TogetherJS.baseUrl = baseUrl;
 
-TogetherJS.hub = TogetherJS._mixinEvents({});
+TogetherJS.hub = mixinEvents({});
 
 TogetherJS._onmessage = function (msg) {
   var type = msg.type;
