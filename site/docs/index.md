@@ -51,7 +51,7 @@ In this section we'll describe the general way that TogetherJS works, without di
 
 The core of TogetherJS is the **hub**: this is a server that everyone in a session connects to, and it echos messages to all the participants using Web Sockets.  This server does not rewrite the messages or do much of anything besides **pass the messages between the participants**.
 
-[WebRTC](http://www.webrtc.org/) is available for **audio chat**, but is not otherwise used.  We are often asked about this, as WebRTC offers data channels that allow browsers to send data directly to other browsers without a server.  Unfortunately you still need a server to establish the connection (the connection strings to connect browsers are quite unwieldy), it only supports one-to-one connections, and that support is limited to only some browsers and browser versions.  Also establishing the connection is significantly slower than Web Sockets. But maybe someday.
+[WebRTC](https://webrtc.org/) is used for **audio and video chat**, but not for anything else.  We are often asked about this, as WebRTC offers data channels that let browsers send data directly to each other.  You still need a server to introduce the two browsers, though, and the hub is already there and already fast; a data channel would add a second path to maintain without removing the first.  So application messages continue to go over the Web Socket.
 
 Everything that TogetherJS does is based on these messages being passed between browsers.  It doesn't require that everyone be on the same page, all it requires is that everyone in the session know what hub URL to connect to (the URL is essentially the session name). People *can* be on different sites, but the session URL is stored in [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window.sessionStorage) which is local to one domain (and because we use sessionStorage instead of localStorage, it is local to one tab).  We don't have any techniques implemented to share sessions across multiple sites, but the only barrier is this local storage of session information.
 
@@ -129,7 +129,19 @@ The other way to set a variable *after* TogetherJS is loaded is `TogetherJS.conf
     When true (default false), TogetherJS treats the entire URL, including the hash, as the identifier of the page; i.e., if you one person is on `http://example.com/#view1` and another person is at `http://example.com/#view2` then these two people are considered to be at completely different URLs.  You'd want to use this in single-page apps where being at the same base URL doesn't mean the two people are looking at the same thing.
 
 `TogetherJSConfig_disableWebRTC`:
-    Disables/removes the button to do audio chat via WebRTC.
+    Disables/removes the microphone and camera buttons.
+
+`TogetherJSConfig_enableVideo`:
+    When true (default false), a camera button appears next to the microphone button and participants can share video.  It is off by default because camera access is a bigger ask than the microphone, and because an existing embed should not sprout a camera button when it upgrades.
+
+`TogetherJSConfig_iceServers`:
+    An array of [RTCIceServer](https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#iceservers) objects used for audio/video connections.  Defaults to a public STUN server.  See "About audio and video chat" below for why you may want to supply a TURN server here.
+
+`TogetherJSConfig_getIceServers`:
+    An `async () => RTCIceServer[]` function, called once per connection.  Prefer this over `iceServers` when your TURN credentials are short-lived: a static array cannot express a credential that expires.
+
+`TogetherJSConfig_maxRtcPeers`:
+    How many people may be in a call at once (default 6).  Everyone sends their audio and video directly to everyone else, so the bandwidth each participant needs grows with the size of the call.  Past this limit new connections are refused rather than degrading the call for everyone.
 
 `TogetherJSConfig_youtube`:
     If true, then YouTube videos will be synchronized (i.e., when one person plays or pauses a video, it will play for all people).  This will also load up the YouTube iframe API.
@@ -166,17 +178,41 @@ The button you add to your site to start TogetherJS will typically look like thi
 
 TogetherJS sessions are connected to the domain you start them on (specifically the [origin](http://tools.ietf.org/html/rfc6454)).  So if part of your site is on another domain, people won't be able to talk across those domains.  Even a page that is on https when another is on http will cause the session to be lost.  We might make this work sometime, but if it's an issue to you please give us [feedback](https://docs.google.com/forms/d/1lVE7JyRo_tjakN0mLG1Cd9X9vseBX9wci153z9JcNEs/viewform).
 
-## About Audio Chat and WebRTC
+## About audio and video chat
 
-The live audio chat is based on [WebRTC](http://www.webrtc.org/). This is a very new technology, built into some new browsers.
+Live audio and video chat are based on [WebRTC](https://webrtc.org/), which every current browser supports.
 
-To enable WebRTC both you and your collaborator need a new browser. Right now, [Firefox Nightly](http://nightly.mozilla.org/) is supported, and we believe that the newest release of Chrome should work.
+Click the microphone button to join the call, and click it again to mute yourself.  If you set `TogetherJSConfig_enableVideo`, a camera button appears alongside it; peers who turn their camera on show up as tiles in a video panel.  Audio plays whether or not that panel is open.  "Leave call" in the microphone popup hangs up and releases the microphone and camera.
 
-Sometime in 2013 support for this should be available in new (non-experimental) versions of Firefox, Chrome, and both Firefox and Chrome for Android.
+### It needs a secure page
 
-To see a summary of outstanding issues that we know of with audio chat see [this page](https://github.com/mozilla/togetherjs/issues?labels=rtc&milestone=&page=1&state=open).
+Browsers only grant access to the microphone and camera on a secure origin.  If your page is served over plain `http`, the buttons will tell you so — no permission prompt will help, the API is simply not there.  `localhost` counts as secure, so local development works.
 
-Note that audio chat will not work between some networks.  These networks require a [TURN server](http://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) which unfortunately we do not have allocated (and full support for TURN has not landed in some browsers).  Unfortunately when the network makes chat impossible, chat will simply not work – we don't receive an error, and can't tell you why chat is not working.  See [#327](https://github.com/mozilla/togetherjs/issues/327) for progress.
+### It needs TURN on some networks
+
+Everyone in a call connects directly to everyone else.  Some networks — symmetric NATs, and many corporate firewalls — will not allow that, and the connection needs a [TURN server](https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT) to relay it.  TogetherJS does not run one, and the default configuration only includes a STUN server, which is enough for most home networks but not all of them.
+
+If your users are on networks where calls fail to connect, supply your own:
+
+```js
+TogetherJSConfig_iceServers = [
+  {urls: "stun:stun.l.google.com:19302"},
+  {urls: "turn:turn.example.com:3478", username: "…", credential: "…"}
+];
+```
+
+TURN credentials are usually short-lived, so if yours are minted per session use the async hook instead:
+
+```js
+TogetherJSConfig_getIceServers = async () => {
+  const resp = await fetch("/my-turn-credentials");
+  return resp.json();
+};
+```
+
+### How many people
+
+The call is a full mesh: each participant sends their audio and video to every other participant separately, so the bandwidth each person needs grows with the number of people.  That is fine for a handful and poor beyond it, so calls are capped at `TogetherJSConfig_maxRtcPeers` (default 6).  Supporting larger calls would mean routing media through a server (an SFU), which TogetherJS does not do.
 
 ## Extending TogetherJS
 
@@ -432,9 +468,7 @@ The bare minimum that we've identified for TogetherJS is [WebSocket support](htt
 
 We recommend the most recent release of [Firefox](http://www.mozilla.org/en-US/firefox/new/) or [Chrome](https://www.google.com/intl/en/chrome/browser/).
 
-If you want to have [WebRTC support](https://github.com/mozilla/togetherjs/wiki/About-Audio-Chat-and-WebRTC) and are using Firefox, as of April 2013 this requires [Firefox Nightly](http://nightly.mozilla.org/) (this support will be moving towards beta and release in the coming months).
-
-We haven't done much testing on mobile (yet!) and cannot recommend anything there.
+Audio and video chat work in any current browser, but need the page to be served over https (see "About audio and video chat" above).
 
 #### Internet Explorer
 

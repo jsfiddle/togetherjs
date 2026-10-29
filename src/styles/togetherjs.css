@@ -1,0 +1,1343 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * ---------------------------------------------------------------------------
+ * TogetherJS interface styles.
+ *
+ * Three rules this file keeps to, which the 2013 original did not:
+ *
+ * 1. Every selector is scoped to a TogetherJS root -- `.togetherjs` or a
+ *    `#togetherjs-*` id -- so nothing here can restyle the page it is
+ *    embedded in. The original set `font-size: 16px !important` on every
+ *    input on the host page, faded every disabled button on it, and turned
+ *    them all TogetherJS blue on hover.
+ *
+ *    The token defaults, and only those, sit in `@layer togetherjs.tokens`.
+ *    That is what makes a host's own `.togetherjs { --tj-accent: ... }` win:
+ *    an unlayered rule beats a layered one whatever its specificity, and the
+ *    client's stylesheet is injected after the host's, so equal specificity
+ *    alone would have gone the wrong way.
+ *
+ *    The component rules below are deliberately NOT layered. Putting them in
+ *    one too would hand the host every rule by default, which sounds polite
+ *    until its plain `button { padding: .6rem 1.2rem }` reshapes our round
+ *    colour swatches into ovals. Scoping keeps us out of the host's way;
+ *    the tokens are the way in.
+ *
+ * 2. Colour, spacing, type and depth come from custom properties declared in
+ *    one place. Setting `--tj-accent` recolours the whole UI, because the
+ *    hover, border and muted variants are derived from it with color-mix()
+ *    rather than hardcoded. Nothing below writes a raw hex except the token
+ *    definitions themselves.
+ *
+ * 3. Typography is inherited from the host page by default, so the widget
+ *    reads as part of the site rather than as a visitor from another one.
+ *
+ * Dark mode follows prefers-color-scheme, and `TogetherJSConfig_theme` of
+ * "light" or "dark" overrides it through the data-tj-theme attribute.
+ * ---------------------------------------------------------------------------
+ */
+
+/* ======================================================================
+   Tokens
+   ====================================================================== */
+
+@layer togetherjs.tokens {
+
+  .togetherjs {
+    /* --- Colour: the three a host is most likely to set --- */
+    --tj-accent: #0a7cc1;
+    --tj-surface: #ffffff;
+    --tj-text: #16181d;
+
+    /* --- Derived from the above; override only for fine control --- */
+    --tj-accent-text: #ffffff;
+    --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, black);
+    --tj-accent-quiet: color-mix(in oklab, var(--tj-accent) 10%, var(--tj-surface));
+    --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, black);
+
+    --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 4%, var(--tj-surface));
+    --tj-surface-hover: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+    --tj-text-muted: color-mix(in oklab, var(--tj-text) 62%, var(--tj-surface));
+    --tj-border: color-mix(in oklab, var(--tj-text) 14%, var(--tj-surface));
+    --tj-border-strong: color-mix(in oklab, var(--tj-text) 26%, var(--tj-surface));
+    --tj-danger: #c0392b;
+
+    /* --- Geometry --- */
+    --tj-space: 8px;
+    --tj-radius: 6px;
+    --tj-radius-lg: 10px;
+    --tj-radius-pill: 999px;
+    --tj-button-size: 40px;
+    --tj-avatar-size: 30px;
+    --tj-dock-width: 52px;
+    --tj-panel-width: 290px;
+
+    /* --- Depth: 1px borders carry the structure, shadow only lifts --- */
+    --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 2px 8px rgb(0 0 0 / 0.07);
+    --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.07), 0 12px 32px rgb(0 0 0 / 0.13);
+    --tj-backdrop: rgb(16 18 22 / 0.42);
+
+    /* --- Type: inherited from the host page by default --- */
+    --tj-font: inherit;
+    --tj-font-size: 14px;
+    --tj-font-size-sm: 12px;
+    --tj-line-height: 1.45;
+
+    /* --- Motion --- */
+    --tj-duration: 0.15s;
+    --tj-ease: cubic-bezier(0.2, 0, 0.1, 1);
+
+    /* --- Stacking. One base; everything below is `calc(var(--tj-z) + n)`,
+           so a host with its own high-z chrome moves TogetherJS in one go. */
+    --tj-z: 10000;
+  }
+
+  /* Dark mode. data-tj-theme goes on <html>, not on the container: cursors,
+     clicks and focus rings are appended to <body>, outside the container, and
+     they need the same tokens. The media query is matched on :root so that an
+     explicit data-tj-theme="light" still wins on a dark system. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tj-theme="light"]) .togetherjs {
+      --tj-accent: #4aa3e0;
+      --tj-surface: #1c1f24;
+      --tj-text: #e9ebee;
+      --tj-accent-text: #0c1116;
+      --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
+      --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
+      --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+      --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
+      --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
+      --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
+      --tj-danger: #e06a5c;
+      --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
+      --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
+      --tj-backdrop: rgb(0 0 0 / 0.6);
+    }
+  }
+
+  :root[data-tj-theme="dark"] .togetherjs {
+    --tj-accent: #4aa3e0;
+    --tj-surface: #1c1f24;
+    --tj-text: #e9ebee;
+    --tj-accent-text: #0c1116;
+    --tj-accent-hover: color-mix(in oklab, var(--tj-accent) 86%, white);
+    --tj-accent-border: color-mix(in oklab, var(--tj-accent) 76%, white);
+    --tj-surface-sunken: color-mix(in oklab, var(--tj-text) 7%, var(--tj-surface));
+    --tj-surface-hover: color-mix(in oklab, var(--tj-text) 12%, var(--tj-surface));
+    --tj-border: color-mix(in oklab, var(--tj-text) 18%, var(--tj-surface));
+    --tj-border-strong: color-mix(in oklab, var(--tj-text) 32%, var(--tj-surface));
+    --tj-danger: #e06a5c;
+    --tj-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 2px 8px rgb(0 0 0 / 0.45);
+    --tj-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 12px 32px rgb(0 0 0 / 0.55);
+    --tj-backdrop: rgb(0 0 0 / 0.6);
+  }
+}
+
+/* ======================================================================
+   Reset
+   Scoped to our own subtrees and written with :where() so it adds no
+   specificity: any rule below, and any rule a host writes, outranks it.
+   This replaces an inlined copy of the YUI 3.10.3 reset that still had
+   IE6/IE7 star-hacks in it.
+   ====================================================================== */
+
+.togetherjs,
+.togetherjs :where(*),
+.togetherjs :where(*)::before,
+.togetherjs :where(*)::after {
+  box-sizing: border-box;
+}
+
+.togetherjs :where(div, span, p, section, header, ul, ol, li, h1, h2, h3,
+                   h4, figure, form, fieldset, legend) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  background: none;
+  list-style: none;
+}
+
+.togetherjs :where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+.togetherjs :where(svg.togetherjs-icon) {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* ======================================================================
+   Root containers
+   ====================================================================== */
+
+.togetherjs {
+  font-family: var(--tj-font);
+  font-size: var(--tj-font-size);
+  line-height: var(--tj-line-height);
+  color: var(--tj-text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The container is only a coordinate space; its children are positioned. */
+#togetherjs-container {
+  position: static;
+}
+
+.togetherjs-hidden {
+  display: none !important;
+}
+
+/* Visible only to assistive technology. */
+.togetherjs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* One focus treatment for everything, and only for keyboard focus. The
+   original removed outlines outright and put nothing in their place. */
+.togetherjs :focus-visible {
+  outline: 2px solid var(--tj-accent);
+  outline-offset: 2px;
+  border-radius: var(--tj-radius);
+}
+
+/* ======================================================================
+   Buttons
+   ====================================================================== */
+
+.togetherjs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--tj-space) * 0.75);
+  min-height: 32px;
+  padding: 6px 14px;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--tj-duration) var(--tj-ease),
+              border-color var(--tj-duration) var(--tj-ease);
+}
+
+.togetherjs button:hover {
+  background: var(--tj-surface-hover);
+}
+
+.togetherjs button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.togetherjs button:disabled:hover {
+  background: var(--tj-surface);
+}
+
+.togetherjs button.togetherjs-primary {
+  background: var(--tj-accent);
+  border-color: var(--tj-accent);
+  color: var(--tj-accent-text);
+}
+
+.togetherjs button.togetherjs-primary:hover {
+  background: var(--tj-accent-hover);
+  border-color: var(--tj-accent-hover);
+}
+
+.togetherjs button.togetherjs-destructive {
+  background: var(--tj-danger);
+  border-color: var(--tj-danger);
+  color: #fff;
+}
+
+.togetherjs button.togetherjs-destructive:hover {
+  background: color-mix(in oklab, var(--tj-danger) 86%, black);
+}
+
+.togetherjs button.togetherjs-secondary,
+.togetherjs button.togetherjs-default,
+.togetherjs button.togetherjs-cancel {
+  background: var(--tj-surface);
+}
+
+.togetherjs section.togetherjs-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--tj-space);
+  padding: var(--tj-space) calc(var(--tj-space) * 1.5);
+  border-top: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+  border-radius: 0 0 var(--tj-radius-lg) var(--tj-radius-lg);
+}
+
+.togetherjs .togetherjs-alt-text {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+/* ======================================================================
+   The dock
+   ====================================================================== */
+
+#togetherjs-dock {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 1);
+  width: var(--tj-dock-width);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow);
+  overflow: hidden;
+  /* The drag writes inline top/left; these are the fallback anchors for
+     each edge class, and are overridden the moment the dock is moved. */
+  touch-action: none;
+}
+
+#togetherjs-dock.togetherjs-dock-right {
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+}
+
+#togetherjs-dock.togetherjs-dock-left {
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+}
+
+/* Horizontal layouts for the top and bottom edges. The 2013 version had a
+   -bottom class in the JS with no CSS at all behind it, which is part of
+   why the bottom edge was hardcoded unreachable. */
+#togetherjs-dock.togetherjs-dock-top,
+#togetherjs-dock.togetherjs-dock-bottom {
+  width: auto;
+  flex-direction: row;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#togetherjs-dock.togetherjs-dock-top {
+  top: 12px;
+}
+
+#togetherjs-dock.togetherjs-dock-bottom {
+  bottom: 12px;
+}
+
+/* While dragging, the JS sets explicit coordinates; drop the centring
+   translate so the dock follows the pointer exactly. */
+#togetherjs-dock.togetherjs-dock-free {
+  transform: none;
+}
+
+/* The drag handle. It is a real button, so it is reachable by keyboard
+   (arrow keys nudge the dock) and announces itself. */
+#togetherjs-dock-anchor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 2px;
+  border: 0;
+  border-radius: 0;
+  background: var(--tj-surface-sunken);
+  color: var(--tj-text-muted);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+#togetherjs-dock-anchor:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+#togetherjs-dock-anchor:active,
+#togetherjs-dock.togetherjs-dragging #togetherjs-dock-anchor {
+  cursor: grabbing;
+}
+
+#togetherjs-dock-anchor .togetherjs-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* On a vertical dock the grip reads better lying down. */
+#togetherjs-dock.togetherjs-dock-right #togetherjs-dock-anchor .togetherjs-icon,
+#togetherjs-dock.togetherjs-dock-left #togetherjs-dock-anchor .togetherjs-icon,
+#togetherjs-dock.togetherjs-dock-free #togetherjs-dock-anchor .togetherjs-icon {
+  transform: rotate(90deg);
+}
+
+#togetherjs-dock.togetherjs-dragging {
+  box-shadow: var(--tj-shadow-lg);
+  user-select: none;
+}
+
+#togetherjs-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px;
+  gap: 2px;
+}
+
+#togetherjs-dock.togetherjs-dock-top #togetherjs-buttons,
+#togetherjs-dock.togetherjs-dock-bottom #togetherjs-buttons {
+  flex-direction: row;
+}
+
+#togetherjs-buttons .togetherjs-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tj-button-size);
+  height: var(--tj-button-size);
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text-muted);
+  cursor: pointer;
+}
+
+#togetherjs-buttons .togetherjs-button:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+/* Active state is the accent fill. Because the icons paint with
+   currentColor, this is all it takes to recolour them -- the old PNGs were
+   baked white, so the only way to change them was to ship another file. */
+#togetherjs-buttons .togetherjs-button.togetherjs-active {
+  background: var(--tj-accent);
+  color: var(--tj-accent-text);
+}
+
+#togetherjs-buttons .togetherjs-button.togetherjs-active:hover {
+  background: var(--tj-accent-hover);
+}
+
+#togetherjs-buttons hr,
+#togetherjs-dock .togetherjs-hr {
+  width: 60%;
+  height: 1px;
+  margin: 4px auto;
+  border: 0;
+  background: var(--tj-border);
+}
+
+#togetherjs-dock-participants {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+#togetherjs-dock.togetherjs-dock-top #togetherjs-dock-participants,
+#togetherjs-dock.togetherjs-dock-bottom #togetherjs-dock-participants {
+  flex-direction: row;
+}
+
+/* An unread-message or incoming-call pulse on a dock button. */
+#togetherjs-buttons .togetherjs-button.togetherjs-color-alert::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-accent);
+  box-shadow: 0 0 0 2px var(--tj-surface);
+  animation: togetherjs-pulse 1.6s var(--tj-ease) infinite;
+}
+
+#togetherjs-profile-button {
+  position: relative;
+}
+
+#togetherjs-profile-arrow {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 3px solid var(--tj-text-muted);
+}
+
+/* ======================================================================
+   People: avatars, names, status
+   ====================================================================== */
+
+.togetherjs .togetherjs-person {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tj-avatar-size);
+  height: var(--tj-avatar-size);
+  border-radius: var(--tj-radius-pill);
+  border: 2px solid var(--tj-border-strong);
+  background-color: var(--tj-surface-sunken);
+  background-size: cover;
+  background-position: center;
+  color: var(--tj-text-muted);
+  overflow: hidden;
+  flex: none;
+}
+
+/* The fallback mark inside an avatar with no picture. Peer identity is also
+   carried by the border colour, but colour alone is not enough, so the
+   abbreviated name sits on top of this where there is room. */
+.togetherjs .togetherjs-person .togetherjs-icon {
+  width: 65%;
+  height: 65%;
+}
+
+.togetherjs .togetherjs-person-small {
+  --tj-avatar-size: 22px;
+}
+
+.togetherjs .togetherjs-person-inactive {
+  opacity: 0.45;
+}
+
+.togetherjs .togetherjs-person-name,
+.togetherjs .togetherjs-person-name-self {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.togetherjs .togetherjs-person-name-abbrev {
+  font-size: var(--tj-font-size-sm);
+  font-weight: 600;
+}
+
+/* A small wedge of the peer's colour on the avatar, so that identity does
+   not rest on the border alone. */
+.togetherjs .togetherjs-person-avatar-swatch {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 5px;
+}
+
+.togetherjs .togetherjs-person-status-overlay {
+  position: relative;
+}
+
+.togetherjs .togetherjs-person-bgcolor-self {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--tj-radius-pill);
+  border: 1px solid var(--tj-border-strong);
+  vertical-align: -2px;
+}
+
+/* ======================================================================
+   Windows (panels anchored to a dock button) and modals
+   ====================================================================== */
+
+.togetherjs .togetherjs-window,
+.togetherjs .togetherjs-modal {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 2);
+  width: var(--tj-panel-width);
+  max-width: calc(100vw - 2 * var(--tj-space));
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow-lg);
+  overflow: hidden;
+}
+
+.togetherjs .togetherjs-modal {
+  z-index: calc(var(--tj-z) + 5);
+  width: 340px;
+}
+
+.togetherjs .togetherjs-modal-wide {
+  width: 420px;
+}
+
+.togetherjs .togetherjs-window > header,
+.togetherjs .togetherjs-modal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tj-space);
+  padding: calc(var(--tj-space) * 1.25) calc(var(--tj-space) * 1.5);
+  border-bottom: 1px solid var(--tj-border);
+  font-size: var(--tj-font-size);
+  font-weight: 600;
+}
+
+.togetherjs .togetherjs-window > section,
+.togetherjs .togetherjs-modal > section {
+  padding: calc(var(--tj-space) * 1.5);
+}
+
+.togetherjs .togetherjs-window > section + section,
+.togetherjs .togetherjs-modal > section + section {
+  padding-top: 0;
+}
+
+.togetherjs .togetherjs-window > section.togetherjs-buttons,
+.togetherjs .togetherjs-modal > section.togetherjs-buttons {
+  padding-top: var(--tj-space);
+}
+
+.togetherjs .togetherjs-window p,
+.togetherjs .togetherjs-modal p {
+  margin: 0 0 var(--tj-space);
+}
+
+.togetherjs .togetherjs-window p:last-child,
+.togetherjs .togetherjs-modal p:last-child {
+  margin-bottom: 0;
+}
+
+.togetherjs .togetherjs-window a,
+.togetherjs .togetherjs-modal a {
+  color: var(--tj-accent);
+}
+
+/* The close button injected into every window header. */
+.togetherjs .togetherjs-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text-muted);
+  cursor: pointer;
+  flex: none;
+}
+
+.togetherjs .togetherjs-close:hover {
+  background: var(--tj-surface-hover);
+  color: var(--tj-text);
+}
+
+.togetherjs .togetherjs-close .togetherjs-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.togetherjs .togetherjs-subtitle {
+  padding: calc(var(--tj-space) * 0.75) calc(var(--tj-space) * 1.5);
+  border-bottom: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-modal-background {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--tj-z) + 4);
+  background: var(--tj-backdrop);
+}
+
+/* The little wedge that points from a panel back at its dock button. */
+#togetherjs-window-pointer-right,
+#togetherjs-window-pointer-left,
+#togetherjs-window-pointer-top,
+#togetherjs-window-pointer-bottom {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  transform: rotate(45deg);
+}
+
+#togetherjs-window-pointer-right {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+#togetherjs-window-pointer-left {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+#togetherjs-window-pointer-top {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+#togetherjs-window-pointer-bottom {
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+
+/* ======================================================================
+   Form controls
+   ====================================================================== */
+
+.togetherjs input[type="text"],
+.togetherjs input[type="url"],
+.togetherjs input[type="number"],
+.togetherjs textarea,
+.togetherjs select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface);
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+}
+
+.togetherjs input[type="text"]:focus,
+.togetherjs input[type="url"]:focus,
+.togetherjs textarea:focus,
+.togetherjs select:focus {
+  border-color: var(--tj-accent);
+}
+
+.togetherjs label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+.togetherjs .togetherjs-hr,
+.togetherjs .togetherjs-menu-hr-avatar {
+  height: 1px;
+  margin: var(--tj-space) 0;
+  background: var(--tj-border);
+}
+
+.togetherjs .togetherjs-share-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--tj-font-size-sm);
+}
+
+/* ======================================================================
+   The profile menu (and its mobile window twin)
+   ====================================================================== */
+
+.togetherjs .togetherjs-menu {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  min-width: 220px;
+  padding: 4px;
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-radius: var(--tj-radius-lg);
+  box-shadow: var(--tj-shadow-lg);
+}
+
+.togetherjs .togetherjs-menu-item {
+  display: flex;
+  align-items: center;
+  /* The shared button rule centres its contents; menu rows are left-aligned
+     lists, so their icons line up down the column. */
+  justify-content: flex-start;
+  gap: calc(var(--tj-space) * 1.25);
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--tj-radius);
+  background: transparent;
+  color: var(--tj-text);
+  font-size: var(--tj-font-size);
+  text-align: start;
+  cursor: pointer;
+}
+
+.togetherjs button.togetherjs-menu-item:hover {
+  background: var(--tj-surface-hover);
+}
+
+.togetherjs .togetherjs-menu-item .togetherjs-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--tj-text-muted);
+}
+
+.togetherjs .togetherjs-menu-disabled,
+.togetherjs div.togetherjs-menu-item {
+  cursor: default;
+}
+
+#togetherjs-menu-profile {
+  gap: calc(var(--tj-space) * 1.25);
+  font-weight: 600;
+}
+
+#togetherjs-menu-end,
+#togetherjs-menu-end-button {
+  color: var(--tj-danger);
+}
+
+#togetherjs-menu-end .togetherjs-icon,
+#togetherjs-menu-end-button .togetherjs-icon {
+  color: inherit;
+}
+
+#togetherjs-invite-users:empty {
+  display: none;
+}
+
+/* ======================================================================
+   The colour picker
+   ====================================================================== */
+
+#togetherjs-pick-color {
+  min-width: 0;
+  padding: calc(var(--tj-space) * 1.25);
+}
+
+#togetherjs-swatches {
+  display: grid;
+  /* Fixed tracks, not 1fr: the swatches are round, so they must not stretch
+     with the popup. */
+  grid-template-columns: repeat(6, 26px);
+  gap: 6px;
+}
+
+.togetherjs .togetherjs-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+  min-height: 0;
+  border: 2px solid transparent;
+  border-radius: var(--tj-radius-pill);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+  cursor: pointer;
+}
+
+.togetherjs .togetherjs-swatch:hover {
+  transform: scale(1.1);
+}
+
+/* The selected swatch gets a ring *and* a tick, so the choice is not
+   carried by colour alone. */
+.togetherjs .togetherjs-swatch-active {
+  border-color: var(--tj-text);
+}
+
+/* The tick lives in the markup; it is simply revealed when selected, and
+   blend mode keeps it legible on a swatch of any lightness. */
+.togetherjs .togetherjs-swatch .togetherjs-icon {
+  width: 14px;
+  height: 14px;
+  margin: auto;
+  color: #fff;
+  mix-blend-mode: difference;
+  visibility: hidden;
+}
+
+.togetherjs .togetherjs-swatch-active .togetherjs-icon {
+  visibility: visible;
+}
+
+#togetherjs-custom-color-row {
+  display: flex;
+  align-items: center;
+  gap: var(--tj-space);
+  margin-top: calc(var(--tj-space) * 1.25);
+  padding-top: calc(var(--tj-space) * 1.25);
+  border-top: 1px solid var(--tj-border);
+}
+
+#togetherjs-custom-color-row label {
+  flex: 1;
+  margin: 0;
+  color: var(--tj-text);
+  font-size: var(--tj-font-size-sm);
+}
+
+/* The native picker, trimmed to look like one more swatch. It brings the
+   platform's own eyedropper and works on touch, which a hand-rolled wheel
+   would not. */
+.togetherjs input[type="color"] {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--tj-border-strong);
+  border-radius: var(--tj-radius-pill);
+  background: none;
+  cursor: pointer;
+  flex: none;
+}
+
+.togetherjs input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.togetherjs input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--tj-radius-pill);
+}
+
+.togetherjs input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: var(--tj-radius-pill);
+}
+
+/* ======================================================================
+   Chat
+   ====================================================================== */
+
+#togetherjs-chat {
+  display: flex;
+  flex-direction: column;
+  max-height: min(70vh, 460px);
+}
+
+#togetherjs-chat-messages {
+  flex: 1;
+  min-height: 120px;
+  padding: var(--tj-space) 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.togetherjs .togetherjs-chat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tj-space);
+  padding: 5px calc(var(--tj-space) * 1.5);
+}
+
+.togetherjs .togetherjs-chat-item .togetherjs-person {
+  --tj-avatar-size: 24px;
+  margin-top: 1px;
+}
+
+.togetherjs .togetherjs-chat-content {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.togetherjs .togetherjs-chat-item .togetherjs-person-name {
+  margin-right: 4px;
+}
+
+.togetherjs .togetherjs-timestamp {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+.togetherjs .togetherjs-chat-join-item,
+.togetherjs .togetherjs-chat-left-item,
+.togetherjs .togetherjs-chat-url-change {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-chat-input-box {
+  padding: var(--tj-space) calc(var(--tj-space) * 1.5);
+  border-top: 1px solid var(--tj-border);
+  background: var(--tj-surface-sunken);
+}
+
+#togetherjs-chat-input {
+  min-height: 34px;
+  max-height: 120px;
+  resize: none;
+  overflow-y: auto;
+}
+
+/* Hints that there is more above or below the visible chat. */
+.togetherjs .togetherjs-scrolled-above::before,
+.togetherjs .togetherjs-scrolled-below::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--tj-border);
+}
+
+/* ======================================================================
+   Notifications
+   ====================================================================== */
+
+.togetherjs .togetherjs-notification {
+  position: fixed;
+  z-index: calc(var(--tj-z) + 3);
+  width: 300px;
+  padding: calc(var(--tj-space) * 1.25);
+  background: var(--tj-surface);
+  border: 1px solid var(--tj-border);
+  border-left: 3px solid var(--tj-accent);
+  border-radius: var(--tj-radius);
+  box-shadow: var(--tj-shadow-lg);
+  cursor: pointer;
+}
+
+.togetherjs .togetherjs-notification-closebtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.togetherjs .togetherjs-notification-logo {
+  display: none;
+}
+
+/* ======================================================================
+   Video
+   ====================================================================== */
+
+#togetherjs-video-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: var(--tj-space);
+}
+
+.togetherjs .togetherjs-video-tile {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--tj-radius);
+  background: var(--tj-surface-sunken);
+  border: 1px solid var(--tj-border);
+  overflow: hidden;
+}
+
+.togetherjs .togetherjs-video-tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Self-view is mirrored, which is what people expect of their own image. */
+}
+
+#togetherjs-video-self video {
+  transform: scaleX(-1);
+}
+
+/* Until a track arrives the tile shows the peer's avatar instead of black. */
+.togetherjs .togetherjs-video-tile:not(.togetherjs-video-live) video {
+  display: none;
+}
+
+.togetherjs .togetherjs-video-avatar {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.togetherjs .togetherjs-video-live .togetherjs-video-avatar {
+  display: none;
+}
+
+.togetherjs .togetherjs-video-label {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+  color: #fff;
+  font-size: var(--tj-font-size-sm);
+}
+
+#togetherjs-video-empty {
+  color: var(--tj-text-muted);
+  font-size: var(--tj-font-size-sm);
+  text-align: center;
+}
+
+.togetherjs .togetherjs-rtc-device-row {
+  margin-bottom: var(--tj-space);
+}
+
+/* ======================================================================
+   Cursors, clicks and focus rings drawn on the host page
+   ====================================================================== */
+
+.togetherjs-cursor {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  pointer-events: none;
+  transition: top var(--tj-duration) linear, left var(--tj-duration) linear;
+}
+
+.togetherjs-cursor svg {
+  width: 16px;
+  height: 22px;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
+}
+
+.togetherjs-cursor .togetherjs-cursor-container {
+  position: absolute;
+  /* Clear of the arrow's tail, which reaches x=14, y=20. */
+  top: 17px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The name bubble. Its fill is the theme's own surface rather than the peer's
+   colour, so the label stays legible whatever colour the peer picked and
+   whatever it is floating over; the peer's colour is the 2px ring. */
+.togetherjs-cursor .togetherjs-cursor-name {
+  padding: 2px 9px;
+  border: 2px solid var(--tj-peer-color, currentColor);
+  border-radius: var(--tj-radius-pill);
+  background: color-mix(in srgb, var(--tj-surface) 86%, transparent);
+  color: var(--tj-text);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: var(--tj-shadow);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.togetherjs-cursor .togetherjs-cursor-typing {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px 6px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-surface);
+  box-shadow: var(--tj-shadow);
+}
+
+.togetherjs-cursor .togetherjs-cursor-typing span {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--tj-radius-pill);
+  background: var(--tj-text-muted);
+}
+
+.togetherjs-cursor .togetherjs-typing-animating span {
+  animation: togetherjs-typing 1.2s var(--tj-ease) infinite;
+}
+
+.togetherjs-cursor .togetherjs-typing-ellipse-two {
+  animation-delay: 0.15s;
+}
+
+.togetherjs-cursor .togetherjs-typing-ellipse-three {
+  animation-delay: 0.3s;
+}
+
+.togetherjs-click {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 2px solid var(--tj-accent);
+  border-radius: var(--tj-radius-pill);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.togetherjs-clicking {
+  animation: togetherjs-click 0.6s var(--tj-ease) 1;
+}
+
+.togetherjs-focus {
+  position: absolute;
+  z-index: calc(var(--tj-z) + 6);
+  border: 2px solid;
+  border-radius: var(--tj-radius);
+  pointer-events: none;
+}
+
+/* ======================================================================
+   Tooltips
+   ====================================================================== */
+
+.togetherjs .togetherjs-tooltip {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border-radius: var(--tj-radius);
+  background: var(--tj-text);
+  color: var(--tj-surface);
+  font-size: var(--tj-font-size-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--tj-duration) var(--tj-ease);
+}
+
+.togetherjs .togetherjs-dock-person:hover > .togetherjs-tooltip,
+.togetherjs .togetherjs-dock-person:focus-visible > .togetherjs-tooltip {
+  opacity: 1;
+}
+
+.togetherjs .togetherjs-person-tooltip-arrow-r {
+  display: none;
+}
+
+/* ======================================================================
+   Animation
+   ====================================================================== */
+
+@keyframes togetherjs-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes togetherjs-typing {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%           { opacity: 1; }
+}
+
+@keyframes togetherjs-click {
+  from { opacity: 1; transform: scale(0.4); }
+  to   { opacity: 0; transform: scale(1.3); }
+}
+
+@keyframes togetherjs-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.togetherjs .togetherjs-animated {
+  animation: togetherjs-fade-in var(--tj-duration) var(--tj-ease);
+}
+
+/* Every animation in this file is decorative. The original guarded exactly
+   one of four, and left an infinite pulse running on an incoming call. */
+@media (prefers-reduced-motion: reduce) {
+  .togetherjs,
+  .togetherjs *,
+  .togetherjs-cursor,
+  .togetherjs-cursor *,
+  .togetherjs-click {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ======================================================================
+   Narrow viewports
+   The original keyed off `max-device-width`, which measures the physical
+   screen rather than the viewport, so a narrow window on a desktop never
+   matched and a large phone in landscape matched when it should not.
+   ====================================================================== */
+
+.togetherjs .togetherjs-only-mobile { display: none; }
+.togetherjs .togetherjs-not-mobile { display: initial; }
+
+@media (max-width: 560px) {
+  .togetherjs .togetherjs-only-mobile { display: initial; }
+  .togetherjs .togetherjs-not-mobile { display: none; }
+
+  #togetherjs-dock,
+  #togetherjs-dock.togetherjs-dock-right,
+  #togetherjs-dock.togetherjs-dock-left,
+  #togetherjs-dock.togetherjs-dock-top,
+  #togetherjs-dock.togetherjs-dock-bottom,
+  #togetherjs-dock.togetherjs-dock-free {
+    /* One predictable place on a small screen, whatever was dragged. */
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    flex-direction: row;
+    border-radius: 0;
+    border-width: 1px 0 0 0;
+    transform: none;
+  }
+
+  #togetherjs-dock #togetherjs-buttons {
+    flex-direction: row;
+    justify-content: center;
+    flex: 1;
+  }
+
+  /* There is nowhere to drag to, so hide the handle rather than offer it. */
+  #togetherjs-dock-anchor {
+    display: none;
+  }
+
+  .togetherjs .togetherjs-window,
+  .togetherjs .togetherjs-menu {
+    left: var(--tj-space) !important;
+    right: var(--tj-space);
+    bottom: calc(var(--tj-button-size) + 3 * var(--tj-space)) !important;
+    top: auto !important;
+    width: auto;
+  }
+
+  .togetherjs .togetherjs-modal {
+    left: var(--tj-space) !important;
+    right: var(--tj-space);
+    width: auto;
+  }
+
+  #togetherjs-window-pointer-right,
+  #togetherjs-window-pointer-left,
+  #togetherjs-window-pointer-top,
+  #togetherjs-window-pointer-bottom {
+    display: none !important;
+  }
+}
+
+/* ======================================================================
+   Right-to-left
+   ====================================================================== */
+
+.togetherjs:dir(rtl) .togetherjs-tooltip {
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.togetherjs:dir(rtl) .togetherjs-menu-item {
+  text-align: start;
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A copy of the cursor in src/templates/interface.html, for editing.
+     The inline version paints with var(--tj-peer-color); this one is a plain
+     file, so it carries a neutral fill. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 22" width="16" height="22">
+  <path d="M1 1.2 L1 17.6 L5.3 13.6 L7.8 19.5 L10.7 18.2 L8.2 12.5 L13.7 12.2 Z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+</svg>
