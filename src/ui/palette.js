@@ -91,32 +91,9 @@ export function pickColor(taken) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-/* Relative luminance, per WCAG. Used to decide whether text on a peer's
-   colour should be black or white. */
-function luminance(hex) {
-  var channels = [1, 3, 5].map(function (i) {
-    var c = parseInt(hex.substr(i, 2), 16) / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
-}
-
-/* The foreground colour to use on top of `background`: whichever of black or
-   white has the better contrast ratio against it. */
-export function foregroundFor(background) {
-  var hex = normalizeColor(background);
-  if (!hex) {
-    return "#111111";
-  }
-  var l = luminance(hex);
-  // Contrast against white is (1.05)/(l+0.05); against black, (l+0.05)/0.05.
-  return (1.05 / (l + 0.05)) >= ((l + 0.05) / 0.05) ? "#ffffff" : "#111111";
-}
-
 export default {
   PALETTE: PALETTE,
   isValidColor: isValidColor,
   normalizeColor: normalizeColor,
   pickColor: pickColor,
-  foregroundFor: foregroundFor,
 };

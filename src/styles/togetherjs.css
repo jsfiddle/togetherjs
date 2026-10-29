@@ -88,10 +88,12 @@
   --tj-z: 10000;
 }
 
-/* Dark mode. The media query is wrapped so that an explicit
-   data-tj-theme="light" on the container still wins on a dark system. */
+/* Dark mode. data-tj-theme goes on <html>, not on the container: cursors,
+   clicks and focus rings are appended to <body>, outside the container, and
+   they need the same tokens. The media query is matched on :root so that an
+   explicit data-tj-theme="light" still wins on a dark system. */
 @media (prefers-color-scheme: dark) {
-  .togetherjs:not([data-tj-theme="light"]) {
+  :root:not([data-tj-theme="light"]) .togetherjs {
     --tj-accent: #4aa3e0;
     --tj-surface: #1c1f24;
     --tj-text: #e9ebee;
@@ -109,7 +111,7 @@
   }
 }
 
-.togetherjs[data-tj-theme="dark"] {
+:root[data-tj-theme="dark"] .togetherjs {
   --tj-accent: #4aa3e0;
   --tj-surface: #1c1f24;
   --tj-text: #e9ebee;
@@ -1097,27 +1099,38 @@
 }
 
 .togetherjs-cursor svg {
-  width: 15px;
-  height: 23px;
+  width: 16px;
+  height: 22px;
   display: block;
-  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.35));
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3));
 }
 
 .togetherjs-cursor .togetherjs-cursor-container {
   position: absolute;
-  top: 14px;
-  left: 10px;
+  /* Clear of the arrow's tail, which reaches x=14, y=20. */
+  top: 17px;
+  left: 16px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
+/* The name bubble. Its fill is the theme's own surface rather than the peer's
+   colour, so the label stays legible whatever colour the peer picked and
+   whatever it is floating over; the peer's colour is the 2px ring. */
 .togetherjs-cursor .togetherjs-cursor-name {
-  padding: 1px 6px;
+  padding: 2px 9px;
+  border: 2px solid var(--tj-peer-color, currentColor);
   border-radius: var(--tj-radius-pill);
+  background: color-mix(in srgb, var(--tj-surface) 86%, transparent);
+  color: var(--tj-text);
   font-size: 11px;
   font-weight: 600;
+  line-height: 1.5;
   white-space: nowrap;
+  box-shadow: var(--tj-shadow);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .togetherjs-cursor .togetherjs-cursor-typing {

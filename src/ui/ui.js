@@ -88,15 +88,19 @@ ui.displayToggle = function (el) {
 /* Light, dark, or follow the system. The stylesheet's dark rules are written
    so that an explicit data-tj-theme wins over the prefers-color-scheme media
    query in either direction. */
-function applyTheme(container) {
+function applyTheme() {
+  /* The attribute goes on <html> rather than on the container, because the
+     cursors, click ripples and focus rings are appended to <body> and read
+     the same tokens; an attribute on the container would never reach them. */
   TogetherJS.config.track("theme", function (theme) {
+    var root = document.documentElement;
     if (theme === "light" || theme === "dark") {
-      container.attr("data-tj-theme", theme);
+      root.setAttribute("data-tj-theme", theme);
     } else {
       if (theme && theme !== "auto") {
         console.warn("Unknown TogetherJSConfig_theme:", theme, "(expected light, dark or auto)");
       }
-      container[0].removeAttribute("data-tj-theme");
+      root.removeAttribute("data-tj-theme");
     }
   });
 }
@@ -342,7 +346,7 @@ ui.prepareUI = function () {
   var container = ui.container = $(templates("interface"));
   assert(container.length);
   expandIcons(container[0]);
-  applyTheme(container);
+  applyTheme();
   $("body").append(container);
   fixupAvatars(container);
   restoreDockPosition(container);

@@ -258,7 +258,9 @@ test("the theme can be forced to dark", async ({ browser, hub, statics }) => {
   });
   await startSession(page);
 
-  await expect(page.locator("#togetherjs-container")).toHaveAttribute("data-tj-theme", "dark");
+  // On <html>, so that cursors and click ripples outside the container get
+  // the same tokens.
+  await expect(page.locator("html")).toHaveAttribute("data-tj-theme", "dark");
   // The token actually resolves, rather than just the attribute being set.
   const surface = await page.evaluate(() =>
     getComputedStyle(document.querySelector("#togetherjs-container"))

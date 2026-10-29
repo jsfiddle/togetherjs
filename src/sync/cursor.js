@@ -12,7 +12,6 @@ import ui from "../ui/ui.js";
 import util from "../core/util.js";
 import session from "../core/session.js";
 import elementFinder from "../dom/elementFinder.js";
-import { foregroundFor } from "../ui/palette.js";
 import eventMaker from "../dom/eventMaker.js";
 import peers from "../core/peers.js";
 import templating from "../dom/templating.js";
@@ -57,41 +56,22 @@ class Cursor {
 
   updatePeer(peer) {
     // FIXME: can I use peer.setElement()?
-    this.element.css({color: peer.color});
+    /* One custom property carries the peer's colour to both the arrow's fill
+       and the name bubble's ring; the bubble's own fill and text come from
+       the theme, so a label is legible whatever colour the peer picked. */
+    this.element.css({color: peer.color, "--tj-peer-color": peer.color});
     var name = this.element.find(".togetherjs-cursor-name");
-    var nameContainer = this.element.find(".togetherjs-cursor-container");
     assert(name.length);
     name.text(peer.name);
-    nameContainer.css({
-      backgroundColor: peer.color,
-      color: foregroundFor(peer.color)
-    });
-    var path = this.element.find("svg path");
-    path.attr("fill", peer.color);
     // FIXME: should I just remove the element?
+    /* A peer that is no longer live fades out whole. The original animated
+       the label's width, height and padding down to zero in two steps, which
+       collapsed it sideways; now that the label is a flex row with a border
+       that read as a squashing pill rather than a departure. */
     if (peer.status != "live") {
-      //this.element.hide();
-      this.element.find("svg").animate({
-        opacity: 0
-      }, 350);
-      this.element.find(".togetherjs-cursor-container").animate({
-              width: 34,
-              height: 20,
-              padding: 12,
-              margin: 0
-          }, 200).animate({
-              width: 0,
-              height: 0,
-              padding: 0,
-              opacity: 0
-              }, 200);
+      this.element.animate({opacity: 0}, 350);
     } else {
-      //this.element.show();
-      this.element.animate({
-        opacity:0.3
-      }).animate({
-        opacity:1
-      });
+      this.element.animate({opacity: 1}, 200);
     }
   }
 

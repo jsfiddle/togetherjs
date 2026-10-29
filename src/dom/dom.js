@@ -65,6 +65,11 @@ function camelCase(name) {
 }
 
 function setStyle(el, name, value) {
+  // Custom properties are case-sensitive and must go through setProperty.
+  if (name.startsWith("--")) {
+    el.style.setProperty(name, value);
+    return;
+  }
   const prop = camelCase(name);
   if (typeof value === "number" && !UNITLESS.has(prop)) {
     value = value + "px";
