@@ -19,6 +19,7 @@ import ui from "../ui/ui.js";
 import storage from "../core/storage.js";
 import media, { mediaSupported, requiresSecureContext } from "./media.js";
 import mesh from "./mesh.js";
+import speaking from "./speaking.js";
 
 var rtcUi = util.Module("rtcUi");
 
@@ -118,6 +119,7 @@ function tileFor(peerId) {
 }
 
 function removePeerMedia(peerId) {
+  speaking.unwatch(peerId);
   var audio = audioElements.get(peerId);
   if (audio) {
     audio.srcObject = null;
@@ -318,6 +320,7 @@ async function populateDevicePickers() {
 mesh.on("track", function (event) {
   if (event.track.kind === "audio") {
     attach(audioElementFor(event.peerId), event.stream);
+    speaking.watch(event.peerId, event.stream);
   } else {
     var tile = tileFor(event.peerId);
     attach(tile.find("video")[0], event.stream);
@@ -325,6 +328,12 @@ mesh.on("track", function (event) {
     refreshVideoPanel();
   }
   refreshButtons();
+});
+
+/* Relayed rather than emitted directly from speaking.js, so that module
+   stays a plain measurement with no opinion about the rest of the client. */
+speaking.on("change", function (event) {
+  session.emit("peer-speaking", event);
 });
 
 mesh.on("peer-state", function (event) {

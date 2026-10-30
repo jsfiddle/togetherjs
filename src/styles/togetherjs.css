@@ -1125,47 +1125,62 @@
 /* The name bubble. Its fill is the theme's own surface rather than the peer's
    colour, so the label stays legible whatever colour the peer picked and
    whatever it is floating over; the peer's colour is the 2px ring. */
+/* The name bubble, filled with the peer's own colour. Its text colour is
+   whichever of black or white reads against that particular colour, worked
+   out in cursor.js -- the swatches are all one lightness but the picker also
+   offers the platform colour input, so anything can turn up here. */
 .togetherjs-cursor .togetherjs-cursor-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 2px 9px;
-  border: 2px solid var(--tj-peer-color, currentColor);
   border-radius: var(--tj-radius-pill);
-  background: color-mix(in srgb, var(--tj-surface) 86%, transparent);
-  color: var(--tj-text);
+  background: var(--tj-peer-color, var(--tj-accent));
+  color: var(--tj-peer-text, #fff);
   font-size: 11px;
   font-weight: 600;
   line-height: 1.5;
   white-space: nowrap;
   box-shadow: var(--tj-shadow);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
+/* The status mark beside the name: typing dots, or a microphone when the
+   peer is talking. Both inherit the bubble's text colour, so they stay
+   readable on any peer colour without a second contrast calculation. */
 .togetherjs-cursor .togetherjs-cursor-typing {
   display: inline-flex;
+  align-items: center;
   gap: 2px;
-  padding: 3px 6px;
-  border-radius: var(--tj-radius-pill);
-  background: var(--tj-surface);
-  box-shadow: var(--tj-shadow);
 }
 
 .togetherjs-cursor .togetherjs-cursor-typing span {
   width: 4px;
   height: 4px;
   border-radius: var(--tj-radius-pill);
-  background: var(--tj-text-muted);
+  background: currentColor;
+  opacity: 0.55;
 }
 
 .togetherjs-cursor .togetherjs-typing-animating span {
   animation: togetherjs-typing 1.2s var(--tj-ease) infinite;
 }
 
-.togetherjs-cursor .togetherjs-typing-ellipse-two {
+.togetherjs-cursor .togetherjs-typing-animating span:nth-child(2) {
   animation-delay: 0.15s;
 }
 
-.togetherjs-cursor .togetherjs-typing-ellipse-three {
+.togetherjs-cursor .togetherjs-typing-animating span:nth-child(3) {
   animation-delay: 0.3s;
+}
+
+.togetherjs-cursor .togetherjs-cursor-speaking {
+  display: inline-flex;
+}
+
+.togetherjs-cursor .togetherjs-cursor-speaking .togetherjs-icon {
+  width: 12px;
+  height: 12px;
+  animation: togetherjs-speaking 1.4s var(--tj-ease) infinite;
 }
 
 .togetherjs-click {
@@ -1228,6 +1243,11 @@
 @keyframes togetherjs-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes togetherjs-speaking {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
 }
 
 @keyframes togetherjs-typing {

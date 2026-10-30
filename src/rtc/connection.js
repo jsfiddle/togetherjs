@@ -98,9 +98,32 @@ export function PeerConnection(options) {
     });
   };
 
+  /* One inbound MediaStream per kind, built here rather than taken from the
+     event.
+
+     The transceivers above are created empty and filled later with
+     replaceTrack(), and a track attached that way belongs to no stream — so
+     event.streams is empty and event.streams[0] is undefined. That went
+     straight into `el.srcObject`, which meant remote audio was never actually
+     attached to anything and the call was silent. It was invisible because
+     the end-to-end tests asserted on getStats().packetsReceived, which says
+     RTP is arriving at the transport, not that anyone can hear it.
+
+     Kept separate by kind so the <audio> sink stays audio-only and the video
+     tile stays video-only; one combined stream would have the tile playing
+     the audio a second time. */
+  var remoteStreams = { audio: new MediaStream(), video: new MediaStream() };
+
   pc.ontrack = function (event) {
+    var stream = event.streams[0];
+    if (!stream) {
+      stream = remoteStreams[event.track.kind] || new MediaStream();
+      if (!stream.getTracks().includes(event.track)) {
+        stream.addTrack(event.track);
+      }
+    }
     if (onTrack) {
-      onTrack(event.track, event.streams[0], peerId);
+      onTrack(event.track, stream, peerId);
     }
   };
 

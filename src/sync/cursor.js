@@ -14,6 +14,7 @@ import elementFinder from "../dom/elementFinder.js";
 import eventMaker from "../dom/eventMaker.js";
 import peers from "../core/peers.js";
 import templating from "../dom/templating.js";
+import { foregroundFor } from "../ui/palette.js";
 
 var assert = util.assert;
 var cursor = util.Module("cursor");
@@ -49,6 +50,7 @@ class Cursor {
     $(document.body).append(this.element);
 
     this.keydownTimeout = null;
+    this.speaking = false;
     this.clearKeydown = this.clearKeydown.bind(this);
     this.atOtherUrl = false;
   }
@@ -58,8 +60,14 @@ class Cursor {
     /* One custom property carries the peer's colour to both the arrow's fill
        and the name bubble's ring; the bubble's own fill and text come from
        the theme, so a label is legible whatever colour the peer picked. */
-    this.element.css({color: peer.color, "--tj-peer-color": peer.color});
-    var name = this.element.find(".togetherjs-cursor-name");
+    this.element.css({
+      color: peer.color,
+      "--tj-peer-color": peer.color,
+      // The bubble is filled with the peer's colour, so its text has to be
+      // whichever of black or white reads against that particular colour.
+      "--tj-peer-text": foregroundFor(peer.color),
+    });
+    var name = this.element.find(".togetherjs-cursor-label");
     assert(name.length);
     name.text(peer.name);
     // FIXME: should I just remove the element?
@@ -144,14 +152,40 @@ class Cursor {
     if (this.keydownTimeout) {
       clearTimeout(this.keydownTimeout);
     } else {
-      animateKeyboard(this.element.find(".togetherjs-cursor-typing").show());
+      animateKeyboard(this.element.find(".togetherjs-cursor-typing"));
     }
     this.keydownTimeout = setTimeout(this.clearKeydown, KEYDOWN_WAIT_TIME);
+    this._refreshStatus();
   }
 
   clearKeydown() {
     this.keydownTimeout = null;
     stopKeyboardAnimation(this.element.find(".togetherjs-cursor-typing").hide());
+    this._refreshStatus();
+  }
+
+  /* Whether this peer's microphone is currently carrying speech. Worked out
+     locally from their incoming audio by rtc/speaking.js, so it only ever
+     fires for peers whose audio we actually receive. */
+  setSpeaking(isSpeaking) {
+    this.speaking = !!isSpeaking;
+    this._refreshStatus();
+  }
+
+  /* Only one mark at a time, and speaking wins: someone talking while they
+     type is better described as talking. */
+  _refreshStatus() {
+    var speakingEl = this.element.find(".togetherjs-cursor-speaking");
+    var typingEl = this.element.find(".togetherjs-cursor-typing");
+    if (this.speaking) {
+      speakingEl.show();
+      typingEl.hide();
+    } else {
+      speakingEl.hide();
+      if (this.keydownTimeout) {
+        typingEl.show();
+      }
+    }
   }
 
   _destroy() {
@@ -462,6 +496,13 @@ function documentKeydown(event) {
     session.send({type: "keydown"});
   });
 }
+
+session.on("peer-speaking", function (event) {
+  if (event.peerId === session.clientId) {
+    return;
+  }
+  Cursor.getClient(event.peerId).setSpeaking(event.speaking);
+});
 
 session.hub.on("keydown", function (msg) {
   // FIXME: when the cursor is hidden there's nothing to show with setKeydown().

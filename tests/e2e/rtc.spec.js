@@ -6,7 +6,9 @@
  * That makes the whole negotiation testable headlessly.
  *
  * The tests assert on getStats() rather than only on connectionState: ICE
- * completing does not prove media is flowing.
+ * completing does not prove media is flowing. Nor, it turns out, does
+ * getStats() prove anyone can hear it -- see "remote audio reaches an element
+ * that can play it" below.
  */
 
 import { test, expect, openClient, startSession, peerCount } from "./fixtures.js";
@@ -14,6 +16,18 @@ import { test, expect, openClient, startSession, peerCount } from "./fixtures.js
 /** Join the call from this page. */
 function joinAudio(page) {
   return page.evaluate(() => window.TogetherJSTestSpy.rtc.startAudio());
+}
+
+/* The audio tracks actually attached to the <audio> sinks on this page.
+   Packets arriving at the transport and packets reaching a sink are two
+   different things, and only the second one is audible. */
+function attachedAudioTracks(page) {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll("audio[data-togetherjs-peer]")).reduce(
+      (total, el) => total + (el.srcObject ? el.srcObject.getAudioTracks().length : 0),
+      0,
+    ),
+  );
 }
 
 function meshSize(page) {
@@ -75,6 +89,35 @@ test("two peers connect and audio flows both ways", async ({ browser, hub, stati
   // ICE completing is not the same as media arriving.
   await expect.poll(() => inboundPackets(a), { timeout: 20000 }).toBeGreaterThan(0);
   await expect.poll(() => inboundPackets(b), { timeout: 20000 }).toBeGreaterThan(0);
+
+  await a.context().close();
+  await b.context().close();
+});
+
+test("remote audio reaches an element that can play it", async ({ browser, hub, statics }) => {
+  /* The call was silent for a while and these tests did not notice. Both
+     sides create their transceivers up front and fill them with
+     replaceTrack() later, and a track attached that way belongs to no
+     MediaStream -- so `event.streams[0]` in ontrack was undefined and went
+     into `el.srcObject` as undefined. RTP kept arriving, packetsReceived kept
+     climbing, and nothing came out of the speakers.
+
+     So: assert on the sink, not only on the transport. */
+  const { a, b } = await twoPeerCall(browser, hub);
+
+  await joinAudio(a);
+  await joinAudio(b);
+  await expect.poll(() => allConnected(a), { timeout: 20000 }).toBe(true);
+
+  await expect.poll(() => attachedAudioTracks(a), { timeout: 20000 }).toBe(1);
+  await expect.poll(() => attachedAudioTracks(b), { timeout: 20000 }).toBe(1);
+
+  // ...and the track is live, not an ended leftover.
+  const live = await a.evaluate(() => {
+    const el = document.querySelector("audio[data-togetherjs-peer]");
+    return el.srcObject.getAudioTracks().every((t) => t.readyState === "live");
+  });
+  expect(live).toBe(true);
 
   await a.context().close();
   await b.context().close();

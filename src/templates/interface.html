@@ -534,9 +534,16 @@
               stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
       </svg>
       <span class="togetherjs-cursor-container">
-        <span class="togetherjs-cursor-name"></span>
-        <span style="display:none" class="togetherjs-cursor-typing" id="togetherjs-cursor-typebox">
-          <span class="togetherjs-typing-ellipse-one"></span><span class="togetherjs-typing-ellipse-two"></span><span class="togetherjs-typing-ellipse-three"></span>
+        <!-- The name and the status mark share one bubble. The mark is either
+             the typing dots or a microphone; never both, and usually neither.
+             (The typing element used to carry an id, which every cloned
+             cursor then duplicated.) -->
+        <span class="togetherjs-cursor-name">
+          <span class="togetherjs-cursor-label"></span>
+          <span style="display:none" class="togetherjs-cursor-typing" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span style="display:none" class="togetherjs-cursor-speaking" data-togetherjs-icon="microphone"></span>
         </span>
         <!-- Displayed when the cursor is below the screen: -->
         <span class="togetherjs-cursor-down"></span>

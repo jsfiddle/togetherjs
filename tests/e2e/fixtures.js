@@ -93,8 +93,14 @@ function installSyntheticMedia() {
     const ctx = new AudioContext();
     const oscillator = ctx.createOscillator();
     const destination = ctx.createMediaStreamDestination();
-    oscillator.connect(destination);
+    // Through a gain node, and exposed, so a test can make this page fall
+    // silent — which is how the speaking indicator gets tested.
+    const gain = ctx.createGain();
+    gain.gain.value = 0.6;
+    oscillator.connect(gain);
+    gain.connect(destination);
     oscillator.start();
+    window.__togetherjsTestGain = gain;
     return destination.stream.getAudioTracks()[0];
   }
 
