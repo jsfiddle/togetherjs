@@ -76,6 +76,66 @@ $ HUB_URL=https://hub.example.com npm run build
 `BASE_URL` does the same for the URL the client's own assets are served from;
 leave it unset and the client works out where it was loaded from.
 
+Installing from npm
+-------------------
+
+The package is not published to the npm registry, but it installs straight
+from GitHub:
+
+```sh
+$ npm install github:jsfiddle/togetherjs#develop
+```
+
+or, in `package.json`:
+
+```json
+"dependencies": {
+  "togetherjs": "github:jsfiddle/togetherjs#develop"
+}
+```
+
+Any branch, tag or commit works after the `#`. `dist/` is not checked in; npm
+builds it at install time through the `prepare` script, so nothing else needs
+to happen. (pnpm and Yarn Berry only run a git dependency's `prepare` if you
+allow build scripts for it.)
+
+```js
+import TogetherJS from "togetherjs";
+
+TogetherJS.config("hubBase", "https://hub.example.com");
+
+button.addEventListener("click", TogetherJS);
+```
+
+Two things your own build has to take care of:
+
+* **Assets.** The client fetches `togetherjs.css` and
+  `images/notification.ogg` at runtime. A drop-in `<script>` finds them next
+  to its own URL; once the client is bundled into your code it cannot. Either
+  copy `node_modules/togetherjs/dist/` somewhere public and assign
+  `TogetherJS.baseUrl` before starting a session, or hand both files to your
+  bundler and tell the client:
+
+  ```js
+  import "togetherjs/dist/togetherjs.css";
+  import sound from "togetherjs/dist/images/notification.ogg?url"; // Vite
+
+  TogetherJS.config({ stylesheet: false, notificationSound: sound });
+  ```
+
+  `stylesheet` also accepts a URL. (The `/test` chat command loads
+  `walkabout.js` from `baseUrl` and has no such option.)
+* **The hub.** The hub URL baked into the build is whatever `HUB_URL` was in
+  the environment when npm installed the package, which is usually nothing
+  useful. Set `hubBase` at runtime as above.
+
+`TogetherJS.isCreator()` tells you whether this client started the running
+session or joined it.
+
+The module touches `window` and `document` when it is imported, so import it
+only in the browser. It also still assigns `window.TogetherJS`, and still
+reads `TogetherJSConfig_*` globals if you prefer those.
+
 Theming
 -------
 

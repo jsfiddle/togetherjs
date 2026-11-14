@@ -1,7 +1,7 @@
 <% /*
    All of the markup for the TogetherJS interface.
 
-   {{baseUrl}} is rewritten to wherever TogetherJS was deployed, and
+   {{notificationSound}} is rewritten to the sound's URL at runtime, and
    {{ gettext('...') }} is translated at build time (see build/templates.mjs).
    This file is inlined into src/templates/generated.js.
 
@@ -447,7 +447,7 @@
   </div>
 
   <!-- Invisible element that plays the incoming-message sound: -->
-  <audio id="togetherjs-notification" src="{{baseUrl}}/images/notification.ogg"></audio>
+  <audio id="togetherjs-notification" src="{{notificationSound}}"></audio>
 
   <!-- The intro screen for someone who joins a session the first time: -->
   <div id="togetherjs-intro" class="togetherjs-modal" role="dialog" aria-modal="true"

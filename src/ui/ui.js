@@ -1176,7 +1176,12 @@ ui.chat = {
     var doNotify = !! notify;
     var section = popup.find("#togetherjs-chat-notifier-message");
     if (notify && visibilityApi.hidden()) {
-      ui.container.find("#togetherjs-notification")[0].play();
+      // Browsers refuse to play sound before the user has interacted with the
+      // page, and a missed chime is not worth an unhandled rejection.
+      var playing = ui.container.find("#togetherjs-notification")[0].play();
+      if (playing) {
+        playing.catch(function () {});
+      }
     }
     if (id && section.data("message-id") == id) {
       doNotify = true;

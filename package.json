@@ -16,7 +16,8 @@
       "import": "./dist/togetherjs.esm.js",
       "default": "./dist/togetherjs.js"
     },
-    "./dist/*": "./dist/*"
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
@@ -36,6 +37,7 @@
   },
   "scripts": {
     "build": "node build/build.mjs",
+    "prepare": "npm run build",
     "dev": "node build/build.mjs --watch --serve",
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.js\" \"build/**/*.mjs\" \"tests/**/*.js\"",
