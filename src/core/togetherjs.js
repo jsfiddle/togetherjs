@@ -279,7 +279,7 @@ TogetherJS.config = function (name, maybeValue) {
     if (!Object.prototype.hasOwnProperty.call(settings, attr)) {
       continue;
     }
-    if (attr == "loaded" || attr == "callToStart") {
+    if (attr == "loaded" || attr == "callToStart" || attr == "noAutoStart") {
       continue;
     }
     if (!Object.prototype.hasOwnProperty.call(TogetherJS._defaultConfiguration, attr)) {
