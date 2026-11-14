@@ -97,6 +97,13 @@ var defaultConfiguration = {
   baseFont: null,
   // "light", "dark", or "auto" to follow the operating system's setting.
   theme: "auto",
+  // URL of the stylesheet. Defaults to togetherjs.css under baseUrl; set it
+  // to false when the host page ships the styles itself (e.g. through its
+  // own bundler).
+  stylesheet: null,
+  // URL of the chat notification sound. Defaults to
+  // images/notification.ogg under baseUrl.
+  notificationSound: null,
 };
 
 // Substituted by build/build.mjs.
@@ -130,7 +137,6 @@ function resolveBaseUrl() {
       return src.replace(/\/*togetherjs(\.min)?\.js(\?.*)?$/, "");
     }
   }
-  console.warn("Could not determine TogetherJS's baseUrl");
   return "";
 }
 
@@ -360,18 +366,30 @@ TogetherJS._onmessage = function (msg) {
   TogetherJS.hub.emit(msg.type, msg);
 };
 
+/* Where a file the client fetches at runtime lives. Reads the public baseUrl
+   property rather than the local, so a bundled consumer can assign it after
+   importing the module. */
+TogetherJS.assetUrl = function (path) {
+  if (!TogetherJS.baseUrl) {
+    console.warn("Could not determine TogetherJS's baseUrl; " + path + " will probably not load");
+  }
+  return TogetherJS.baseUrl.replace(/\/+$/, "") + "/" + path;
+};
+
 /* Injects the stylesheet. Called on start rather than at load so that merely
    including the script does not restyle the host page. */
 TogetherJS.addStyle = function () {
   if (document.getElementById("togetherjs-stylesheet")) {
     return;
   }
+  var href = TogetherJS.config.get("stylesheet");
+  if (href === false) {
+    return;
+  }
   var link = document.createElement("link");
   link.id = "togetherjs-stylesheet";
   link.setAttribute("rel", "stylesheet");
-  // Read from the public property rather than the local, so a bundled
-  // consumer can assign TogetherJS.baseUrl after importing the module.
-  link.href = TogetherJS.baseUrl.replace(/\/+$/, "") + "/togetherjs.css";
+  link.href = href || TogetherJS.assetUrl("togetherjs.css");
   document.head.appendChild(link);
 };
 

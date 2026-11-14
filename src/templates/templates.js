@@ -46,7 +46,10 @@ function clean(t) {
   // Removes <% /* ... */ %> comments:
   t = t.replace(/[<][%]\s*\/\*[\S\s\r\n]*\*\/\s*[%][>]/, "");
   t = util.trim(t);
-  t = t.replace(/\{\{baseUrl\}\}/g, TogetherJS.baseUrl);
+  t = t.replace(/\{\{notificationSound\}\}/g, function () {
+    var url = TogetherJS.config.get("notificationSound") || TogetherJS.assetUrl("images/notification.ogg");
+    return url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  });
   /* NOTE: these expand to HTML, so they belong in text content only. Putting
      TOOL_NAME inside an attribute value splits the attribute at the markup's
      own quotes and corrupts the element. */

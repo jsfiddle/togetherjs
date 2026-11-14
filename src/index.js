@@ -153,6 +153,11 @@ TogetherJS.send = function (msg) {
   session.appSend(msg);
 };
 
+/* True for whoever started the session, false for everyone who joined it. */
+TogetherJS.isCreator = function () {
+  return TogetherJS.running && !session.isClient;
+};
+
 TogetherJS.shareUrl = function () {
   return TogetherJS.running ? session.shareUrl() : null;
 };

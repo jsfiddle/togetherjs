@@ -102,7 +102,6 @@ allow build scripts for it.)
 ```js
 import TogetherJS from "togetherjs";
 
-TogetherJS.baseUrl = "/static/togetherjs";          // see below
 TogetherJS.config("hubBase", "https://hub.example.com");
 
 button.addEventListener("click", TogetherJS);
@@ -110,15 +109,28 @@ button.addEventListener("click", TogetherJS);
 
 Two things your own build has to take care of:
 
-* **Assets.** The client fetches `togetherjs.css`, `images/` and (for the
-  `/test` chat command) `walkabout.js` at runtime, relative to
-  `TogetherJS.baseUrl`. A drop-in `<script>` works that out from its own URL;
-  once the client is bundled into your code it cannot, so copy
-  `node_modules/togetherjs/dist/` somewhere public and point
-  `TogetherJS.baseUrl` at it before starting a session.
+* **Assets.** The client fetches `togetherjs.css` and
+  `images/notification.ogg` at runtime. A drop-in `<script>` finds them next
+  to its own URL; once the client is bundled into your code it cannot. Either
+  copy `node_modules/togetherjs/dist/` somewhere public and assign
+  `TogetherJS.baseUrl` before starting a session, or hand both files to your
+  bundler and tell the client:
+
+  ```js
+  import "togetherjs/dist/togetherjs.css";
+  import sound from "togetherjs/dist/images/notification.ogg?url"; // Vite
+
+  TogetherJS.config({ stylesheet: false, notificationSound: sound });
+  ```
+
+  `stylesheet` also accepts a URL. (The `/test` chat command loads
+  `walkabout.js` from `baseUrl` and has no such option.)
 * **The hub.** The hub URL baked into the build is whatever `HUB_URL` was in
   the environment when npm installed the package, which is usually nothing
   useful. Set `hubBase` at runtime as above.
+
+`TogetherJS.isCreator()` tells you whether this client started the running
+session or joined it.
 
 The module touches `window` and `document` when it is imported, so import it
 only in the browser. It also still assigns `window.TogetherJS`, and still
