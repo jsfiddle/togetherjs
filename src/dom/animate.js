@@ -24,6 +24,11 @@ function finished(el) {
   return Promise.all(node.getAnimations().map((a) => a.finished.catch(() => {})));
 }
 
+/* dom.js's stop() cancels whatever is running on an element, which rejects
+   the animation's finished promise. Whoever cancelled has taken over the
+   element, so there is nothing left to do here. */
+function cancelled() {}
+
 /* Slide a notification window in from the right. */
 export function slideIn(el) {
   el.css({ opacity: 0, zIndex: 8888 });
@@ -39,7 +44,7 @@ export function slideIn(el) {
   return animation.finished.then(() => {
     el.css({ opacity: 1, zIndex: 9999 });
     animation.cancel();
-  });
+  }, cancelled);
 }
 
 /* Pop a window out of its dock button, with a small overshoot. */
@@ -94,7 +99,7 @@ export function fadeOutWindow(el) {
   return animation.finished.then(() => {
     animation.cancel();
     el.css({ transform: "", opacity: "" });
-  });
+  }, cancelled);
 }
 
 /* Grow an avatar into the dock. */
