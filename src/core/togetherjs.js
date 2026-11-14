@@ -369,7 +369,9 @@ TogetherJS.addStyle = function () {
   var link = document.createElement("link");
   link.id = "togetherjs-stylesheet";
   link.setAttribute("rel", "stylesheet");
-  link.href = baseUrl + "/togetherjs.css";
+  // Read from the public property rather than the local, so a bundled
+  // consumer can assign TogetherJS.baseUrl after importing the module.
+  link.href = TogetherJS.baseUrl.replace(/\/+$/, "") + "/togetherjs.css";
   document.head.appendChild(link);
 };
 
