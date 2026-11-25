@@ -1,10 +1,24 @@
 import { DurableObject } from "cloudflare:workers";
 import type { Env } from "./env";
 
+// Inbound messages are billed even when dropped, so a flooding socket is closed
+// rather than ignored. Real clients peak well below this (cursor is 10/s).
+const RATE_PER_SECOND = 100;
+const RATE_BURST = 200;
+
+interface RateState {
+  tokens: number;
+  updatedAt: number;
+  closed: boolean;
+}
+
 // Ported from ../../hub/server.js: a room is just a set of peers that get
 // every message anyone else in the room sends, verbatim. No persistence,
 // no history — matches the old in-memory `allConnections[id]` relay.
 export class Room extends DurableObject<Env> {
+  // In-memory only: a hibernated room is by definition not being flooded.
+  private rates = new WeakMap<WebSocket, RateState>();
+
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("Expected websocket upgrade", { status: 426 });
@@ -30,6 +44,24 @@ export class Room extends DurableObject<Env> {
   }
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    const rate = this.rateFor(ws);
+    if (rate.closed) {
+      return;
+    }
+    if (!takeToken(rate)) {
+      rate.closed = true;
+      console.warn("Closing flooding socket", {
+        roomId: ws.deserializeAttachment(),
+        messageType: messageType(message),
+      });
+      try {
+        ws.close(1008, "Rate limit exceeded");
+      } catch (e) {
+        // Already closing — nothing to do.
+      }
+      return;
+    }
+
     let serverEcho = false;
     if (typeof message === "string") {
       try {
@@ -67,6 +99,15 @@ export class Room extends DurableObject<Env> {
     }
   }
 
+  private rateFor(ws: WebSocket): RateState {
+    let rate = this.rates.get(ws);
+    if (!rate) {
+      rate = { tokens: RATE_BURST, updatedAt: Date.now(), closed: false };
+      this.rates.set(ws, rate);
+    }
+    return rate;
+  }
+
   private async reportPeerCount(roomId: string, peerCount: number): Promise<void> {
     const prefix = roomIdPrefix(roomId);
     if (!prefix) {
@@ -74,6 +115,29 @@ export class Room extends DurableObject<Env> {
     }
     const id = this.env.REGISTRY.idFromName("global");
     await this.env.REGISTRY.get(id).report(roomId, prefix, peerCount);
+  }
+}
+
+// Token bucket: refills at RATE_PER_SECOND up to RATE_BURST, one token per message.
+function takeToken(rate: RateState): boolean {
+  const now = Date.now();
+  rate.tokens = Math.min(RATE_BURST, rate.tokens + ((now - rate.updatedAt) / 1000) * RATE_PER_SECOND);
+  rate.updatedAt = now;
+  if (rate.tokens < 1) {
+    return false;
+  }
+  rate.tokens -= 1;
+  return true;
+}
+
+function messageType(message: string | ArrayBuffer): string | null {
+  if (typeof message !== "string") {
+    return null;
+  }
+  try {
+    return JSON.parse(message)?.type ?? null;
+  } catch (e) {
+    return null;
   }
 }
 

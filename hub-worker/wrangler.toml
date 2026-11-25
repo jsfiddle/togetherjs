@@ -3,6 +3,12 @@ main = "src/index.ts"
 compatibility_date = "2025-07-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Workers Logs. Free plan: 200k events/day, 3-day retention; normal traffic fits
+# at full sampling, lower head_sampling_rate if it stops fitting.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [[durable_objects.bindings]]
 name = "ROOM"
 class_name = "Room"
