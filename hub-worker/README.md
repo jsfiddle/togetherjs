@@ -7,6 +7,10 @@ protocol, same behavior, no server to babysit:
 - WebSocket connections to `/hub/<roomId>` join a room; every message from one
   peer is relayed verbatim to every other peer in the same room. Setting
   `"server-echo": true` on a message also sends it back to the sender.
+- A socket sending more than 100 messages/sec (bursts up to 200) is closed
+  with code `1008`. Inbound messages count against the Durable Objects request
+  quota even when dropped, so one looping client could otherwise use up the
+  free plan's daily limit for every room.
 - On connect, the server sends `{"type": "init-connection", "peerCount": N}`
   where `N` is the number of peers already in the room.
 - `GET /findroom?prefix=CHARS&max=NUM` → `{"name": "<prefix>__<id>"}`, for
